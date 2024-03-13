@@ -1,0 +1,4 @@
+[console_scripts]
+test_node = host.test_node:main
+test_sub = host.test_sub:main
+

@@ -1,0 +1,3 @@
+source;share/aeroprint/hook/pythonpath.ps1
+source;share/aeroprint/hook/pythonpath.dsv
+source;share/aeroprint/hook/pythonpath.sh
