@@ -3,19 +3,6 @@ sudo apt-get install git -y
 if cd aeroprint; then git pull; else
     git clone git@github.com:kuederleR/aeroprint.git;
 fi
-if [[ $(git config --get user.name) == true ]]; then
-   echo "Git already configured";
-else
-   read -p "Enter your name: " name
-   read -p "Enter your email: " email
-
-   git config --global user.name "$name"
-   git config --global user.email "$email"
-   git config --global push.default simple
-   git config --global core.ignorecase false
-   git config --global core.autocrlf input
-   echo "git configured sucessfully."
-fi
 sudo apt-get update && sudo apt-get upgrade -y
 sudo apt install software-properties-common
 sudo add-apt-repository universe
