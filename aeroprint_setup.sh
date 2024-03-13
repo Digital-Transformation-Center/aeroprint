@@ -1,9 +1,9 @@
 #!/bin/sh
-sudo apt-get install git
+sudo apt-get install git -y
 if cd aeroprint; then git pull; else
     git clone git@github.com:kuederleR/aeroprint.git;
 fi
-if [[ $(git config --get myvalue) == true ]]; then
+if [[ $(git config --get user.name) == true ]]; then
    echo "Git already configured";
 else
    read -p "Enter your name: " name
