@@ -7,10 +7,5 @@ def generate_launch_description():
             package='starling',
             executable='test_pub',
             name='drone'
-        ),
-        Node(
-            package='host', 
-            executable='test_sub', 
-            name='host'
         )
     ])

@@ -11,6 +11,7 @@ setup.py
 host/__init__.py
 host/test_node.py
 host/test_sub.py
+launch/host_launch.py
 resource/host
 test/test_copyright.py
 test/test_flake8.py

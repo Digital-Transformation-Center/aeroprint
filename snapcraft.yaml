@@ -22,6 +22,9 @@ parts:
   #   source-branch: master
     
 apps:
-  aeroprint:    
+  host:    
     command: opt/ros/foxy/bin/ros2 launch starling starling_launch.py
+    extensions: [ros2-foxy]
+  starling:
+    command: opt/ros/foxy/bin/ros2 launch host host_launch.py
     extensions: [ros2-foxy]
