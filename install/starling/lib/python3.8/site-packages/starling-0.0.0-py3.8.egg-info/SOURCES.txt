@@ -8,6 +8,7 @@ setup.py
 ../../build/starling/starling.egg-info/requires.txt
 ../../build/starling/starling.egg-info/top_level.txt
 ../../build/starling/starling.egg-info/zip-safe
+launch/starling_launch.py
 resource/starling
 starling/__init__.py
 starling/test_node.py
