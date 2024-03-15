@@ -18,7 +18,7 @@ To install the pre-release version of the application, run this line in an Ubunt
 sudo snap install --devmode --edge aeroprint
 ```
 
-If you do not have snap installed, run ```sudo apt install snap```.
+If you do not have snap installed, run ```sudo apt install snapd```.
 
 Run ```aeroprint.base``` for the base code or ```aeroprint.starling``` to run the UAV code.
 
