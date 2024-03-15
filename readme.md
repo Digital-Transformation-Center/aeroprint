@@ -1,5 +1,24 @@
 # Aeroprint Project Resources
 
+## Getting Started
+
+Before doing any work either on this project, or a fork of this project, there is a set of materials that are very strongly suggested reads. To familiarize yourself with both the hardware and software involved in this project,
+
+please **read thoroughly** the following materials:
+
+- (optional) [git chapter 2](https://git-scm.com/book/en/v2/Git-Basics-Getting-a-Git-Repository)
+    - Read this Git Basics chapter if you have little or no experience with git.
+- [ROS 2 Foxy Documentation](https://docs.ros.org/en/foxy/index.html)
+    - You do not need to go through the install or setup tutorials unless you really want to. The resources in this repository will do all of this for you. However, do read the docs to familiarize yourself with ROS 2.
+- [ModalAI Starling Hardware Overview](https://docs.modalai.com/starling-v2-hardware-overview/)
+    - If you plan to do any work whatsoever with the Starling, you **must** familiarize yourself with the hardware.
+- [ModalAI VOXL Developer Bootcamp](https://docs.modalai.com/voxl-developer-bootcamp/)
+    - Do not work on the Starling or any of its software prior to total completion of the VOXL Developer Bootcamp.
+- [ModalAI VOXL SDK Docs](https://docs.modalai.com/voxl-sdk/)
+    - Prior to any software development related to the Starling, read the VOXL SDK documentation. The [Building ROS2 Nodes](https://docs.modalai.com/building-ros2-nodes/) section will be especially critical to this project and reading the ambedded video is highly recommended. 
+
+Also, it is recommended that you [install Visual Studio Code](https://code.visualstudio.com/download) to improve your development efficiency. VS Code has an excellent [tool for using git](https://code.visualstudio.com/docs/sourcecontrol/overview) if you prefer not to use the CLI.
+
 ## Installation
 
 Run this line to perform a full installation of this library and ROS2 Foxy.
@@ -74,3 +93,12 @@ graph TD
 
     classDef file fill:#5fa;
 ```
+
+## Snap App Deployment
+
+The ```snapcraft.yaml``` file in this repository allows [snap](https://snapcraft.io/) to automatically build and deploy a lightweight application. This file specifies details about the app and provides commands to run upon app execution. 
+
+Currently, snap is automatically building new versions of the aeroprint application when new changes are pushed to the project's master branch. This app is published to the [edge channel](https://snapcraft.io/docs/channels), as it is in early development.
+
+The benefit of using snap is that it provides a simple way to deploy the application on any machine running linux. Canonical provides a base snap that provides a minimal Ubuntu 20 runtime, allowing our ROS app to run on systems not running Ubuntu 20.04.
+ 
