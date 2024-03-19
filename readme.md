@@ -17,6 +17,8 @@ please **read thoroughly** the following materials:
 - [ModalAI VOXL SDK Docs](https://docs.modalai.com/voxl-sdk/)
     - Prior to any software development related to the Starling, read the VOXL SDK documentation. The [Building ROS2 Nodes](https://docs.modalai.com/building-ros2-nodes/) section will be especially critical to this project and reading the ambedded video is highly recommended. 
 
+This project relies heavily on ROS 2 and the VOXL SDK. Both of these libraries are best supported in Ubuntu 20.04. Because of this, development and testing should be done within an Ubuntu 20.04 environment. We should all have a common build of this OS that is platform agnostic. TODO: build Ubuntu 20.04 runtime for dev and testing. 
+
 Also, it is recommended that you [install Visual Studio Code](https://code.visualstudio.com/download) to improve your development efficiency. VS Code has an excellent [tool for using git](https://code.visualstudio.com/docs/sourcecontrol/overview) if you prefer not to use the CLI.
 
 ## Installation
@@ -71,7 +73,7 @@ graph TD;
         end
     end
 
-    classDef file fill:#5fa;   
+    classDef file fill:#deb0a2;   
 ```
 
 ## ROS Package Layout
@@ -91,7 +93,7 @@ graph TD
         host --- setup2[setup.py\n\n Configure package\n specifics and define\n executables for ROS]:::file;
     end
 
-    classDef file fill:#5fa;
+    classDef file fill:#deb0a2;
 ```
 
 ## Snap App Deployment
