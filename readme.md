@@ -73,7 +73,7 @@ graph TD;
         end
     end
 
-    classDef file fill:#deb0a2;   
+    classDef file fill:#ecffe8;   
 ```
 
 ## ROS Package Layout
@@ -93,7 +93,7 @@ graph TD
         host --- setup2[setup.py\n\n Configure package\n specifics and define\n executables for ROS]:::file;
     end
 
-    classDef file fill:#deb0a2;
+    classDef file fill:#ecffe8;
 ```
 
 ## Snap App Deployment
