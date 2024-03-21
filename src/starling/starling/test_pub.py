@@ -1,31 +1,34 @@
 import rclpy
+import math
+import time
 from rclpy.node import Node
-from std_msgs.msg import String
+from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy
+from px4_msgs.msg import VehicleLocalPosition, VehicleStatus
 
-class TestPublisher(Node):
-    def __init__(self):
-        super().__init__('test_publisher')
-        self.publisher_ = self.create_publisher(String, 'topic', 10)
-        timer_period = 0.5 # seconds
-        self.timer = self.create_timer(timer_period, self.timer_callback)
-        self.i = 0
-    
-    def timer_callback(self):
-        msg = String()
-        msg.data = 'Hello World: %d' % self.i
-        self.publisher_.publish(msg)
-        self.get_logger().info('Publishing: "%s"' % msg.data)
-        self.i += 1
+class StarlingDataNode(Node):
+    """Node for reading some starling data as a test."""
+    def __init__(self) -> None:
+        super().__init__('starling_data_node')
 
-def main(args = None):
-    rclpy.init(args=args)
+        self.get_logger().info("Starling data test node alive!")
 
-    test_pub = TestPublisher()
+        # Configure QoS profile for publishing and subscribing
+        qos_profile = QoSProfile(
+            reliability=ReliabilityPolicy.BEST_EFFORT,
+            durability=DurabilityPolicy.TRANSIENT_LOCAL,
+            history=HistoryPolicy.KEEP_LAST,
+            depth=1
+        )
 
-    rclpy.spin(test_pub)
+        self.vehicle_status_subscriber = self.create_subscription(
+            VehicleStatus, '/fmu/out/vehicle_status', self.vehicle_status_callback, qos_profile)
 
-    test_pub.destroy_node()
-    rclpy.shutdown()
+    def vehicle_status_callback(self, vehicle_status):
+        """Callback function for vehicle_status topic subscriber."""
+        print(vehicle_status)
+
+def main(args=None) -> None:
+    print('Hi from starling.')
 
 
 if __name__ == '__main__':
