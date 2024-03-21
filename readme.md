@@ -104,3 +104,7 @@ Currently, snap is automatically building new versions of the aeroprint applicat
 
 The benefit of using snap is that it provides a simple way to deploy the application on any machine running linux. Canonical provides a base snap that provides a minimal Ubuntu 20 runtime, allowing our ROS app to run on systems not running Ubuntu 20.04.
  
+## Essential Resources
+- [Slides on using ROS 2 with VOXL 2](https://static.sched.com/hosted_files/px4summit2023/e8/James%20Strawson%20-%20How%20to%20fly%20a%20figure%208%20using%20ROS2%20on%20the%20new%20VOXL%202%20Starling%20PX4%20Autonomy%20Dev%20Kit.pdf)
+- [PX4 message docs](https://docs.px4.io/main/en/msg_docs/)
+- [Using ROS2 with VOXL 2](https://docs.modalai.com/ros2-installation-voxl2/)
