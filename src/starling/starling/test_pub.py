@@ -3,7 +3,7 @@ import math
 import time
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy
-from px4_msgs.msg import VehicleLocalPosition, VehicleStatus
+from px4_msgs.msg import VehicleOdometry
 
 class StarlingDataNode(Node):
     """Node for reading some starling data as a test."""
@@ -21,11 +21,11 @@ class StarlingDataNode(Node):
         )
 
         self.vehicle_status_subscriber = self.create_subscription(
-            VehicleStatus, '/fmu/out/vehicle_status', self.vehicle_status_callback, qos_profile)
+            VehicleOdometry, '/fmu/out/vehicle_odometry', self.vehicle_odo_callback, qos_profile)
 
-    def vehicle_status_callback(self, vehicle_status):
+    def vehicle_odo_callback(self, vehicle_odometry):
         """Callback function for vehicle_status topic subscriber."""
-        print(vehicle_status)
+        print(vehicle_odometry.position)
 
 def main(args=None) -> None:
     rclpy.init(args=args)
