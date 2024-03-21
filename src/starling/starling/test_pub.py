@@ -28,7 +28,11 @@ class StarlingDataNode(Node):
         print(vehicle_status)
 
 def main(args=None) -> None:
-    print('Hi from starling.')
+    rclpy.init(args=args)
+    starling_data_node = StarlingDataNode()
+    rclpy.spin(starling_data_node)
+    starling_data_node.destroy_node()
+    rclpy.shutdown()
 
 
 if __name__ == '__main__':
