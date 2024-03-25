@@ -13,6 +13,10 @@ resource/starling
 starling/__init__.py
 starling/test_node.py
 starling/test_pub.py
-test/test_copyright.py
-test/test_flake8.py
-test/test_pep257.py
+starling.egg-info/PKG-INFO
+starling.egg-info/SOURCES.txt
+starling.egg-info/dependency_links.txt
+starling.egg-info/entry_points.txt
+starling.egg-info/requires.txt
+starling.egg-info/top_level.txt
+starling.egg-info/zip-safe

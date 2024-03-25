@@ -24,6 +24,7 @@ RUN apt-get update && apt-get install -y \
 
 # Set environment variables if needed
 # ENV MY_ENV_VAR=value
+EXPOSE 7400-7411
 
 # Start a shell when the container runs
 CMD ["bash"]

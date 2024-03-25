@@ -24,7 +24,8 @@ setup(
     entry_points={
         'console_scripts': [
             'test_node = host.test_node:main', 
-            'test_sub = host.test_sub:main'
+            'test_sub = host.test_sub:main',
+            'pc_processor = host.pc_processor:main'
         ],
     },
 )
