@@ -1,6 +1,8 @@
 # Simple workflow for deploying static content to GitHub Pages
 name: Compile
 
+runs-on: self-hosted
+
 on:
   # Runs on pushes targeting the default branch
   push:
