@@ -26,7 +26,7 @@ concurrency:
 jobs:
   # Single deploy job since we're just deploying
   ccp:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -36,7 +36,7 @@ jobs:
           pylama --linters=cppcheck src/arduino
   
   ros:
-    runs-on: self-hosted
+    runs-on: ubuntu-20.04
     steps:
       - name: Checkout
         uses: actions/checkout@v3
