@@ -1,6 +1,6 @@
 def main():
     print('Hi from host.')
-    error caused here.
+    error caused.
 
 
 if __name__ == '__main__':
