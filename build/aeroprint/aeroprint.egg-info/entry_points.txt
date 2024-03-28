@@ -1,3 +1,0 @@
-[console_scripts]
-starling_fc = aeroprint.starling_fc:main
-

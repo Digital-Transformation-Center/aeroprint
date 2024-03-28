@@ -1,9 +1,0 @@
-source;share/starling/hook/pythonpath.ps1
-source;share/starling/hook/pythonpath.dsv
-source;share/starling/hook/pythonpath.sh
-source;share/starling/hook/ament_prefix_path.ps1
-source;share/starling/hook/ament_prefix_path.dsv
-source;share/starling/hook/ament_prefix_path.sh
-source;../../build/starling/share/starling/hook/pythonpath_develop.ps1
-source;../../build/starling/share/starling/hook/pythonpath_develop.dsv
-source;../../build/starling/share/starling/hook/pythonpath_develop.sh
