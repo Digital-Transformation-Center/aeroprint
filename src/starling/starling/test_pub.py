@@ -5,10 +5,12 @@ from rclpy.node import Node
 from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy
 from px4_msgs.msg import VehicleOdometry
 
+
 class StarlingDataNode(Node):
     """Node for reading some starling data as a test."""
+
     def __init__(self) -> None:
-        super().__init__('starling_data_node')
+        super().__init__("starling_data_node")
 
         self.get_logger().info("Starling data test node alive!")
 
@@ -17,15 +19,20 @@ class StarlingDataNode(Node):
             reliability=ReliabilityPolicy.BEST_EFFORT,
             durability=DurabilityPolicy.TRANSIENT_LOCAL,
             history=HistoryPolicy.KEEP_LAST,
-            depth=1
+            depth=1,
         )
 
         self.vehicle_status_subscriber = self.create_subscription(
-            VehicleOdometry, '/fmu/out/vehicle_odometry', self.vehicle_odo_callback, qos_profile)
+            VehicleOdometry,
+            "/fmu/out/vehicle_odometry",
+            self.vehicle_odo_callback,
+            qos_profile,
+        )
 
     def vehicle_odo_callback(self, vehicle_odometry):
         """Callback function for vehicle_status topic subscriber."""
         print(vehicle_odometry.position)
+
 
 def main(args=None) -> None:
     rclpy.init(args=args)
@@ -35,5 +42,5 @@ def main(args=None) -> None:
     rclpy.shutdown()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
