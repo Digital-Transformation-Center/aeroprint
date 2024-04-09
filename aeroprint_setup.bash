@@ -6,6 +6,7 @@ GREEN='\033[32m'
 NC='\033[0m' # No Color
 echo -e "${RED}Setting up the AeroPrint tools.${NC}"
 
+## Install or update git
 sudo apt-get install git -y
 if cd ~/aeroprint; then echo -e "${GREEN}Updating the repository.${NC}" && git pull; else
     echo -e "${RED}Repository does not exist on this system.${NC}"
@@ -13,6 +14,8 @@ if cd ~/aeroprint; then echo -e "${GREEN}Updating the repository.${NC}" && git p
     echo "Cloning repository."
     git clone git@github.com:kuederleR/aeroprint.git
 fi
+
+## Install ROS2 Foxy
 if printenv ROS_DISTRO | grep foxy -q; then echo -e "${GREEN}Ros 2 Foxy already installed.${NC}"; else
     echo -e "${GREEN}Installing ROS 2 Foxy.${NC}"
     sudo apt-get update && sudo apt-get upgrade -y
@@ -25,15 +28,26 @@ if printenv ROS_DISTRO | grep foxy -q; then echo -e "${GREEN}Ros 2 Foxy already 
     sudo apt install ros-foxy-desktop python3-argcomplete -y
     sudo apt install python3-colcon-common-extensions -y
 fi
+
+## Install RosDep
+if rosdep --version > /dev/null; then echo -e "${GREEN}RosDep already installed.${NC}"; else
+    echo -e "${GREEN}Installing RosDep.${NC}"
+    sudo apt-get install python3-rosdep
+fi
+
+## Source ROS2 Foxy
 if cat ~/.bashrc | grep "source /opt/ros/foxy/setup.bash" -q; then echo -e "${GREEN}ROS 2 Foxy already sourced.${NC}"; else
     echo -e "${GREEN}Sourcing ROS 2 Foxy.${NC}"
     echo "source /opt/ros/foxy/setup.bash" >> ~/.bashrc
 fi
+
+## Source aeroprint package by default
 if cat ~/.bashrc | grep "source ~/aeroprint/install/setup.bash" -q; then echo -e "${GREEN}AeroPrint package already sourced.${NC}"; else
     echo -e "${GREEN}Sourcing AeroPrint setup.${NC}"
     echo "source ~/aeroprint/install/setup.bash" >> ~/.bashrc
 fi
 
+## Install pip
 if pip3 --version > /dev/null; then echo -e "${GREEN}Pip already installed.${NC}"; else
     echo -e "${GREEN}Installing pip.${NC}"
     sudo apt-get install python3-pip
