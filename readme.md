@@ -2,6 +2,8 @@
 
 ## Getting Started
 
+### Reading Materials
+
 Before doing any work either on this project, or a fork of this project, there is a set of materials that are very strongly suggested reads. To familiarize yourself with both the hardware and software involved in this project,
 
 please **read thoroughly** the following materials:
@@ -21,15 +23,12 @@ This project relies heavily on ROS 2 and the VOXL SDK. Both of these libraries a
 
 Also, it is recommended that you [install Visual Studio Code](https://code.visualstudio.com/download) to improve your development efficiency. VS Code has an excellent [tool for using git](https://code.visualstudio.com/docs/sourcecontrol/overview) if you prefer not to use the CLI.
 
-## Installation
+### Installation and Starting Development
+Refer to this repository's [Wiki](https://github.com/kuederleR/aeroprint/wiki) for guidance during AeroPrint development. The suggested order for getting started is as follws:
+1) [Installation](https://github.com/kuederleR/aeroprint/wiki/Installation)
+2) [Contributing](https://github.com/kuederleR/aeroprint/wiki/Contributing)
+3) [Running ROS Packages](https://github.com/kuederleR/aeroprint/wiki/Running-ROS-Packages)
 
-Run this line to perform a full installation of this library and ROS2 Foxy.
-
-``` bash
-sudo curl -sSL https://github.com/kuederleR/aeroprint/raw/master/aeroprint_setup.sh | sh
-```
-
-If you do not have curl installed, run ```sudo apt install curl```.
 
 ## Running Pre-Release Applications
 
