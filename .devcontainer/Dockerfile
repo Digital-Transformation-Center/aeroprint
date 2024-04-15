@@ -3,6 +3,7 @@ ARG USERNAME=ap_dev
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 
+ENV SHELL /bin/bash
 # Create the user
 RUN groupadd --gid $USER_GID $USERNAME \
     && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
@@ -16,9 +17,9 @@ RUN apt-get update && apt-get upgrade -y
 RUN apt-get install -y python3-pip \ 
     && apt install python3-colcon-common-extensions -y \
     && apt install python3-rosdep -y \
-    && source /opt/ros/foxy/local_setup.bash
-ENV SHELL /bin/bash
+    && echo "source /opt/ros/foxy/setup.bash" >> /etc/bash.bashrc
 
+# ENTRYPOINT ["ros2", "/opt/ros/foxy/setup.bash"]
 # ********************************************************
 # * Anything else you want to do like clean up goes here *
 # ********************************************************
