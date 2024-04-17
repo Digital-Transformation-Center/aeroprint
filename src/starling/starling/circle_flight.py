@@ -86,7 +86,7 @@ class OffboardFigure8Node(Node):
                 -r * math.sin(a),
                 0.0,
             ]
-            msg.yaw = math.atan2(msg.velocity[1], msg.velocity[0])
+            msg.yaw = math.atan2(msg.acceleration[1], msg.acceleration[0])
 
             self.path.append(msg)
 
