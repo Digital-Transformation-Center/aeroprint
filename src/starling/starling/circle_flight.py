@@ -46,9 +46,9 @@ class OffboardFigure8Node(Node):
         )
 
         self.rate = 20
-        self.radius = 1
-        self.cycle_s = 8
-        self.altitude = -1.5
+        self.radius = 0.6
+        self.cycle_s = 10
+        self.altitude = -1.0
         self.steps = self.cycle_s * self.rate
         self.path = []
         self.vehicle_local_position = VehicleLocalPosition()
@@ -66,7 +66,7 @@ class OffboardFigure8Node(Node):
     def init_path(self):
 
         dt = 1.0 / self.rate
-        dadt = (2.0 * math.pi) / self.cycle_s
+        dadt = (4.0 * math.pi) / self.cycle_s
         r = self.radius
 
         for i in range(self.steps):
