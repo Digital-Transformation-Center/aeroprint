@@ -47,8 +47,8 @@ class OffboardFigure8Node(Node):
 
         self.rate = 20
         self.radius = 0.6
-        self.cycle_s = 10
-        self.altitude = -1.0
+        self.cycle_s = 20
+        
         self.steps = self.cycle_s * self.rate
         self.path = []
         self.vehicle_local_position = VehicleLocalPosition()
@@ -59,6 +59,10 @@ class OffboardFigure8Node(Node):
         self.offboard_setpoint_counter = 0
         self.start_time = time.time()
         self.offboard_arr_counter = 0
+        self.min_altitude = -0.60
+        self.altitude = -0.60
+        self.init_path()
+        self.altitude = -0.90
         self.init_path()
 
         self.timer = self.create_timer(0.1, self.timer_callback)
@@ -75,7 +79,7 @@ class OffboardFigure8Node(Node):
             a = (-math.pi / 2.0) + i * (2.0 * math.pi / self.steps)
             
 
-            msg.position = [r * math.cos(a), r * math.sin(a), self.altitude]
+            msg.position = [r + r * math.cos(a), r * math.sin(a), self.altitude]
             msg.velocity = [
                 -r * math.sin(a),
                 r * math.cos(a),
@@ -86,7 +90,7 @@ class OffboardFigure8Node(Node):
                 -r * math.sin(a),
                 0.0,
             ]
-            msg.yaw = math.atan2(msg.acceleration[1], msg.acceleration[0])
+            msg.yaw = math.atan2(msg.acceleration[1], msg.acceleration[0]) + (math.pi / 16)
 
             self.path.append(msg)
 
@@ -113,7 +117,7 @@ class OffboardFigure8Node(Node):
             self.offboard_setpoint_counter += 1
 
         if self.start_time + 10 > time.time():
-            self.publish_takeoff_setpoint(0.0, 0.0, self.altitude)
+            self.publish_takeoff_setpoint(0.0, 0.0, self.min_altitude)
         else:
             if not self.hit_figure_8:
                 self.get_logger().info("Doing figure 8 now")
@@ -166,7 +170,7 @@ class OffboardFigure8Node(Node):
             )
 
         if self.offboard_arr_counter >= len(self.path):
-            self.publish_takeoff_setpoint(0.0, 0.0, self.altitude)
+            self.publish_takeoff_setpoint(0.0, 0.0, self.min_altitude)
 
         if self.offboard_arr_counter == len(self.path) + 100:
             self.figure8_timer.cancel()
@@ -178,7 +182,7 @@ class OffboardFigure8Node(Node):
         """Publish the trajectory setpoint."""
         msg = TrajectorySetpoint()
         msg.position = [x, y, z]
-        msg.yaw = (45.0) * math.pi / 180.0
+        msg.yaw = 0.00
         msg.timestamp = int(self.get_clock().now().nanoseconds / 1000)
         self.trajectory_setpoint_publisher.publish(msg)
 
