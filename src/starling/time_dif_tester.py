@@ -23,7 +23,7 @@ class PCNode(Node):
     )
     self.pose_node = pose_node
     self.pub_rate = 2.0 #2 hz
-    self.max_time_dif = 0.050
+    self.max_time_dif = 0.005
     self.last_pub_time = self.get_clock().now().nanoseconds
 
   def callback(self, data):
@@ -32,7 +32,7 @@ class PCNode(Node):
     pose = self.pose_node.get_pose()
     pose_time = pose.header.stamp.nanosec
     pc_time = data.header.stamp.nanosec
-    time_dif = abs(pose_time - pc_time) / 1000000000.0
+    time_dif = abs(pose_time - pc_time) / (1e9 * 1.0)
     if (current_time - self.last_pub_time) >= (1 / self.pub_rate) * 1e9 and time_dif <= self.max_time_dif:        
         print(time_dif)
         self.last_pub_time = current_time
