@@ -31,11 +31,14 @@ class PCNode(Node):
     # Get latest pose data
     rclpy.spin_once(self.pose_node)
     pose = self.pose_node.get_pose()
+    pose_time = pose.header.stamp.nanosec
+    pc_time = data.header.stamp.nanosec
+    time_dif = pose_time - pc_time
+    print(time_dif)
     # Get position and orientation from pose
     position = pose.pose.position
     orientation = pose.pose.orientation
     # Convert PointCloud2 to numpy and o3d
-    print(len(data.data))
     points = np.frombuffer(data.data, dtype=np.float32).reshape(-1, 3)# [:, :3]
     print(len(points.tobytes()))
     for i in range(len(points)):
@@ -50,11 +53,10 @@ class PCNode(Node):
     o3dpc.rotate(R, center=(0, 0, 0))
     o3dpc.translate(position)
 
+    # Convert back to PointCloud2
     points = np.asarray(o3dpc.points, dtype=np.float32)
     data.data = points.tobytes()
     self.publisher.publish(data)
-    print(len(data.data))
-
 
 class PoseNode(Node):
   def __init__(self) -> None:
