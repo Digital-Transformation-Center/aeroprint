@@ -62,7 +62,7 @@ class OffboardFigure8Node(Node):
         self.min_altitude = -0.60
         self.altitude = -0.60
         self.init_path()
-        self.altitude = -0.90
+        self.altitude = -1.10
         self.init_path()
 
         self.timer = self.create_timer(0.1, self.timer_callback)
