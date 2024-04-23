@@ -28,12 +28,11 @@ class PCNode(Node):
 
   def callback(self, data):
     current_time = self.get_clock().now().nanoseconds
+    rclpy.spin_once(self.pose_node)
     pose = self.pose_node.get_pose()
     pose_time = pose.header.stamp.nanosec
     pc_time = data.header.stamp.nanosec
-    if (current_time - self.last_pub_time) >= (1 / self.pub_rate) * 1e9 and abs(pose_time - pc_time) <= self.max_time_dif:
-        rclpy.spin_once(self.pose_node)
-        time_dif = abs(pose_time - pc_time) / 1000000000.0
+    if (current_time - self.last_pub_time) >= (1 / self.pub_rate) * 1e9 and abs(pose_time - pc_time) <= self.max_time_dif:        
         print(time_dif)
         self.last_pub_time = current_time
 
