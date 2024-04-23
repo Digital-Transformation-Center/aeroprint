@@ -40,7 +40,6 @@ class PCNode(Node):
     orientation = pose.pose.orientation
     # Convert PointCloud2 to numpy and o3d
     points = np.frombuffer(data.data, dtype=np.float32).reshape(-1, 3)# [:, :3]
-    print(len(points.tobytes()))
     for i in range(len(points)):
         points[i] = [points[i][2], -points[i][1], points[i][0]]
     o3dpc = o3d.geometry.PointCloud()
