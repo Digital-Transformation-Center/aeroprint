@@ -4,7 +4,7 @@ from geometry_msgs.msg import PoseStamped
 from std_msgs.msg import Header
 import open3d as o3d
 import numpy as np
-from rclpy.qos import qos_profile_sensor_data, qos_profile_system_default
+from rclpy.qos import qos_profile_sensor_data, qos_profile_system_default, QoSHistoryPolicy, QoSDurabilityPolicy, QoSReliabilityPolicy
 from rclpy.node import Node
 import numpy as np
 import open3d as o3d
@@ -14,11 +14,17 @@ class PCNode(Node):
     print("new PC Node.")
     super().__init__("point_cloud_handler_node")
     topic = "/tof_pc"
+    qos_profile = QoSProfile(
+        history=QoSHistoryPolicy.KEEP_LAST,
+        depth=1,  # Set queue size to 1
+        reliability=QoSReliabilityPolicy.RELIABLE,
+        durability=QoSDurabilityPolicy.VOLATILE
+    )
     self.sub = self.create_subscription(
       PointCloud2, 
       topic, 
       self.callback, 
-      1
+      qos_profile
     )
     self.publisher = self.create_publisher(
         PointCloud2, "/starling/out/posed_pc", qos_profile_sensor_data
