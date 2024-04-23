@@ -33,7 +33,7 @@ class PCNode(Node):
     pose = self.pose_node.get_pose()
     pose_time = pose.header.stamp.nanosec
     pc_time = data.header.stamp.nanosec
-    time_dif = pose_time - pc_time
+    time_dif = (pose_time - pc_time) / 1000000000.0
     print(time_dif)
     # Get position and orientation from pose
     position = pose.pose.position
