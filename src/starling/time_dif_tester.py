@@ -32,11 +32,12 @@ class PCNode(Node):
     pose = self.pose_node.get_pose()
     pose_time = pose.header.stamp.nanosec
     pc_time = data.header.stamp.nanosec
-    if (current_time - self.last_pub_time) >= (1 / self.pub_rate) * 1e9 and abs(pose_time - pc_time) <= self.max_time_dif:        
+    time_dif = abs(pose_time - pc_time)
+    if (current_time - self.last_pub_time) >= (1 / self.pub_rate) * 1e9 and time_dif <= self.max_time_dif:        
         print(time_dif)
         self.last_pub_time = current_time
     else:
-        print("conditions not met... time difference: " + str(abs(pose_time - pc_time)))
+        print("conditions not met... time difference: " + str(time_dif))
 
 class PoseNode(Node):
   def __init__(self) -> None:
