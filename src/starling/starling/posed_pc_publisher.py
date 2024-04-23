@@ -18,7 +18,6 @@ class PCNode(Node):
       PointCloud2, 
       topic, 
       self.callback, 
-      qos_profile_sensor_data, 
       1
     )
     self.publisher = self.create_publisher(
