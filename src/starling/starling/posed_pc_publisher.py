@@ -4,7 +4,8 @@ from geometry_msgs.msg import PoseStamped
 from std_msgs.msg import Header
 import open3d as o3d
 import numpy as np
-from rclpy.qos import qos_profile_sensor_data, qos_profile_system_default
+from rclpy.qos import qos_profile_sensor_data, qos_profile_system_default, QoSProfile, HistoryPolicy
+
 from rclpy.node import Node
 import numpy as np
 import open3d as o3d
@@ -61,11 +62,12 @@ class PoseNode(Node):
   def __init__(self) -> None:
     super().__init__("pose_handler_node")
     topic = "/vvhub_body_wrt_fixed"
+    qos_profile = QoSProfile(history=HistoryPolicy.KEEP_LAST, depth=1)
     self.sub = self.create_subscription(
       PoseStamped, 
       topic, 
       self.callback, 
-      qos_profile_system_default
+      qos_profile
     )
     self.pose = None
   def callback(self, msg):
