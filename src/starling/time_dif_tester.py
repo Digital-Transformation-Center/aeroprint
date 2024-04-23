@@ -23,7 +23,7 @@ class PCNode(Node):
     )
     self.pose_node = pose_node
     self.pub_rate = 2.0 #2 hz
-    self.max_time_dif = 0.005
+    self.max_time_dif = 0.02
     self.last_pub_time = self.get_clock().now().nanoseconds
 
   def callback(self, data):
