@@ -76,7 +76,7 @@ class OffboardFigure8Node(Node):
         for i in range(self.steps):
             msg = TrajectorySetpoint()
 
-            a = (-math.pi / 2.0) + i * (2.0 * math.pi / self.steps)
+            a = (-math.pi) + i * (2.0 * math.pi / self.steps)
             
 
             msg.position = [r + r * math.cos(a), r * math.sin(a), self.altitude]
