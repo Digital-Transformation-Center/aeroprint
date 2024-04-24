@@ -66,6 +66,7 @@ class PCNode(Node):
       # Convert back to PointCloud2
       points = np.asarray(o3dpc.points, dtype=np.float32)
       data.data = points.tobytes()
+      data.header.stamp.nanosec = int(time_dif * 1e9)
       self.publisher.publish(data)
       self.last_pub_time = current_time
      
