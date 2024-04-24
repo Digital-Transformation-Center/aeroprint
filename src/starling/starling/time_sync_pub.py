@@ -87,6 +87,7 @@ class PoseNode(Node):
       qos_profile_system_default
     )
     self.pose = None
+    rclpy.spin_once(self.sub)
   def callback(self, msg):
     self.pose = msg
   def get_pose(self):
