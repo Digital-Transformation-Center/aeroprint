@@ -104,7 +104,7 @@ class PoseNode(Node):
     closest_index = np.argmin(absolute_differences)
     closest_key = list(self.lookup.keys())[closest_index]
     closest_value = self.lookup[closest_key]
-    keys_to_remove = list(self.lookup.keys())[:-10]
+    keys_to_remove = list(self.lookup.keys())[:-30]
     for key in keys_to_remove:
         self.lookup.pop(key, None)
     return closest_value
