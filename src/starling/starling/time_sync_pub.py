@@ -8,6 +8,8 @@ from rclpy.qos import qos_profile_sensor_data, qos_profile_system_default, QoSHi
 from rclpy.node import Node
 import numpy as np
 import open3d as o3d
+import threading
+
 
 class PCNode(Node):
   def __init__(self, pose_node) -> None:
@@ -34,48 +36,59 @@ class PCNode(Node):
     self.max_time_dif = 0.01
     self.last_pub_time = self.get_clock().now().nanoseconds
 
-    
+
 
   def callback(self, data):
-    pose_spin_time = 1e9
-    timeout = 0
-    while abs(pose_spin_time - data.header.stamp.nanosec) > self.max_time_dif * 1e9 and timeout < 20:
-        print("WOMP")
-        rclpy.spin_once(self.pose_node)
-        pose_spin_time = self.pose_node.get_pose().header.stamp.nanosec
-    current_time = self.get_clock().now().nanoseconds
-    pose = self.pose_node.get_pose()
-    pose_time = pose.header.stamp.nanosec
     pc_time = data.header.stamp.nanosec
-    time_dif = abs(pose_time - pc_time) / (1e9 * 1.0)
-    if (current_time - self.last_pub_time) >= (1 / self.pub_rate) * 1e9 and time_dif <= self.max_time_dif:
-      # Get latest pose data
-      print(time_dif)
-      # Get position and orientation from pose
-      position = pose.pose.position
-      orientation = pose.pose.orientation
-      # Convert PointCloud2 to numpy and o3d
-      points = np.frombuffer(data.data, dtype=np.float32).reshape(-1, 3)# [:, :3]
-      for i in range(len(points)):
-          points[i] = [points[i][2], -points[i][1], points[i][0]]
-      o3dpc = o3d.geometry.PointCloud()
-      o3dpc.points = o3d.utility.Vector3dVector(points)
-
-      # Rotate and translate for position
-      position = np.array([position.x, position.y, position.z], dtype=np.float64)
-      orientation = np.array([orientation.w, orientation.x, orientation.y, orientation.z], dtype=np.float64)
-      R = o3d.geometry.get_rotation_matrix_from_quaternion(orientation)
-      o3dpc.rotate(R, center=(0, 0, 0))
-      o3dpc.translate(position)
-
-      # Convert back to PointCloud2
-      points = np.asarray(o3dpc.points, dtype=np.float32)
-      data.data = points.tobytes()
-      data.header.stamp.nanosec = int(time_dif * 1e9)
-      self.publisher.publish(data)
-      self.last_pub_time = current_time
+    pose = self.pose_node.find(data.header.stamp.nanosec)
+    pose_time = pose.header.stamp.nanosec
+    time_dif = abs(pose_time - pc_time) / (1.0 * 1e9)
+    foo = ""
+    if (pose_time - pc_time > 0):
+        foo = "new"
     else:
-      print("BAD SCAN: " + str(time_dif))
+       foo = "old"
+    print(str(time_dif) + ", " + foo + " pose")
+
+    # pose_spin_time = 1e9
+    # timeout = 0
+    # while abs(pose_spin_time - data.header.stamp.nanosec) > self.max_time_dif * 1e9 and timeout < 20:
+    #     print("WOMP")
+    #     rclpy.spin_once(self.pose_node)
+    #     pose_spin_time = self.pose_node.get_pose().header.stamp.nanosec
+    # current_time = self.get_clock().now().nanoseconds
+    # pose = self.pose_node.get_pose()
+    # pose_time = pose.header.stamp.nanosec
+    # pc_time = data.header.stamp.nanosec
+    # time_dif = abs(pose_time - pc_time) / (1e9 * 1.0)
+    # if (current_time - self.last_pub_time) >= (1 / self.pub_rate) * 1e9 and time_dif <= self.max_time_dif:
+    #   # Get latest pose data
+    #   print(time_dif)
+    #   # Get position and orientation from pose
+    #   position = pose.pose.position
+    #   orientation = pose.pose.orientation
+    #   # Convert PointCloud2 to numpy and o3d
+    #   points = np.frombuffer(data.data, dtype=np.float32).reshape(-1, 3)# [:, :3]
+    #   for i in range(len(points)):
+    #       points[i] = [points[i][2], -points[i][1], points[i][0]]
+    #   o3dpc = o3d.geometry.PointCloud()
+    #   o3dpc.points = o3d.utility.Vector3dVector(points)
+
+    #   # Rotate and translate for position
+    #   position = np.array([position.x, position.y, position.z], dtype=np.float64)
+    #   orientation = np.array([orientation.w, orientation.x, orientation.y, orientation.z], dtype=np.float64)
+    #   R = o3d.geometry.get_rotation_matrix_from_quaternion(orientation)
+    #   o3dpc.rotate(R, center=(0, 0, 0))
+    #   o3dpc.translate(position)
+
+    #   # Convert back to PointCloud2
+    #   points = np.asarray(o3dpc.points, dtype=np.float32)
+    #   data.data = points.tobytes()
+    #   data.header.stamp.nanosec = int(time_dif * 1e9)
+    #   self.publisher.publish(data)
+    #   self.last_pub_time = current_time
+    # else:
+    #   print("BAD SCAN: " + str(time_dif))
 
 class PoseNode(Node):
   def __init__(self) -> None:
@@ -87,21 +100,43 @@ class PoseNode(Node):
       self.callback, 
       qos_profile_system_default
     )
+    self.lookup = {}
     self.pose = None
-    rclpy.spin_once(self)
   def callback(self, msg):
     self.pose = msg
+    self.lookup[msg.header.stamp.nanosec] = msg
   def get_pose(self):
     return self.pose
+  def find(self, target):
+    absolute_differences = np.abs(np.array(list(self.lookup.keys())) - target)
+    # Find the index of the minimum absolute difference
+    closest_index = np.argmin(absolute_differences)
+    closest_key = list(self.lookup.keys())[closest_index]
+    closest_value = self.lookup[closest_key]
+    keys_to_remove = list(self.lookup.keys())[:-10]
+    for key in keys_to_remove:
+        self.lookup.pop(key, None)
+    return closest_value
 
 def main(args=None) -> None:
     rclpy.init(args=args)
+    executor = rclpy.executors.MultiThreadedExecutor()
     pose_node = PoseNode()
     pc_node = PCNode(pose_node)
-    rclpy.spin(pc_node)
-    pc_node.destroy_node()
-    pose_node.destroy_node()
+    executor.add_node(pose_node)
+    executor.add_node(pc_node)
+    # Spin in a separate thread
+    executor_thread = threading.Thread(target=executor.spin, daemon=True)
+    executor_thread.start()
+    rate = pose_node.create_rate(2)
+    try:
+        while rclpy.ok():
+            print('Help me body, you are my only hope')
+            rate.sleep()
+    except KeyboardInterrupt:
+        pass
     rclpy.shutdown()
+    executor_thread.join()
 
     
 
