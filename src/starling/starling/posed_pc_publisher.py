@@ -69,7 +69,8 @@ class PCNode(Node):
       data.header.stamp.nanosec = int(time_dif * 1e9)
       self.publisher.publish(data)
       self.last_pub_time = current_time
-     
+    else:
+      print("BAD SCAN: " + str(time_dif))
 
 class PoseNode(Node):
   def __init__(self) -> None:
