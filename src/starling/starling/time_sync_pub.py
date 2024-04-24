@@ -39,7 +39,7 @@ class PCNode(Node):
   def callback(self, data):
     pose_spin_time = 1e9
     timeout = 0
-    while pose_spin_time - data.header.stamp.nanosec > self.max_time_dif * 1e9 and timeout < 20:
+    while abs(pose_spin_time - data.header.stamp.nanosec) > self.max_time_dif * 1e9 and timeout < 20:
         rclpy.spin_once(self.pose_node)
         pose_spin_time = self.pose_node.get_pose().header.stamp.nanosec
     current_time = self.get_clock().now().nanoseconds
