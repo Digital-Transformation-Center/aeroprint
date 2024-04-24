@@ -30,7 +30,7 @@ class PCNode(Node):
         PointCloud2, "/starling/out/posed_pc", qos_profile_sensor_data
     )
     self.pose_node = pose_node
-    self.pub_rate = 2.0 #2 hz
+    self.pub_rate = 4.0 #2 hz
     self.max_time_dif = 0.01
     self.last_pub_time = self.get_clock().now().nanoseconds
 
