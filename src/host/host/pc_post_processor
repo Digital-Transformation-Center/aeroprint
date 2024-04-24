@@ -1,0 +1,68 @@
+import open3d as o3d
+import os
+import numpy as np
+
+class PCPostProcessor():
+    def __init__(self):
+        # Directory containing PCD files
+        self.pcd_directory = "first_test_points/test6"
+        
+        self.combined_pcd_data = []
+        # Load all PCD files from the directory
+        self.pcd_list = []
+        for filename in os.listdir(self.pcd_directory):
+            if filename.endswith(".pcd"):
+                pcd_path = os.path.join(self.pcd_directory, filename)
+                pcd = o3d.io.read_point_cloud(pcd_path)
+                self.pcd_list.append(pcd)
+        
+        self.combined_pcd = self.pcd_list[0]
+    
+    def down_sample(self):
+        self.combined_pcd = self.combined_pcd.voxel_down_sample(voxel_size=0.01)
+
+    def combine_pcs(self):
+        for pc in self.pcd_list[1:]:
+            print("adding pcd...")
+            self.combined_pcd += pc
+            # self.combined_pcd_data = np.concatenate(self.combined_pcd_data, np.asarray(pc.points))
+
+    def filter_pcs(self):
+        points = np.asarray(self.combined_pcd.points)
+        points = self.confine_to_circle(points, 0.75)
+        points = self.confine_to_z(points, 0.50, 1.0)
+        self.combined_pcd = o3d.geometry.PointCloud()
+        self.combined_pcd.points = o3d.utility.Vector3dVector(points)
+        self.combined_pcd, ind = self.combined_pcd.remove_statistical_outlier(nb_neighbors=10,
+                                                    std_ratio=2.2)
+
+
+    def confine_to_circle(self, points, r):
+        center_x = r
+        center_y = 0.0
+        distances = np.sqrt((points[:, 0] - center_x) ** 2 + (points[:, 1] - center_y) ** 2)
+        mask = distances <= r
+        return points[mask]
+
+    def confine_to_z(self, points, min_z, max_z):
+        z_height = points[:, 2]
+        mask = points[:, 2] < -min_z # and points[:, 2] > -max_z
+        # mask = z_height < -min_z and z_height > -max_z
+        return points[mask]
+    
+    def save(self):
+        self.combine_pcs()
+        print(self.combined_pcd)
+        self.down_sample()
+        print(self.combined_pcd)
+        self.filter_pcs()
+        
+        o3d.io.write_point_cloud(self.pcd_directory + "/combined_filtered.pcd", self.combined_pcd)
+
+def main(args=None):
+    pcpp = PCPostProcessor()
+    pcpp.save()
+
+if __name__ == "__main__":
+    main()
+        
