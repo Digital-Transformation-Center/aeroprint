@@ -8,7 +8,7 @@ pcd.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=0.1, max_nn=30)
 radii = [0.005, 0.01, 0.02, 0.04]
 mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_alpha_shape(
     pcd, 0.02)
-
+# Test comment
 # mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_ball_pivoting(
 #     pcd, o3d.utility.DoubleVector(radii))
 # mesh.compute_vertex_normals()
