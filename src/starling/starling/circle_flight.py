@@ -74,7 +74,7 @@ class OffboardFigure8Node(Node):
     def init_path(self):
 
         dt = 1.0 / self.rate
-        dadt = (4.0 * math.pi) / self.cycle_s
+        dadt = (2.0 * math.pi) / self.cycle_s
         r = self.radius
 
         for i in range(self.steps):
@@ -85,13 +85,13 @@ class OffboardFigure8Node(Node):
 
             msg.position = [r + r * math.cos(a), r * math.sin(a), self.altitude]
             msg.velocity = [
-                -r * math.sin(a),
-                r * math.cos(a),
+                dadt * -r * math.sin(a),
+                dadt * r * math.cos(a),
                 0.0,
             ]
             msg.acceleration = [
-                -r * math.cos(a),
-                -r * math.sin(a),
+                dadt * -r * math.cos(a),
+                dadt * -r * math.sin(a),
                 0.0,
             ]
             msg.yaw = math.atan2(msg.acceleration[1], msg.acceleration[0]) + (math.pi / 16)
