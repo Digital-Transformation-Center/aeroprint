@@ -250,9 +250,12 @@ class OffboardFigure8Node(Node):
 def main(args=None) -> None:
     rclpy.init(args=args)
     offboard_figure8_node = OffboardFigure8Node()
-    rclpy.spin(offboard_figure8_node)
-    offboard_figure8_node.destroy_node()
-    rclpy.shutdown()
+    try:
+        rclpy.spin(offboard_figure8_node)
+    except KeyboardInterrupt:
+        offboard_figure8_node.land()
+        offboard_figure8_node.destroy_node()
+        rclpy.shutdown()
 
 
 if __name__ == "__main__":
