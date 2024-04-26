@@ -31,7 +31,7 @@ class TestPublisher(Node):
         )
         self.scan_title_pub = self.create_publisher(
             String, 
-            "/host/gui", 
+            "/host/gui/out/scan_title", 
             qos_profile_system_default
         )
         self.scan_start_pub = self.create_publisher(
