@@ -64,14 +64,14 @@ class OffboardFigure8Node(Node):
         self.start_time = time.time()
         self.offboard_arr_counter = 0
         self.min_altitude = -0.60
-        self.altitude = -0.60
-        self.init_path()
+        # self.altitude = -0.60
+        self.init_path(-0.60)
         self.altitude = -1.10
-        self.init_path()
+        self.init_path(-1.10)
 
         self.timer = self.create_timer(0.1, self.timer_callback)
 
-    def init_path(self):
+    def init_path(self, altitude):
 
         dt = 1.0 / self.rate
         dadt = (2.0 * math.pi) / self.cycle_s
@@ -83,7 +83,7 @@ class OffboardFigure8Node(Node):
             a = (-math.pi) + i * (2.0 * math.pi / self.steps)
             
 
-            msg.position = [r + r * math.cos(a), r * math.sin(a), self.altitude]
+            msg.position = [r + r * math.cos(a), r * math.sin(a), altitude]
             msg.velocity = [
                 dadt * -r * math.sin(a),
                 dadt * r * math.cos(a),
