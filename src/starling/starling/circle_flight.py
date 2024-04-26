@@ -173,7 +173,7 @@ class OffboardFigure8Node(Node):
             )
 
         if self.offboard_arr_counter >= len(self.path):
-            self.publish_takeoff_setpoint(0.0, 0.0, self.start_altitude)
+            self.publish_takeoff_setpoint(0.0, 0.0, self.end_altitude)
 
         if self.offboard_arr_counter == len(self.path) + 100:
             self.figure8_timer.cancel()
