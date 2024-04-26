@@ -34,11 +34,19 @@ class TestPublisher(Node):
             "/host/gui", 
             qos_profile_system_default
         )
-
+        self.scan_start_pub = self.create_publisher(
+            Bool, 
+            "/starling/out/fc/scan_start", 
+            qos_profile_system_default
+        )
+        self.scan_end_pub = self.create_publisher(
+            Bool, 
+            "/starling/out/fc/scan_end", 
+            qos_profile_system_default
+        )
         self.qvio_reset = VOXLQVIOController()
     
     def run(self):
-        self.qvio_reset.reset()
         self.ready_pub.publish(self.create_bool(False))
         self.radius_pub.publish(self.create_float32(0.75))
         self.object_height_pub.publish(self.create_float32(0.6))
@@ -46,6 +54,14 @@ class TestPublisher(Node):
         self.scan_title_pub.publish(self.create_string("Test Data"))
         self.ready_pub.publish(self.create_bool(True))
 
+    def start_flight(self):
+        self.qvio_reset.reset()
+
+    def start_scan(self):
+        self.scan_start_pub.publish(self.create_bool(True))
+
+    def end_scan(self):
+        self.scan_end_pub.publish(self.create_bool(True))
 
     def create_float32(self, val):
         res = Float32()
@@ -67,6 +83,13 @@ def main(args=None) -> None:
     tp = TestPublisher()
     _ = input("Enter when ready.")
     tp.run()
+    _ = input("Enter to start flight.")
+    tp.start_flight()
+    _ = input("Enter to begin scan.")
+    tp.start_scan()
+    _ = input("Enter to end scan.")
+    tp.end_scan()
+
 
 if __name__ == "__main__":
     main()
