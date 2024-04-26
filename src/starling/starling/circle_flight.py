@@ -51,7 +51,7 @@ class OffboardFigure8Node(Node):
 
         self.rate = 20
         self.radius = 0.9
-        self.cycle_s = 30
+        self.cycle_s = 18
         
         self.steps = self.cycle_s * self.rate
         self.path = []
