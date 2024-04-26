@@ -3,7 +3,7 @@ import math
 import time
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy, qos_profile_system_default
-from std_msgs.msg import Bool
+from std_msgs.msg import Bool, Float32
 from voxl_reset_qvio import VOXLQVIOController
 
 from px4_msgs.msg import (
@@ -55,6 +55,24 @@ class OffboardFigure8Node(Node):
             self.ready_callback, 
             qos_profile_system_default
         )
+        self.radius_sub = self.create_subscription(
+            Float32, 
+            "/host/gui/out/radius", 
+            self.radius_callback,
+            qos_profile_system_default
+        )
+        self.object_height_sub = self.create_subscription(
+            Float32, 
+            "/host/gui/out/object_height",
+            self.object_height_callback,
+            qos_profile_system_default
+        )
+        self.start_height_pub = self.create_subscription(
+            Float32, 
+            "/host/gui/out/start_height", 
+            self.start_height_callback,
+            qos_profile_system_default
+        )
 
         self.ready = False
 
@@ -74,15 +92,40 @@ class OffboardFigure8Node(Node):
         self.offboard_setpoint_counter = 0
         self.start_time = time.time()
         self.offboard_arr_counter = 0
-        self.start_altitude = -1.10
-        self.end_altitude = -0.60
-        self.init_path(self.start_altitude)
-        self.init_path(self.end_altitude)
+        self.start_altitude = 0.0
+        self.end_altitude = 0.0
+        # self.init_circle(self.start_altitude)
+        # self.init_circle(self.end_altitude)
 
-        # self.timer = self.create_timer(0.1, self.timer_callback)
+    def create_path(self):
+        # This is very extra right now, but makes it easier to add levels.
+        circle_altitudes = []
+        num_circles = 2
+        min_height = self.start_height + 0.3
+        max_height = self.start_height + self.object_height + 0.3
+        self.start_altitude = max_height
+        self.end_altitude = min_height
+        for lev in range(num_circles):
+            if lev == 0:
+                circle_altitudes.append(max_height)
+            elif lev == num_circles - 1:
+                circle_altitudes.append(min_height)
+            else:
+                inter_lev = max_height - (lev) * ((max_height - min_height) / (num_circles - 1))
+                circle_altitudes.append(inter_lev)
+
+    def start_height_callback(self, msg):
+        self.start_height = msg.data
+
+    def object_height_callback(self, msg):
+        self.object_height = msg.data
+
+    def radius_callback(self, msg):
+        self.radius = msg.data
 
     def ready_callback(self, msg):
         if msg.data:
+            self.create_path()
             self.engage_offboard_mode()
             self.arm()
             self.armed = True
@@ -97,7 +140,7 @@ class OffboardFigure8Node(Node):
         self.ready = msg.data
 
 
-    def init_path(self, altitude):
+    def init_circle(self, altitude):
 
         dt = 1.0 / self.rate
         dadt = (2.0 * math.pi) / self.cycle_s
