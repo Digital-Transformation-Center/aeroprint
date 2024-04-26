@@ -44,10 +44,17 @@ class TestPublisher(Node):
             "/starling/out/fc/scan_end", 
             qos_profile_system_default
         )
+
+        self.ready_pub.publish(self.create_bool(False))
+        self.radius_pub.publish(self.create_float32(0.0))
+        self.object_height_pub.publish(self.create_float32(0.0))
+        self.start_height_pub.publish(self.create_float32(0.0))
+        self.scan_title_pub.publish(self.create_string(""))
+        
         self.qvio_reset = VOXLQVIOController()
     
     def run(self):
-        self.ready_pub.publish(self.create_bool(False))
+        self.ready_pub.publish(self.create_bool(True))
         self.radius_pub.publish(self.create_float32(0.75))
         self.object_height_pub.publish(self.create_float32(0.6))
         self.start_height_pub.publish(self.create_float32(0.5))
