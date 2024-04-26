@@ -88,7 +88,8 @@ class OffboardFigure8Node(Node):
             self.armed = True
             self.start_time = time.time()
             self.timer = self.create_timer(0.1, self.timer_callback)
-
+        else:
+            self.hit_figure_8 = False
         self.ready = msg.data
 
 

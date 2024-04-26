@@ -54,7 +54,6 @@ class TestPublisher(Node):
         # self.qvio_reset = VOXLQVIOController()
     
     def run(self):
-        self.ready_pub.publish(self.create_bool(True))
         self.radius_pub.publish(self.create_float32(0.75))
         self.object_height_pub.publish(self.create_float32(0.6))
         self.start_height_pub.publish(self.create_float32(0.5))
@@ -70,6 +69,10 @@ class TestPublisher(Node):
 
     def end_scan(self):
         self.scan_end_pub.publish(self.create_bool(True))
+
+    def reset(self):
+        self.ready_pub.publish(self.create_bool(False))
+        # self.qvio_reset.reset()
 
     def create_float32(self, val):
         res = Float32()
@@ -89,6 +92,19 @@ class TestPublisher(Node):
 def main(args=None) -> None:
     rclpy.init(args=args)
     tp = TestPublisher()
+    while True:
+        res = input("Enter Command:")
+        if res == "ready":
+            tp.run()
+        elif res == "start-flight":
+            tp.start_flight()
+        elif res == "start-scan":
+            tp.start_scan()
+        elif res == "end-scan":
+            tp.end_scan()
+        elif res == "reset":
+            tp.reset()
+
     _ = input("Enter when ready.")
     tp.run()
     _ = input("Enter to start flight.")
