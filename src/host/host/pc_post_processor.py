@@ -26,7 +26,7 @@ class PCPostProcessor(Node):
         # Create subscribers
         self.radius_sub = self.create_subscription(
              Float32,
-             "/host/gui/out/flight_radius", 
+             "/host/gui/out/radius", 
              self.radius_callback, 
              qos_profile_system_default
         )
@@ -54,6 +54,11 @@ class PCPostProcessor(Node):
              self.dump_directory_callback, 
              qos_profile_system_default
         )
+        self.export_complete_pub = self.create_publisher(
+            Bool,
+            "/host/out/pcpp/export_complete",
+            qos_profile_system_default
+        )
 
         # Variables for subscribers to update
         self.radius = 0.0
@@ -75,21 +80,28 @@ class PCPostProcessor(Node):
         
     
     def radius_callback(self, msg):
+        self.get_logger().info("Radius set to " + str(msg.data))
         """Callback for radius."""
         self.radius = msg.data
 
     def object_height_callback(self, msg):
+        self.get_logger().info("Object height set to " + str(msg.data))
         """Callback for object height."""
         self.object_height = msg.data
 
     def start_height_callback(self, msg):
+        self.get_logger().info("Start height set to " + str(msg.data))
         """Callback for starting height."""
         self.start_height = msg.data
 
     def dump_complete_callback(self, msg):
         """Callback for dump complete."""
+        self.get_logger().info("Dump finished. Combining Pointclouds.")
         if msg.data:
             self.save()
+            ec = Bool()
+            ec.data = True
+            self.export_complete_pub.publish(ec)
 
     def dump_directory_callback(self, msg):
         """Callback for dump directory."""
@@ -111,7 +123,7 @@ class PCPostProcessor(Node):
     def combine_pcs(self):
         """Combine individual point clouds."""
         for pc in self.pcd_list[1:]:
-            print("adding pcd...")
+            self.get_logger().info("Adding pcd to combined")
             self.combined_pcd += pc
             # self.combined_pcd_data = np.concatenate(self.combined_pcd_data, np.asarray(pc.points))
 
@@ -148,6 +160,7 @@ class PCPostProcessor(Node):
         self.combine_pcs()
         self.down_sample()
         self.filter_pcs()
+        self.get_logger().info("Writing file to " + self.dump_directory + "/combined_filtered.pcd")
         o3d.io.write_point_cloud(self.dump_directory + "/combined_filtered.pcd", self.combined_pcd)
 
 def main(args=None):

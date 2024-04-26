@@ -22,10 +22,10 @@ import os
 class PCNode(Node):
   """Class for dumping ROS PointCloud2 messages to files"""
   def __init__(self) -> None:
-    self.get_logger().info("Point cloud collector alive")
-
     # Create the node and subscriber
     super().__init__("point_cloud_handler_node")
+    self.get_logger().info("Point cloud collector alive")
+
     self.pc2_sub = self.create_subscription(
       PointCloud2, 
       "/starling/out/posed_pc", 
@@ -60,10 +60,16 @@ class PCNode(Node):
        qos_profile_system_default
     )
 
+    self.dump_complete_pub = self.create_publisher(
+       Bool, 
+       "/host/out/pcc/dump_complete", 
+       qos_profile_system_default
+    )
+
     
 
     self.scan_start = False
-    self.scan_end = True
+    self.scan_end = False
 
     self.dump_dir = "" # Dump directory
     self.pc_interval = 1.0 # Point cloud interval in seconds
@@ -72,18 +78,24 @@ class PCNode(Node):
 
   def scan_start_callback(self, msg):
      """Start scanning"""
+     self.get_logger().info("Scan start received.")
      self.scan_start = msg.data
+     self.scan_end = not self.scan_start
 
   def scan_end_callback(self, msg):
      """Stop scanning"""
      self.scan_end = msg.data
+     dc = Bool()
+     dc.data = True
+     self.dump_complete_pub.publish(dc)
 
   def scan_title_callback(self, msg):
      """Make file directory from title, save and publish to ros."""
      raw_title = msg.data
-     file_directory = raw_title.replace("/", "").replace("\\", "").replace(" ", "").lower()
+     file_directory = raw_title.replace("/", "").replace("\\", "").replace(" ", "-").lower()
      self.dump_dir = file_directory
      os.mkdir(self.dump_dir)
+     self.get_logger().info("Dump directory created.")
      dump_dir_ros_msg = String()
      dump_dir_ros_msg.data = self.dump_dir
      self.dump_directory_pub.publish(dump_dir_ros_msg)

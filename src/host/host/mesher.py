@@ -52,7 +52,9 @@ class Mesher(Node):
     
     def export_complete_callback(self, msg):
         """Callback for export complete"""
+        self.get_logger().info("Export complete callback: " + str(msg.data))
         if msg.data:
+            self.get_logger().info("Meshing...")
             self.save()
 
     def process(self):
@@ -72,6 +74,7 @@ class Mesher(Node):
         output_path = String()
         output_path.data = self.directory + "/output.stl"
         self.file_directory_pub.publish(output_path)
+        self.get_logger().info("Mesh complete.")
 
 def main(args=None):
     rclpy.init(args=args)
