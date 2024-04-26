@@ -3,6 +3,8 @@ import math
 import time
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy
+from voxl_reset_qvio import VOXLQVIOController
+
 from px4_msgs.msg import (
     OffboardControlMode,
     TrajectorySetpoint,
@@ -44,6 +46,8 @@ class OffboardFigure8Node(Node):
             self.vehicle_status_callback,
             qos_profile,
         )
+
+        self.voxl_reset = VOXLQVIOController()
 
         self.rate = 20
         self.radius = 0.9
@@ -120,7 +124,7 @@ class OffboardFigure8Node(Node):
             self.publish_takeoff_setpoint(0.0, 0.0, self.min_altitude)
         else:
             if not self.hit_figure_8:
-                self.get_logger().info("Doing figure 8 now")
+                self.get_logger().info("Flying Circle Now")
                 self.figure8_timer = self.create_timer(
                     1 / self.rate, self.offboard_move_callback
                 )

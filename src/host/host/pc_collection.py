@@ -49,7 +49,7 @@ class PCNode(Node):
 
     self.scan_title_sub = self.create_subscription(
        String, 
-       "/host/out/gui/scan_title", 
+       "/host/gui/out/scan_title", 
        self.scan_title_callback, 
        qos_profile_system_default
     )
