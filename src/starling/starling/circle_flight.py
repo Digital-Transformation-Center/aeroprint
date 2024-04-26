@@ -2,7 +2,8 @@ import rclpy
 import math
 import time
 from rclpy.node import Node
-from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy
+from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy, qos_profile_system_default
+from std_msgs.msg import Bool
 from voxl_reset_qvio import VOXLQVIOController
 
 from px4_msgs.msg import (
@@ -30,7 +31,7 @@ class OffboardFigure8Node(Node):
             depth=1,
         )
 
-        # Create publishers
+        # Create flight publishers
         self.offboard_control_mode_publisher = self.create_publisher(
             OffboardControlMode, "/fmu/in/offboard_control_mode", qos_profile
         )
@@ -46,6 +47,16 @@ class OffboardFigure8Node(Node):
             self.vehicle_status_callback,
             qos_profile,
         )
+
+        # Create integrations pubs & subs
+        self.ready_sub = self.create_subscription(
+            Bool, 
+            "/host/gui/out/ready", 
+            self.ready_callback, 
+            qos_profile_system_default
+        )
+
+        self.ready = False
 
         self.voxl_reset = VOXLQVIOController()
 
@@ -68,7 +79,18 @@ class OffboardFigure8Node(Node):
         self.init_path(self.start_altitude)
         self.init_path(self.end_altitude)
 
-        self.timer = self.create_timer(0.1, self.timer_callback)
+        # self.timer = self.create_timer(0.1, self.timer_callback)
+
+    def ready_callback(self, msg):
+        if msg.data:
+            self.engage_offboard_mode()
+            self.arm()
+            self.armed = True
+            self.start_time = time.time()
+            self.timer = self.create_timer(0.1, self.timer_callback)
+
+        self.ready = msg.data
+
 
     def init_path(self, altitude):
 
@@ -111,18 +133,18 @@ class OffboardFigure8Node(Node):
         """Callback function for the timer."""
         self.publish_offboard_control_heartbeat_signal()
 
-        if self.offboard_setpoint_counter == 10:
-            self.engage_offboard_mode()
-            self.arm()
-            self.armed = True
+        # if self.offboard_setpoint_counter == 10:
+        #     self.engage_offboard_mode()
+        #     self.arm()
+        #     self.armed = True
 
-        if self.offboard_setpoint_counter < 11:
-            self.offboard_setpoint_counter += 1
+        # if self.offboard_setpoint_counter < 11:
+        #     self.offboard_setpoint_counter += 1
 
         if self.start_time + 10 > time.time():
             self.publish_takeoff_setpoint(0.0, 0.0, self.start_altitude)
         else:
-            if not self.hit_figure_8:
+            if not self.hit_figure_8 and self.ready:
                 self.get_logger().info("Flying Circle Now")
                 self.figure8_timer = self.create_timer(
                     1 / self.rate, self.offboard_move_callback

@@ -2,7 +2,7 @@ from rclpy.node import Node
 import rclpy
 from std_msgs.msg import Bool, String, Float32
 from rclpy.qos import qos_profile_system_default
-from voxl_reset_qvio import VOXLQVIOController
+# from voxl_reset_qvio import VOXLQVIOController
 
 
 class TestPublisher(Node):
@@ -51,7 +51,7 @@ class TestPublisher(Node):
         self.start_height_pub.publish(self.create_float32(0.0))
         self.scan_title_pub.publish(self.create_string(""))
         
-        self.qvio_reset = VOXLQVIOController()
+        # self.qvio_reset = VOXLQVIOController()
     
     def run(self):
         self.ready_pub.publish(self.create_bool(True))
@@ -62,7 +62,8 @@ class TestPublisher(Node):
         self.ready_pub.publish(self.create_bool(True))
 
     def start_flight(self):
-        self.qvio_reset.reset()
+        # self.qvio_reset.reset()
+        None
 
     def start_scan(self):
         self.scan_start_pub.publish(self.create_bool(True))
