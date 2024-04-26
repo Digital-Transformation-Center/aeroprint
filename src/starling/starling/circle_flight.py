@@ -74,7 +74,7 @@ class OffboardFigure8Node(Node):
     def init_path(self):
 
         dt = 1.0 / self.rate
-        dadt = (2.0 * math.pi) / self.cycle_s
+        dadt = (4.0 * math.pi) / self.cycle_s
         r = self.radius
 
         for i in range(self.steps):
