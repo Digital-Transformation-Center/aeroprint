@@ -106,6 +106,7 @@ class OffboardFigure8Node(Node):
         max_height = self.start_height + self.object_height + 0.3
         self.start_altitude = max_height
         self.end_altitude = min_height
+        self.get_logger().info("Flying path from " + str(self.start_altitude) + "m.")
         for lev in range(num_circles):
             if lev == 0:
                 circle_altitudes.append(max_height)
@@ -114,6 +115,8 @@ class OffboardFigure8Node(Node):
             else:
                 inter_lev = max_height - (lev) * ((max_height - min_height) / (num_circles - 1))
                 circle_altitudes.append(inter_lev)
+        for altitude in circle_altitudes:
+            self.init_circle(altitude)
 
     def start_height_callback(self, msg):
         self.start_height = msg.data
