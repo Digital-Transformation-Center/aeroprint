@@ -200,7 +200,6 @@ class OffboardFigure8Node(Node):
         #     self.offboard_setpoint_counter += 1
         
         if self.start_time + 10 > time.time():
-            self.get_logger().info("Takeoff to " + str(self.start_altitude) + "m.")
             self.publish_takeoff_setpoint(0.0, 0.0, -self.start_altitude)
         else:
             if not self.hit_figure_8 and self.ready:
