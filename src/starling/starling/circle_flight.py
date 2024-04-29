@@ -67,10 +67,20 @@ class OffboardFigure8Node(Node):
             self.object_height_callback,
             qos_profile_system_default
         )
-        self.start_height_pub = self.create_subscription(
+        self.start_height_sub = self.create_subscription(
             Float32, 
             "/host/gui/out/start_height", 
             self.start_height_callback,
+            qos_profile_system_default
+        )
+        self.scan_start_pub = self.create_publisher(
+            Bool, 
+            "/starling/out/fc/scan_start",
+            qos_profile_system_default
+        )
+        self.scan_end_pub = self.create_publisher(
+            Bool, 
+            "/starling/out/fc/scan_end" ,
             qos_profile_system_default
         )
 
@@ -101,7 +111,7 @@ class OffboardFigure8Node(Node):
     def create_path(self):
         # This is very extra right now, but makes it easier to add levels.
         circle_altitudes = []
-        num_circles = 3
+        num_circles = 2
         min_height = self.start_height + 0.3
         max_height = self.start_height + self.object_height + 0.3
         self.start_altitude = max_height
@@ -135,6 +145,9 @@ class OffboardFigure8Node(Node):
         self.get_logger().info("Updating radius to " + str(msg.data))
 
     def ready_callback(self, msg):
+        b = Bool(); b.data  = False
+        self.scan_start_pub.publish(b)
+        self.scan_end_pub.publish(b)
         if msg.data:
             self.create_path()
             self.engage_offboard_mode()
@@ -205,7 +218,9 @@ class OffboardFigure8Node(Node):
             self.publish_takeoff_setpoint(0.0, 0.0, -self.start_altitude)
         else:
             if not self.hit_figure_8 and self.ready:
-                self.get_logger().info("Flying Circle Now")
+                self.get_logger().info("Starting Scan Now.")
+                b = Bool(); b.data = True
+                self.scan_start_pub.publish(b)
                 self.figure8_timer = self.create_timer(
                     1 / self.rate, self.offboard_move_callback
                 )
@@ -255,6 +270,9 @@ class OffboardFigure8Node(Node):
             )
 
         if self.offboard_arr_counter >= len(self.path):
+            self.get_logger().info("End of Scan.")
+            b = Bool(); b.data  = True
+            self.scan_end_pub.publish(b)
             self.publish_takeoff_setpoint(0.0, 0.0, -self.end_altitude)
 
         if self.offboard_arr_counter == len(self.path) + 100:
