@@ -91,8 +91,8 @@ class OffboardFigure8Node(Node):
         self.offboard_setpoint_counter = 0
         self.start_time = time.time()
         self.offboard_arr_counter = 0
-        self.start_altitude = 1.1
-        self.end_altitude = 0.6
+        self.start_altitude = 0.0
+        self.end_altitude = 0.0
         self.start_height = 0.0
         self.object_height = 0.0
         # self.init_circle(self.start_altitude)
@@ -117,8 +117,8 @@ class OffboardFigure8Node(Node):
         #         circle_altitudes.append(inter_lev)
         # for altitude in circle_altitudes:
         #     self.init_circle(altitude)
-        self.init_circle(self.start_altitude)
-        self.init_circle(self.end_altitude)
+        self.init_circle(-self.start_altitude)
+        self.init_circle(-self.end_altitude)
 
     def start_height_callback(self, msg):
         self.start_height = msg.data
