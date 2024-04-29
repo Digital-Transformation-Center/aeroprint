@@ -27,6 +27,7 @@ setup(
         "console_scripts": [
             "test_node = starling.test_node:main",
             "test_pub = starling.test_pub:main",
+            "circle_flight = starling.circle_flight:main"
         ],
     },
 )
