@@ -54,6 +54,7 @@ class TestPublisher(Node):
         # self.qvio_reset = VOXLQVIOController()
     
     def run(self):
+        self.reset()
         self.radius_pub.publish(self.create_float32(0.75))
         self.object_height_pub.publish(self.create_float32(0.6))
         self.start_height_pub.publish(self.create_float32(0.5))
