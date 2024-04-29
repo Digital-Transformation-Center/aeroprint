@@ -105,6 +105,7 @@ class OffboardFigure8Node(Node):
         self.end_altitude = 1.1
         self.start_height = 0.0
         self.object_height = 0.0
+        self.scan_ended = False
         # self.init_circle(self.start_altitude)
         # self.init_circle(self.end_altitude)
 
@@ -148,6 +149,7 @@ class OffboardFigure8Node(Node):
         b = Bool(); b.data  = False
         self.scan_start_pub.publish(b)
         self.scan_end_pub.publish(b)
+        self.scan_ended = False
         if msg.data:
             self.create_path()
             self.engage_offboard_mode()
@@ -270,9 +272,11 @@ class OffboardFigure8Node(Node):
             )
 
         if self.offboard_arr_counter >= len(self.path):
-            self.get_logger().info("End of Scan.")
-            b = Bool(); b.data  = True
-            self.scan_end_pub.publish(b)
+            if not self.scan_ended:
+                self.get_logger().info("End of Scan.")
+                b = Bool(); b.data  = True
+                self.scan_end_pub.publish(b)
+                self.scan_ended = True
             self.publish_takeoff_setpoint(0.0, 0.0, -self.end_altitude)
 
         if self.offboard_arr_counter == len(self.path) + 100:
