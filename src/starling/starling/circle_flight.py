@@ -101,7 +101,7 @@ class OffboardFigure8Node(Node):
     def create_path(self):
         # This is very extra right now, but makes it easier to add levels.
         circle_altitudes = []
-        num_circles = 2
+        num_circles = 3
         min_height = self.start_height + 0.3
         max_height = self.start_height + self.object_height + 0.3
         self.start_altitude = max_height
