@@ -77,7 +77,7 @@ class OffboardFigure8Node(Node):
         self.ready = False
 
         self.voxl_reset = VOXLQVIOController()
-
+        self.start_height = 0.0
         self.rate = 20
         self.radius = 0.9
         self.cycle_s = 18
