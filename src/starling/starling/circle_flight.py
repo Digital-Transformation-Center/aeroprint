@@ -200,7 +200,7 @@ class OffboardFigure8Node(Node):
         
         if self.start_time + 10 > time.time():
             self.get_logger().info("Takeoff to " + str(self.start_altitude) + "m.")
-            self.publish_takeoff_setpoint(0.0, 0.0, self.start_altitude)
+            self.publish_takeoff_setpoint(0.0, 0.0, 1.1)
         else:
             if not self.hit_figure_8 and self.ready:
                 self.get_logger().info("Flying Circle Now")
