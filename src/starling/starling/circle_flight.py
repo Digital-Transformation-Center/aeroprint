@@ -264,6 +264,7 @@ class OffboardFigure8Node(Node):
 
     def publish_takeoff_setpoint(self, x: float, y: float, z: float):
         """Publish the trajectory setpoint."""
+        self.get_logger().info("Takeoff")
         msg = TrajectorySetpoint()
         msg.position = [x, y, z]
         msg.yaw = 0.00
