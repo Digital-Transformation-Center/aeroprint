@@ -91,8 +91,8 @@ class OffboardFigure8Node(Node):
         self.offboard_setpoint_counter = 0
         self.start_time = time.time()
         self.offboard_arr_counter = 0
-        self.start_altitude = 0.0
-        self.end_altitude = 0.0
+        self.start_altitude = 0.6
+        self.end_altitude = 1.1
         self.start_height = 0.0
         self.object_height = 0.0
         # self.init_circle(self.start_altitude)
@@ -201,7 +201,7 @@ class OffboardFigure8Node(Node):
         
         if self.start_time + 10 > time.time():
             self.get_logger().info("Takeoff to " + str(self.start_altitude) + "m.")
-            self.publish_takeoff_setpoint(0.0, 0.0, self.start_altitude)
+            self.publish_takeoff_setpoint(0.0, 0.0, -self.start_altitude)
         else:
             if not self.hit_figure_8 and self.ready:
                 self.get_logger().info("Flying Circle Now")
@@ -254,7 +254,7 @@ class OffboardFigure8Node(Node):
             )
 
         if self.offboard_arr_counter >= len(self.path):
-            self.publish_takeoff_setpoint(0.0, 0.0, self.end_altitude)
+            self.publish_takeoff_setpoint(0.0, 0.0, -self.end_altitude)
 
         if self.offboard_arr_counter == len(self.path) + 100:
             self.figure8_timer.cancel()
