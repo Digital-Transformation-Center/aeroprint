@@ -100,25 +100,25 @@ class OffboardFigure8Node(Node):
 
     def create_path(self):
         # This is very extra right now, but makes it easier to add levels.
-        # circle_altitudes = []
-        # num_circles = 2
-        # min_height = self.start_height + 0.3
-        # max_height = self.start_height + self.object_height + 0.3
-        # self.start_altitude = max_height
-        # self.end_altitude = min_height
-        # self.get_logger().info("Flying path from " + str(self.start_altitude) + "m.")
-        # for lev in range(num_circles):
-        #     if lev == 0:
-        #         circle_altitudes.append(max_height)
-        #     elif lev == num_circles - 1:
-        #         circle_altitudes.append(min_height)
-        #     else:
-        #         inter_lev = max_height - (lev) * ((max_height - min_height) / (num_circles - 1))
-        #         circle_altitudes.append(inter_lev)
-        # for altitude in circle_altitudes:
-        #     self.init_circle(altitude)
-        self.init_circle(-self.start_altitude)
-        self.init_circle(-self.end_altitude)
+        circle_altitudes = []
+        num_circles = 2
+        min_height = self.start_height + 0.3
+        max_height = self.start_height + self.object_height + 0.3
+        self.start_altitude = max_height
+        self.end_altitude = min_height
+        self.get_logger().info("Flying path from " + str(self.start_altitude) + "m.")
+        for lev in range(num_circles):
+            if lev == 0:
+                circle_altitudes.append(max_height)
+            elif lev == num_circles - 1:
+                circle_altitudes.append(min_height)
+            else:
+                inter_lev = max_height - (lev) * ((max_height - min_height) / (num_circles - 1))
+                circle_altitudes.append(inter_lev)
+        for altitude in circle_altitudes:
+            self.init_circle(altitude)
+        # self.init_circle(-self.start_altitude)
+        # self.init_circle(-self.end_altitude)
 
     def start_height_callback(self, msg):
         self.start_height = msg.data
