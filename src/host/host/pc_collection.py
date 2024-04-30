@@ -87,7 +87,7 @@ class PCNode(Node):
     self.scan_end = False
 
     self.dump_dir = self.output_path # Dump directory
-    self.pc_interval = 1.0 # Point cloud interval in seconds
+    self.pc_interval = 2.0 # Point cloud interval in seconds
     # Keep a timestamp to limit scan frequency
     self.last_pc = self.get_clock().now().nanoseconds
 

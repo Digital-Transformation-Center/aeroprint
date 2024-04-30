@@ -64,6 +64,16 @@ class Mesher(Node):
         mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_alpha_shape(
             pcd, 0.02)
         mesh = mesh.filter_smooth_laplacian(number_of_iterations=10)
+        print("Cluster connected triangles")
+        with o3d.utility.VerbosityContextManager(
+                o3d.utility.VerbosityLevel.Debug) as cm:
+            triangle_clusters, cluster_n_triangles, cluster_area = (
+                mesh.cluster_connected_triangles())
+        triangle_clusters = np.asarray(triangle_clusters)
+        cluster_n_triangles = np.asarray(cluster_n_triangles)
+        cluster_area = np.asarray(cluster_area)
+        triangles_to_remove = cluster_n_triangles[triangle_clusters] < max(cluster_n_triangles[triangle_clusters])
+        mesh.remove_triangles_by_mask(triangles_to_remove)
         trimesh_mesh = tm.Trimesh(vertices=mesh.vertices, faces=mesh.triangles)
         trimesh_mesh.fill_holes()
         trimesh_mesh.export(self.directory + "output.stl")
