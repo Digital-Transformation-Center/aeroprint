@@ -66,12 +66,27 @@ class PCNode(Node):
        qos_profile_system_default
     )
 
-    
+    path = os.path.dirname(os.path.abspath(__file__))  
+   # Split the path into components
+    path_parts = path.split(os.sep)
+
+   # Find the index of 'aeroprint' in the path
+    try:
+       aeroprint_index = path_parts.index("aeroprint")
+    except ValueError:
+       print("Error: 'aeroprint' not found in the path")
+    else:
+       # Construct the truncated path
+       truncated_path = os.sep.join(path_parts[:aeroprint_index + 1])
+
+    print("Truncated path:", truncated_path)
+    self.output_path = os.path.join(truncated_path, 'scans/')
+
 
     self.scan_start = False
     self.scan_end = False
 
-    self.dump_dir = "" # Dump directory
+    self.dump_dir = self.output_path # Dump directory
     self.pc_interval = 1.0 # Point cloud interval in seconds
     # Keep a timestamp to limit scan frequency
     self.last_pc = self.get_clock().now().nanoseconds
@@ -79,23 +94,29 @@ class PCNode(Node):
   def scan_start_callback(self, msg):
      """Start scanning"""
      self.get_logger().info("Scan start received.")
+     try:
+      os.mkdir(self.dump_dir)
+      self.get_logger().info("Output Directory: " + str(self.dump_dir))
+     except:
+        self.get_logger().info("Failed to create directory.")
+     self.get_logger().info("Dump directory created.")
      self.scan_start = msg.data
      self.scan_end = not self.scan_start
 
   def scan_end_callback(self, msg):
      """Stop scanning"""
      self.scan_end = msg.data
-     dc = Bool()
-     dc.data = True
-     self.dump_complete_pub.publish(dc)
+   #   dc = Bool()
+   #   dc.data = True
+     self.dump_complete_pub.publish(msg)
 
   def scan_title_callback(self, msg):
      """Make file directory from title, save and publish to ros."""
      raw_title = msg.data
      file_directory = raw_title.replace("/", "").replace("\\", "").replace(" ", "-").lower()
-     self.dump_dir = file_directory
-     os.mkdir(self.dump_dir)
-     self.get_logger().info("Dump directory created.")
+     self.get_logger().info("File directory: " + file_directory)
+     self.dump_dir = os.path.join(self.output_path, file_directory)
+     self.get_logger().info("Changing dump directory to: " + str(self.dump_dir))
      dump_dir_ros_msg = String()
      dump_dir_ros_msg.data = self.dump_dir
      self.dump_directory_pub.publish(dump_dir_ros_msg)

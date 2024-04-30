@@ -66,7 +66,7 @@ class Mesher(Node):
         mesh = mesh.filter_smooth_laplacian(number_of_iterations=10)
         trimesh_mesh = tm.Trimesh(vertices=mesh.vertices, faces=mesh.triangles)
         trimesh_mesh.fill_holes()
-        trimesh_mesh.export("output.stl")
+        trimesh_mesh.export(self.directory + "output.stl")
 
     def save(self):
         """Process, save and publish path of mesh"""
