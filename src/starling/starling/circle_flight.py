@@ -4,7 +4,7 @@ import time
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy, qos_profile_system_default
 from std_msgs.msg import Bool, Float32
-from voxl_reset_qvio import VOXLQVIOController
+# from voxl_reset_qvio import VOXLQVIOController
 
 from px4_msgs.msg import (
     OffboardControlMode,
@@ -324,6 +324,19 @@ class OffboardFigure8Node(Node):
         msg.timestamp = int(self.get_clock().now().nanoseconds / 1000)
         self.vehicle_command_publisher.publish(msg)
 
+import subprocess
+
+class VOXLQVIOController():
+    def __init__(self) -> None:
+        None
+
+    def reset(self):
+        try:
+            subprocess.run(["voxl-reset-qvio"])
+            return True
+        except Exception as e:
+            print(f"Error sending VIO reset command: {e}")
+            return False
 
 def main(args=None) -> None:
     rclpy.init(args=args)
