@@ -151,6 +151,7 @@ class OffboardFigure8Node(Node):
         self.scan_end_pub.publish(b)
         self.scan_ended = False
         if msg.data:
+            self.publish_offboard_control_heartbeat_signal()
             self.get_logger().info("Recieved ready command.")
             self.create_path()
             self.engage_offboard_mode()
