@@ -19,9 +19,9 @@ class OffboardFigure8Node(Node):
     """Node for controlling a vehicle in offboard mode."""
 
     def __init__(self) -> None:
-        super().__init__("offboard_figure8_node")
+        super().__init__("flight_control_node")
 
-        self.get_logger().info("Offboard Figure 8 Node Alive!")
+        self.get_logger().info("Starling Flight Control Node Alive!")
 
         # Configure QoS profile for publishing and subscribing
         qos_profile = QoSProfile(
