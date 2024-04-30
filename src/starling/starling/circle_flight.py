@@ -263,6 +263,7 @@ class OffboardFigure8Node(Node):
         self.publish_vehicle_command(VehicleCommand.VEHICLE_CMD_NAV_LAND)
         self.get_logger().info("Switching to land mode")
         self.taken_off = False
+        self.path = []
         # self.hit_figure_8 = False
 
     def offboard_move_callback(self):
