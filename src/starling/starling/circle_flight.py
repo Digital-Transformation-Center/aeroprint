@@ -99,7 +99,7 @@ class OffboardFigure8Node(Node):
         self.voxl_reset.reset()
         self.rate = 20
         self.radius = 0.9
-        self.cycle_s = 40
+        self.cycle_s = 30
         
         self.steps = self.cycle_s * self.rate
         self.path = []
@@ -122,7 +122,7 @@ class OffboardFigure8Node(Node):
     def create_path(self):
         # This is very extra right now, but makes it easier to add levels.
         circle_altitudes = []
-        num_circles = 3
+        num_circles = 2
         min_height = self.start_height + 0.15
         max_height = self.start_height + self.object_height + 0.2
         self.start_altitude = max_height
