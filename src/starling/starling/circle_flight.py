@@ -1,10 +1,19 @@
+#!/usr/bin/env python3
+"""
+circle_flight.py: ROS node to perform flight based on scan parameters.
+UDRI DTC AEROPRINT
+"""
+__author__ = "Ryan Kuederle, Timothy Marshall"
+__email__ = "ryan.kuederle@udri.udayton.edu"
+__version__ = "0.1.0"
+__status__ = "Beta"
+
 import rclpy
 import math
 import time
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy, qos_profile_system_default
 from std_msgs.msg import Bool, Float32
-# from voxl_reset_qvio import VOXLQVIOController
 
 from px4_msgs.msg import (
     OffboardControlMode,
@@ -87,9 +96,10 @@ class OffboardFigure8Node(Node):
         self.ready = False
 
         self.voxl_reset = VOXLQVIOController()
+        self.voxl_reset.reset()
         self.rate = 20
         self.radius = 0.9
-        self.cycle_s = 30
+        self.cycle_s = 40
         
         self.steps = self.cycle_s * self.rate
         self.path = []
@@ -112,7 +122,7 @@ class OffboardFigure8Node(Node):
     def create_path(self):
         # This is very extra right now, but makes it easier to add levels.
         circle_altitudes = []
-        num_circles = 2
+        num_circles = 3
         min_height = self.start_height + 0.15
         max_height = self.start_height + self.object_height + 0.2
         self.start_altitude = max_height
