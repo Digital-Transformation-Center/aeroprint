@@ -28,6 +28,10 @@ setup(
             "test_node = host.test_node:main",
             "test_sub = host.test_sub:main",
             "pc_processor = host.pc_processor:main",
+            "gui = host.aeroprint_gui:main",
+            "pc-collection = host.pc_collection:main", 
+            "pc-post-processor = host.pc_post_processor:main", 
+            "mesher = host.mesher:main"
         ],
     },
 )

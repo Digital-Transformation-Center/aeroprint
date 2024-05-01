@@ -4,7 +4,7 @@ import time
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy, qos_profile_system_default
 from std_msgs.msg import Bool, Float32
-from voxl_reset_qvio import VOXLQVIOController
+# from voxl_reset_qvio import VOXLQVIOController
 
 from px4_msgs.msg import (
     OffboardControlMode,
@@ -19,9 +19,9 @@ class OffboardFigure8Node(Node):
     """Node for controlling a vehicle in offboard mode."""
 
     def __init__(self) -> None:
-        super().__init__("offboard_figure8_node")
+        super().__init__("flight_control_node")
 
-        self.get_logger().info("Offboard Figure 8 Node Alive!")
+        self.get_logger().info("Starling Flight Control Node Alive!")
 
         # Configure QoS profile for publishing and subscribing
         qos_profile = QoSProfile(
@@ -67,20 +67,29 @@ class OffboardFigure8Node(Node):
             self.object_height_callback,
             qos_profile_system_default
         )
-        self.start_height_pub = self.create_subscription(
+        self.start_height_sub = self.create_subscription(
             Float32, 
             "/host/gui/out/start_height", 
             self.start_height_callback,
+            qos_profile_system_default
+        )
+        self.scan_start_pub = self.create_publisher(
+            Bool, 
+            "/starling/out/fc/scan_start",
+            qos_profile_system_default
+        )
+        self.scan_end_pub = self.create_publisher(
+            Bool, 
+            "/starling/out/fc/scan_end" ,
             qos_profile_system_default
         )
 
         self.ready = False
 
         self.voxl_reset = VOXLQVIOController()
-
         self.rate = 20
         self.radius = 0.9
-        self.cycle_s = 18
+        self.cycle_s = 30
         
         self.steps = self.cycle_s * self.rate
         self.path = []
@@ -92,8 +101,11 @@ class OffboardFigure8Node(Node):
         self.offboard_setpoint_counter = 0
         self.start_time = time.time()
         self.offboard_arr_counter = 0
-        self.start_altitude = 0.0
-        self.end_altitude = 0.0
+        self.start_altitude = 0.6
+        self.end_altitude = 1.1
+        self.start_height = 0.0
+        self.object_height = 0.0
+        self.scan_ended = False
         # self.init_circle(self.start_altitude)
         # self.init_circle(self.end_altitude)
 
@@ -101,10 +113,11 @@ class OffboardFigure8Node(Node):
         # This is very extra right now, but makes it easier to add levels.
         circle_altitudes = []
         num_circles = 2
-        min_height = self.start_height + 0.3
-        max_height = self.start_height + self.object_height + 0.3
+        min_height = self.start_height + 0.15
+        max_height = self.start_height + self.object_height + 0.2
         self.start_altitude = max_height
         self.end_altitude = min_height
+        self.get_logger().info("Flying path from " + str(self.start_altitude) + "m.")
         for lev in range(num_circles):
             if lev == 0:
                 circle_altitudes.append(max_height)
@@ -113,22 +126,38 @@ class OffboardFigure8Node(Node):
             else:
                 inter_lev = max_height - (lev) * ((max_height - min_height) / (num_circles - 1))
                 circle_altitudes.append(inter_lev)
+        print("circle altitudes: ", circle_altitudes)
+        for altitude in circle_altitudes:
+            self.init_circle(-altitude)
+        
+        # self.init_circle(-self.start_altitude)
+        # self.init_circle(-self.end_altitude)
 
     def start_height_callback(self, msg):
         self.start_height = msg.data
+        self.get_logger().info("Updating start height to " + str(msg.data))
 
     def object_height_callback(self, msg):
         self.object_height = msg.data
+        self.get_logger().info("Updating object height to " + str(msg.data))
 
     def radius_callback(self, msg):
         self.radius = msg.data
+        self.get_logger().info("Updating radius to " + str(msg.data))
 
     def ready_callback(self, msg):
+        b = Bool(); b.data  = False
+        self.scan_start_pub.publish(b)
+        self.scan_end_pub.publish(b)
+        self.scan_ended = False
         if msg.data:
+            self.publish_offboard_control_heartbeat_signal()
+            self.get_logger().info("Recieved ready command.")
             self.create_path()
             self.engage_offboard_mode()
             self.arm()
             self.armed = True
+            # self.publish_takeoff_setpoint(0.0, 0.0, self.end_altitude)
             self.start_time = time.time()
             self.timer = self.create_timer(0.1, self.timer_callback)
         else:
@@ -188,12 +217,14 @@ class OffboardFigure8Node(Node):
 
         # if self.offboard_setpoint_counter < 11:
         #     self.offboard_setpoint_counter += 1
-
+        
         if self.start_time + 10 > time.time():
-            self.publish_takeoff_setpoint(0.0, 0.0, self.start_altitude)
+            self.publish_takeoff_setpoint(0.0, 0.0, -self.start_altitude)
         else:
             if not self.hit_figure_8 and self.ready:
-                self.get_logger().info("Flying Circle Now")
+                self.get_logger().info("Starting Scan Now.")
+                b = Bool(); b.data = True
+                self.scan_start_pub.publish(b)
                 self.figure8_timer = self.create_timer(
                     1 / self.rate, self.offboard_move_callback
                 )
@@ -234,6 +265,7 @@ class OffboardFigure8Node(Node):
         self.publish_vehicle_command(VehicleCommand.VEHICLE_CMD_NAV_LAND)
         self.get_logger().info("Switching to land mode")
         self.taken_off = False
+        self.path = []
         # self.hit_figure_8 = False
 
     def offboard_move_callback(self):
@@ -243,7 +275,12 @@ class OffboardFigure8Node(Node):
             )
 
         if self.offboard_arr_counter >= len(self.path):
-            self.publish_takeoff_setpoint(0.0, 0.0, self.end_altitude)
+            if not self.scan_ended:
+                self.get_logger().info("End of Scan.")
+                b = Bool(); b.data  = True
+                self.scan_end_pub.publish(b)
+                self.scan_ended = True
+            self.publish_takeoff_setpoint(0.0, 0.0, -self.end_altitude)
 
         if self.offboard_arr_counter == len(self.path) + 100:
             self.figure8_timer.cancel()
@@ -289,6 +326,19 @@ class OffboardFigure8Node(Node):
         msg.timestamp = int(self.get_clock().now().nanoseconds / 1000)
         self.vehicle_command_publisher.publish(msg)
 
+import subprocess
+
+class VOXLQVIOController():
+    def __init__(self) -> None:
+        None
+
+    def reset(self):
+        try:
+            subprocess.run(["voxl-reset-qvio"])
+            return True
+        except Exception as e:
+            print(f"Error sending VIO reset command: {e}")
+            return False
 
 def main(args=None) -> None:
     rclpy.init(args=args)
