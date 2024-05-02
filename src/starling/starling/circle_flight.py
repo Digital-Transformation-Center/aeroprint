@@ -136,7 +136,7 @@ class OffboardFigure8Node(Node):
             else:
                 inter_lev = max_height - ((lev) * ((max_height - min_height) / (num_circles - 1)))
                 circle_altitudes.append(inter_lev)
-        print("circle altitudes: ", circle_altitudes)
+        self.get_logger().info("circle altitudes: ", circle_altitudes)
         for altitude in circle_altitudes:
             self.init_circle(-altitude)
         
