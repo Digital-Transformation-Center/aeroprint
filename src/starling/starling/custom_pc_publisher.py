@@ -93,7 +93,7 @@ class PCNode(Node):
       else:
         print("BAD SCAN: " + str(time_dif))
     except Exception as e:
-       self.get_logger().info(e)
+       self.get_logger().info(str(e))
 
 class PoseNode(Node):
   """Node for acquiring pose data from VOXL MPA."""
