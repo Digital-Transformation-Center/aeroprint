@@ -92,8 +92,8 @@ class PCNode(Node):
         self.last_pub_time = current_time
       else:
         print("BAD SCAN: " + str(time_dif))
-    except ValueError:
-       self.get_logger().info("Unable to get pose map.")
+    except Exception as e:
+       self.get_logger().info(e)
 
 class PoseNode(Node):
   """Node for acquiring pose data from VOXL MPA."""
