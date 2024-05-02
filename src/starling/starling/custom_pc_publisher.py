@@ -142,7 +142,7 @@ def main(args=None) -> None:
     rate = pose_node.create_rate(2)
     try:
         while rclpy.ok():
-            print('Help me body, you are my only hope')
+            print('Executing threads')
             rate.sleep()
     except KeyboardInterrupt:
         pass
