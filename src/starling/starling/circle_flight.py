@@ -99,7 +99,7 @@ class OffboardFigure8Node(Node):
         self.voxl_reset.reset()
         self.rate = 20
         self.radius = 0.9
-        self.cycle_s = 30
+        self.cycle_s = 40
         
         self.steps = self.cycle_s * self.rate
         self.path = []
@@ -156,6 +156,7 @@ class OffboardFigure8Node(Node):
         self.get_logger().info("Updating radius to " + str(msg.data))
 
     def ready_callback(self, msg):
+        self.voxl_reset.reset()
         b = Bool(); b.data  = False
         self.scan_start_pub.publish(b)
         self.scan_end_pub.publish(b)
