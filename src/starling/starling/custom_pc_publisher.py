@@ -110,6 +110,7 @@ class PoseNode(Node):
     self.pose = None
   def callback(self, msg):
     """Add pose to dictionary."""
+    self.get_logger().info("Recieved pose data.")
     self.pose = msg
     self.lookup[msg.header.stamp.nanosec] = msg
   def get_pose(self):
