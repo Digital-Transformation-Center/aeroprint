@@ -122,8 +122,8 @@ class OffboardFigure8Node(Node):
     def create_path(self):
         # This is very extra right now, but makes it easier to add levels.
         circle_altitudes = []
-        num_circles = 2
-        min_height = self.start_height + 0.15
+        num_circles = 3
+        min_height = self.start_height + 0.20
         max_height = self.start_height + self.object_height + 0.2
         self.start_altitude = max_height
         self.end_altitude = min_height
@@ -134,7 +134,7 @@ class OffboardFigure8Node(Node):
             elif lev == num_circles - 1:
                 circle_altitudes.append(min_height)
             else:
-                inter_lev = max_height - (lev) * ((max_height - min_height) / (num_circles - 1))
+                inter_lev = max_height - ((lev) * ((max_height - min_height) / (num_circles - 1)))
                 circle_altitudes.append(inter_lev)
         print("circle altitudes: ", circle_altitudes)
         for altitude in circle_altitudes:
@@ -177,6 +177,7 @@ class OffboardFigure8Node(Node):
                 self.timer.cancel()
             except: pass
             self.offboard_arr_counter = 0
+            self.path = []
             self.land()
             self.hit_figure_8 = False
 
