@@ -88,7 +88,7 @@ class PCNode(Node):
         points = np.asarray(o3dpc.points, dtype=np.float32)
         data.data = points.tobytes()
         data.header.stamp.nanosec = int(time_dif * 1e9)
-        self.get_logger().log("Publishing scan")
+        self.get_logger().info("Publishing scan")
         self.publisher.publish(data)
         self.last_pub_time = current_time
       else:
