@@ -1,10 +1,19 @@
+#!/usr/bin/env python3
+"""
+circle_flight.py: ROS node to perform flight based on scan parameters.
+UDRI DTC AEROPRINT
+"""
+__author__ = "Ryan Kuederle, Timothy Marshall"
+__email__ = "ryan.kuederle@udri.udayton.edu"
+__version__ = "0.1.0"
+__status__ = "Beta"
+
 import rclpy
 import math
 import time
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy, qos_profile_system_default
 from std_msgs.msg import Bool, Float32
-# from voxl_reset_qvio import VOXLQVIOController
 
 from px4_msgs.msg import (
     OffboardControlMode,
@@ -87,9 +96,10 @@ class OffboardFigure8Node(Node):
         self.ready = False
 
         self.voxl_reset = VOXLQVIOController()
+        self.voxl_reset.reset()
         self.rate = 20
         self.radius = 0.9
-        self.cycle_s = 30
+        self.cycle_s = 40
         
         self.steps = self.cycle_s * self.rate
         self.path = []
@@ -112,8 +122,8 @@ class OffboardFigure8Node(Node):
     def create_path(self):
         # This is very extra right now, but makes it easier to add levels.
         circle_altitudes = []
-        num_circles = 2
-        min_height = self.start_height + 0.15
+        num_circles = 3
+        min_height = self.start_height + 0.20
         max_height = self.start_height + self.object_height + 0.2
         self.start_altitude = max_height
         self.end_altitude = min_height
@@ -124,9 +134,9 @@ class OffboardFigure8Node(Node):
             elif lev == num_circles - 1:
                 circle_altitudes.append(min_height)
             else:
-                inter_lev = max_height - (lev) * ((max_height - min_height) / (num_circles - 1))
+                inter_lev = max_height - ((lev) * ((max_height - min_height) / (num_circles - 1)))
                 circle_altitudes.append(inter_lev)
-        print("circle altitudes: ", circle_altitudes)
+        self.get_logger().info("circle altitudes: "+ str(circle_altitudes))
         for altitude in circle_altitudes:
             self.init_circle(-altitude)
         
@@ -146,6 +156,7 @@ class OffboardFigure8Node(Node):
         self.get_logger().info("Updating radius to " + str(msg.data))
 
     def ready_callback(self, msg):
+        self.voxl_reset.reset()
         b = Bool(); b.data  = False
         self.scan_start_pub.publish(b)
         self.scan_end_pub.publish(b)
@@ -159,10 +170,14 @@ class OffboardFigure8Node(Node):
             self.armed = True
             # self.publish_takeoff_setpoint(0.0, 0.0, self.end_altitude)
             self.start_time = time.time()
+            self.offboard_setpoint_counter
             self.timer = self.create_timer(0.1, self.timer_callback)
         else:
-            self.timer.cancel()
+            try:
+                self.timer.cancel()
+            except: pass
             self.offboard_arr_counter = 0
+            self.path = []
             self.land()
             self.hit_figure_8 = False
 
@@ -210,13 +225,13 @@ class OffboardFigure8Node(Node):
         """Callback function for the timer."""
         self.publish_offboard_control_heartbeat_signal()
 
-        # if self.offboard_setpoint_counter == 10:
-        #     self.engage_offboard_mode()
-        #     self.arm()
-        #     self.armed = True
+        if self.offboard_setpoint_counter == 10:
+            self.engage_offboard_mode()
+            self.arm()
+            self.armed = True
 
-        # if self.offboard_setpoint_counter < 11:
-        #     self.offboard_setpoint_counter += 1
+        if self.offboard_setpoint_counter < 11:
+            self.offboard_setpoint_counter += 1
         
         if self.start_time + 10 > time.time():
             self.publish_takeoff_setpoint(0.0, 0.0, -self.start_altitude)

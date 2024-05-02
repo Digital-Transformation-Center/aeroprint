@@ -3,7 +3,7 @@
 pc_post_processor.py: ROS node for combining and filtering individual posed point clouds.
 UDRI DTC AEROPRINT
 """
-__author__ = "Ryan Kuederle"
+__author__ = "Ryan Kuederle, Saif Ullah"
 __email__ = "ryan.kuederle@udri.udayton.edu"
 __version__ = "0.1.0"
 __status__ = "Beta"
@@ -138,7 +138,6 @@ class PCPostProcessor(Node):
         self.combined_pcd, ind = self.combined_pcd.remove_statistical_outlier(nb_neighbors=10,
                                                     std_ratio=2.2)
 
-
     def confine_to_circle(self, points, r):
         """Confine points to a circle."""
         center_x = r
@@ -148,7 +147,7 @@ class PCPostProcessor(Node):
         return points[mask]
 
     def confine_to_z(self, points, min_z, max_z):
-        """COnfine points within certain Z boundaries."""
+        """Confine points within certain Z boundaries."""
         z_height = points[:, 2]
         mask = points[:, 2] < -min_z # and points[:, 2] > -max_z
         # mask = z_height < -min_z and z_height > -max_z
@@ -162,6 +161,7 @@ class PCPostProcessor(Node):
         self.filter_pcs()
         self.get_logger().info("Writing file to " + self.dump_directory + "/combined_filtered.pcd")
         o3d.io.write_point_cloud(self.dump_directory + "/combined_filtered.pcd", self.combined_pcd)
+        self.pcd_list = []
 
 def main(args=None):
     rclpy.init(args=args)

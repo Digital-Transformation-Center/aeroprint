@@ -3,7 +3,7 @@
 mesher.py: ROS node meshing output point cloud.
 UDRI DTC AEROPRINT
 """
-__author__ = "Ryan Kuederle"
+__author__ = "Ryan Kuederle, Saif Ullah"
 __email__ = "ryan.kuederle@udri.udayton.edu"
 __version__ = "0.1.0"
 __status__ = "Beta"
@@ -60,11 +60,12 @@ class Mesher(Node):
     def process(self):
         """FUnction to process mesh"""
         pcd = o3d.io.read_point_cloud(self.pc_file_location)
-        pcd.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=0.1, max_nn=30))
+        pcd.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=0.05, max_nn=30))
         mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_alpha_shape(
-            pcd, 0.02)
-        mesh = mesh.filter_smooth_laplacian(number_of_iterations=10)
-        print("Cluster connected triangles")
+            pcd, 0.04)
+        # mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_poisson(pcd, depth=8)
+        mesh = mesh.filter_smooth_laplacian(number_of_iterations=15)
+        # print("Cluster connected triangles")
         with o3d.utility.VerbosityContextManager(
                 o3d.utility.VerbosityLevel.Debug) as cm:
             triangle_clusters, cluster_n_triangles, cluster_area = (
@@ -74,15 +75,33 @@ class Mesher(Node):
         cluster_area = np.asarray(cluster_area)
         triangles_to_remove = cluster_n_triangles[triangle_clusters] < max(cluster_n_triangles[triangle_clusters])
         mesh.remove_triangles_by_mask(triangles_to_remove)
-        trimesh_mesh = tm.Trimesh(vertices=mesh.vertices, faces=mesh.triangles)
-        trimesh_mesh.fill_holes()
-        trimesh_mesh.export(self.directory + "output.stl")
+        # mesh.compute_vertex_normals()
 
+        # edge_manifold = mesh.is_edge_manifold(allow_boundary_edges=True)
+        # edge_manifold_boundary = mesh.is_edge_manifold(allow_boundary_edges=False)
+        # vertex_manifold = mesh.is_vertex_manifold()
+        # self_intersecting = mesh.is_self_intersecting()
+        # watertight = mesh.is_watertight()
+        # orientable = mesh.is_orientable()
+
+        # print(f"edge_manifold: {edge_manifold}")
+        # print(f"edge_manifold_boundary: {edge_manifold_boundary}")
+        # print(f"vertex_manifold: {vertex_manifold}")
+        # print(f"self_intersecting: {self_intersecting}")
+        # print(f"watertight: {watertight}")
+        # print(f"orientable: {orientable}")
+
+
+        # Convert the voxel grid to a point cloud
+        self.get_logger().info("Exporting mesh")
+        mesh.compute_vertex_normals()
+        o3d.io.write_triangle_mesh(self.directory + "-output.stl", mesh)
     def save(self):
         """Process, save and publish path of mesh"""
         self.process()
         output_path = String()
-        output_path.data = self.directory + "/output.stl"
+        output_path.data = self.directory + "-output.stl"
+        self.get_logger().info("Output mesh: " + output_path.data)
         self.file_directory_pub.publish(output_path)
         self.get_logger().info("Mesh complete.")
 
@@ -95,30 +114,3 @@ def main(args=None):
 
 if __name__ == "__main__":
     main() 
-
-# pcd_path = "first_test_points/test6/combined_filtered.pcd"
-# pcd = o3d.io.read_point_cloud(pcd_path)
-# pcd.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=0.1, max_nn=30))
-# radii = [0.005, 0.01, 0.02, 0.04]
-# mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_alpha_shape(
-#     pcd, 0.02)
-# # Test comment
-# # mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_ball_pivoting(
-# #     pcd, o3d.utility.DoubleVector(radii))
-# # mesh.compute_vertex_normals()
-# # # mesh = mesh.filter_smooth_simple(number_of_iterations=5)
-# mesh = mesh.filter_smooth_laplacian(number_of_iterations=10)
-# # mesh = o3d.t.geometry.TriangleMesh.from_legacy(mesh).fill_holes().to_legacy()
-
-# trimesh_mesh = tm.Trimesh(vertices=mesh.vertices, faces=mesh.triangles)
-# trimesh_mesh.fill_holes()
-# trimesh_mesh.export("trimesh_mesh.stl")
-
-# # print('run Poisson surface reconstruction')
-# # with o3d.utility.VerbosityContextManager(
-# #         o3d.utility.VerbosityLevel.Debug) as cm:
-# #     mesh, densities = o3d.geometry.TriangleMesh.create_from_point_cloud_poisson(
-# #         pcd, depth=20)
-# print(mesh)
-
-# # o3d.visualization.draw_geometries([pcd, mesh])
