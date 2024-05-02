@@ -171,7 +171,9 @@ class OffboardFigure8Node(Node):
             self.start_time = time.time()
             self.timer = self.create_timer(0.1, self.timer_callback)
         else:
-            self.timer.cancel()
+            try:
+                self.timer.cancel()
+            except: pass
             self.offboard_arr_counter = 0
             self.land()
             self.hit_figure_8 = False
