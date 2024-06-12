@@ -7,6 +7,9 @@ Welcome to AeroPrint's documentation!
 =====================================
 
 .. toctree::
+   host
+   starling
+   printer
    :maxdepth: 2
    :caption: Contents:
 
