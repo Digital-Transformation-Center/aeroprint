@@ -3,3 +3,4 @@ build/
 log/
 scans/
 .venv/
+src/data_management/data_management/datasets/
