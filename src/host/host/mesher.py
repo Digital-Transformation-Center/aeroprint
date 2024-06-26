@@ -58,7 +58,7 @@ class Mesher(Node):
             self.save()
 
     def process(self):
-        """FUnction to process mesh"""
+        """Function to process mesh"""
         pcd = o3d.io.read_point_cloud(self.pc_file_location)
         pcd.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=0.05, max_nn=30))
         mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_alpha_shape(

@@ -53,3 +53,26 @@ if pip3 --version > /dev/null; then echo -e "${GREEN}Pip already installed.${NC}
     sudo apt-get install python3-pip
 fi
 
+## Install numpy
+if numpy --version > /dev/null; then echo -e "${GREEN}numpy already installed.${NC}"; else
+    echo -e "${GREEN}Installing numpy.${NC}"
+    sudo apt-get install python3-numpy
+fi
+
+## Install open3d
+if open3d --version > /dev/null; then echo -e "${GREEN}open3d already installed.${NC}"; else
+    echo -e "${GREEN}Installing open3d.${NC}"
+    sudo apt-get install python3-open3d
+fi
+
+## Install trimesh
+if trimesh --version > /dev/null; then ech -e "${GREEN}trimesh already installed.${NC}"; else
+    echo -e "${GREEN}Installing trimesh.${NC}"
+    sudo apt-get install python3-trimesh
+fi
+
+## Install PrusaLinkPy
+if PrusaLinkPy --version > /dev/null; then echo -e "${GREEN}PrusaLinkPy already installed.${NC}"; else
+    echo -e "${GREEN}Installing PrusaLinkPy.${NC}"
+    sudo apt-get install python3-PrusaLinkPy
+fi
