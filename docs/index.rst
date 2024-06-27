@@ -7,6 +7,7 @@ Welcome to AeroPrint's documentation!
 =====================================
 
 .. toctree::
+   launch_assist
    host
    starling
    printer
