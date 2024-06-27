@@ -354,6 +354,9 @@ class HeightGraphic(QWidget):
         self.end_point = end_point
         self.update()  # Update the canvas
 
+    def start_ros():
+        rclpy.init(args=None)
+
 
 def main(args=None) -> None:
     rclpy.init(args=args)
