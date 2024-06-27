@@ -18,6 +18,7 @@
   <exec_depend>python-git</exec_depend>
   <exec_depend>python-rosdep</exec_depend>
   <exec_depend>python-numpy</exec_depend>
+  <exec_depend>python-pandas</exec_depend>
   <exec_depend>open3d-python</exec_depend>
   <exec_depend>pip</exec_depend>
   <exec_depend>trimesh</exec_depend>
