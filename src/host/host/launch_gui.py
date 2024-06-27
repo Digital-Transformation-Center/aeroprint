@@ -5,7 +5,6 @@ from PyQt6.QtCore import Qt, QTimer
 import os
 import paramiko
 import threading
-# from aeroprint_gui import MyWindow
 
 class MainWindow(QMainWindow):
     """
@@ -65,14 +64,14 @@ class MainWindow(QMainWindow):
         to be called again after 1 second.
         """
         if self.checker.all_checks_passed():
-            # self.close()
+            launch_command = 'source ~/aeroprint/install/setup.bash && ros2 launch host host_launch.py'
+            subprocess.Popen(launch_command, shell=True)
+            self.close()
             print("DONE")
         else:
             print("NOT DONE")
             QTimer.singleShot(1000, self.start_gui)
-            MyWindow.start_ros()
-            window = MyWindow()
-            window.show()
+            
 
 class StarlingStartedWidget(QWidget):
     def __init__(self, connection_widget, checker):
