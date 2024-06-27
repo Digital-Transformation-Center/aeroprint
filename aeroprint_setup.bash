@@ -29,6 +29,12 @@ if printenv ROS_DISTRO | grep foxy -q; then echo -e "${GREEN}Ros 2 Foxy already 
     sudo apt install python3-colcon-common-extensions -y
 fi
 
+## Install RosDep
+if rosdep --version > /dev/null; then echo -e "${GREEN}RosDep already installed.${NC}"; else
+    echo -e "${GREEN}Installing RosDep.${NC}"
+    sudo apt-get install python3-rosdep
+fi
+
 ## Source ROS2 Foxy
 if cat ~/.bashrc | grep "source /opt/ros/foxy/setup.bash" -q; then echo -e "${GREEN}ROS 2 Foxy already sourced.${NC}"; else
     echo -e "${GREEN}Sourcing ROS 2 Foxy.${NC}"
@@ -40,3 +46,5 @@ if cat ~/.bashrc | grep "source ~/aeroprint/install/setup.bash" -q; then echo -e
     echo -e "${GREEN}Sourcing AeroPrint setup.${NC}"
     echo "source ~/aeroprint/install/setup.bash" >> ~/.bashrc
 fi
+
+cd ~/aeroprint && rosdep install --from-paths src --ignore-src -r

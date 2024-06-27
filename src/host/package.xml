@@ -16,7 +16,6 @@
   <exec_depend>std_msgs</exec_depend>
   <!--sqlite3 is included in python3-->
   <exec_depend>python-git</exec_depend>
-  <exec_depend>python-rosdep</exec_depend>
   <exec_depend>python-numpy</exec_depend>
   <exec_depend>python-pandas</exec_depend>
   <exec_depend>open3d-python</exec_depend>
