@@ -70,9 +70,9 @@ class MainWindow(QMainWindow):
         else:
             print("NOT DONE")
             QTimer.singleShot(1000, self.start_gui)
-            # MyWindow.start_ros()
-            # window = MyWindow()
-            # window.show()
+            MyWindow.start_ros()
+            window = MyWindow()
+            window.show()
 
 class StarlingStartedWidget(QWidget):
     def __init__(self, connection_widget, checker):
