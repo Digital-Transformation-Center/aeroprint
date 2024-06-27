@@ -52,4 +52,3 @@ if pip3 --version > /dev/null; then echo -e "${GREEN}Pip already installed.${NC}
     echo -e "${GREEN}Installing pip.${NC}"
     sudo apt-get install python3-pip
 fi
-
