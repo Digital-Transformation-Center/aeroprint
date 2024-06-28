@@ -1,3 +1,13 @@
+#!/usr/bin/env python3
+"""
+launch_gui.py: PyQt GUI for preflight check.
+UDRI DTC AEROPRINT
+"""
+__author__ = "Ryan Kuederle"
+__email__ = "ryan.kuederle@udri.udayton.edu"
+__version__ = "0.01.01"
+__status__ = "Beta"
+
 import subprocess
 from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QHBoxLayout, QMainWindow, QVBoxLayout, QDialog
 from PyQt6.QtGui import QPixmap
@@ -20,6 +30,20 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
+        path = os.path.dirname(os.path.abspath(__file__))  
+        # Split the path into components
+        path_parts = path.split(os.sep)
+
+        # Find the index of 'aeroprint' in the path
+        try:
+            aeroprint_index = path_parts.index("aeroprint")
+        except ValueError:
+            print("Error: 'aeroprint' not found in the path")
+        else:
+            # Construct the truncated path
+            truncated_path = os.sep.join(path_parts[:aeroprint_index + 1])
+        self.install_path = os.path.join(truncated_path, 'install/setup.bash')  
+        
         self.checker = Checker()
         self.setWindowTitle("AeroPrint Startup")
         self.starling_connection_widget = StarlingConnectionWidget(self.checker)
@@ -37,6 +61,7 @@ class MainWindow(QMainWindow):
         self.checker.add_check("wifi")
         self.checker.add_check("starling_connection")
         self.checker.add_check("starling_started")
+
         run_checks_thread = threading.Thread(target=self.run_checks)
         run_checks_thread.start()
         
@@ -64,8 +89,8 @@ class MainWindow(QMainWindow):
         to be called again after 1 second.
         """
         if self.checker.all_checks_passed():
-            launch_command = 'source ~/aeroprint/install/setup.bash && ros2 launch host host_launch.py'
-            subprocess.Popen(launch_command, shell=True)
+            launch_command = f'source {self.install_path} && ros2 launch host host_launch.py'
+            subprocess.Popen(launch_command, shell=True, executable='/bin/bash')
             self.close()
             print("DONE")
         else:

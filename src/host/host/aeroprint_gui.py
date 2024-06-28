@@ -5,7 +5,7 @@ UDRI DTC AEROPRINT
 """
 __author__ = "Ryan Kuederle"
 __email__ = "ryan.kuederle@udri.udayton.edu"
-__version__ = "0.1.0"
+__version__ = "0.01.01"
 __status__ = "Beta"
 
 import sys
@@ -20,7 +20,7 @@ from rclpy.qos import qos_profile_system_default
 from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy, qos_profile_sensor_data
 from sensor_msgs.msg import Image
 import cv2
-from cv_bridge import CvBridge
+# from cv_bridge import CvBridge
 import threading
 import sys
 
