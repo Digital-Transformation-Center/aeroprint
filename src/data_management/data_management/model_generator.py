@@ -1,7 +1,7 @@
 import tensorflow as tf
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.applications import VGG16, EfficientNetV2L
-from tensorflow.keras.layers import Dense, GlobalAveragePooling2D, Dropout
+from tensorflow.keras.layers import Dense, GlobalAveragePooling2D, Dropout, Flatten
 from tensorflow.keras.models import Model, Sequential
 from tensorflow.image import flip_left_right, adjust_brightness, adjust_contrast
 
@@ -43,13 +43,22 @@ class ModelGenerator():
         predictions = Dense(self.num_classes, activation='softmax')(x)
         model = Model(inputs=self.base_model.input, outputs=predictions)
 
-        my_model = Sequential([self.base_model_2,
-                       GlobalAveragePooling2D(),
-                       Dense(512, activation='relu'),
-                       Dropout(0.2),
-                       Dense(512, activation='relu'),
-                       Dropout(0.2),
-                       Dense(self.num_classes, activation='softmax')])
+        base_model_output = self.base_model_2.output
+        x = GlobalAveragePooling2D()(base_model_output)
+        x = Dense(512, activation='relu')(x)
+        x = Dropout(0.2)(x)
+        x = Dense(512, activation='relu')(x)
+        x = Dropout(0.2)(x)
+        predictions = Dense(self.num_classes, activation='softmax')(x)
+
+        my_model = Model(inputs=self.base_model_2.input, outputs=predictions)
+        # my_model = Sequential([self.base_model_2,
+        #                 GlobalAveragePooling2D(),
+        #                 Dense(512, activation='relu'),
+        #                 Dropout(0.2),
+        #                 Dense(512, activation='relu'),
+        #                 Dropout(0.2),
+        #                 Dense(self.num_classes, activation='softmax')])
         
         
         BATCH_SIZE = 4
@@ -103,12 +112,12 @@ class ModelGenerator():
         )
     
         # Train the model
-        model.fit(train_generator, epochs=3)
+        # model.fit(train_generator, epochs=3)
         # my_model.fit(train_dataset, validation_data=val_dataset, epochs=3)
         my_model.fit(train_dataset, epochs=3, validation_data=val_dataset)
         class_names = list(train_generator.class_indices.keys())
         print("Class Names:", class_names)
-        print(model.summary())
+        # print(model.summary())
         print(my_model.summary())
         # Export the model to the export folder in the proper Keras format
         # model.save(self.export_path)

@@ -9,6 +9,7 @@ from model_tester import ModelTester
 import numpy as np
 import json
 import threading
+from PIL import Image
 class CameraDumpGUI(QWidget):
     def __init__(self):
         super().__init__()
@@ -99,6 +100,10 @@ class CameraDumpGUI(QWidget):
         self.dataset_properties_json_path = os.path.join(self.dataset_resources_path, "properties.json")
         self.action_widget.set_images_path(self.dataset_images_path)
         self.action_widget.set_model_path(self.dataset_model_path)
+        self.model_path = os.path.join(self.dataset_model_path, "model.keras")
+        try:
+            self.action_widget.set_test_model(ModelTester(self.model_path))
+        except: pass
 
     def display_camera(self):
         ret, frame = self.camera.read()
@@ -214,17 +219,21 @@ class ActionsWidget(QWidget):
 
     def test_model(self):
         model_path = os.path.join(self.model_path, "model.keras")
-        model_tester = ModelTester(model_path)
-        # Convert cv2 frame to image
-        image = cv2.cvtColor(self.current_frame, cv2.COLOR_BGR2RGB)
-        image = cv2.resize(self.current_frame, (224, 224))
-        image = image / 255.0
-        image = np.expand_dims(image, axis=0)
+        
+        # Convert cv2 image to PIL Image
+        pil_image = Image.fromarray(cv2.cvtColor(self.current_frame, cv2.COLOR_BGR2RGB))
+        pil_image = pil_image.resize((224, 224))
+        img = np.asarray(pil_image)
+        img_batch = np.expand_dims(img, axis=0)
         # Get the list of folders in the images path
         folder_list = os.listdir(self.images_path)
         folder_list.reverse()
-        prediction, certainty = model_tester.test(image)
-        self.prediction_text.setText(folder_list[prediction.argmax()])
+        print(img.shape)
+        prediction, certainty = self.model_tester.test(img_batch)
+        if (certainty < 0.9):
+            self.prediction_text.setText("Unknown")
+        else:
+            self.prediction_text.setText(folder_list[prediction.argmax()])
         print(folder_list[prediction.argmax()], certainty)
 
 
@@ -237,8 +246,12 @@ class ActionsWidget(QWidget):
     def set_current_frame(self, frame):
         self.current_frame = frame
 
+    def set_test_model(self, model_tester):
+        self.model_tester = model_tester
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+    app.setStyle('fusion')
     gui = CameraDumpGUI()
     gui.show()
     sys.exit(app.exec())
