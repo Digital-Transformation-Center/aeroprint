@@ -162,7 +162,7 @@ class OffboardFigure8Node(Node):
             self.arm()
             self.armed = True
             self.start_time = time.time()
-            self.publish_offboard_control_heartbeat_signal)
+            self.publish_offboard_control_heartbeat_signal()
             self.publish_takeoff_setpoint(0.0, 0.0, -self.start_altitude)
             time.sleep(5)
             self.figure8_timer = self.create_timer(1.0 / self.rate, self.offboard_move_callback)
