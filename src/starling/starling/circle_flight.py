@@ -27,6 +27,7 @@ from px4_msgs.msg import (
     VehicleStatus,
 )
 
+
 class OffboardFigure8Node(Node):
     """Node for controlling a vehicle in offboard mode."""
 
@@ -119,9 +120,8 @@ class OffboardFigure8Node(Node):
         self.start_height = 0.0
         self.object_height = 0.0
         self.scan_ended = False
-        self.stops = [int(self.steps / 4), int(self.steps / 2), int(3 * self.steps / 4)]  # Example stop points
-        self.stop_duration = 5  # Stop duration in seconds
-        self.stop_counter = 0
+        # self.init_circle(self.start_altitude)
+        # self.init_circle(self.end_altitude)
 
     def create_path(self):
         # This is very extra right now, but makes it easier to add levels.
@@ -143,6 +143,9 @@ class OffboardFigure8Node(Node):
         self.get_logger().info("circle altitudes: "+ str(circle_altitudes))
         for altitude in circle_altitudes:
             self.init_circle(-altitude)
+        
+        # self.init_circle(-self.start_altitude)
+        # self.init_circle(-self.end_altitude)
 
     def start_height_callback(self, msg):
         self.start_height = msg.data
@@ -166,7 +169,6 @@ class OffboardFigure8Node(Node):
         self.scan_start_pub.publish(b)
         self.scan_end_pub.publish(b)
         self.scan_ended = False
-        self.stop_counter = 0
         if msg.data:
             self.publish_offboard_control_heartbeat_signal()
             self.get_logger().info("Recieved ready command.")
@@ -174,6 +176,7 @@ class OffboardFigure8Node(Node):
             self.engage_offboard_mode()
             self.arm()
             self.armed = True
+            # self.publish_takeoff_setpoint(0.0, 0.0, self.end_altitude)
             self.start_time = time.time()
             self.timer = self.create_timer(0.1, self.timer_callback)
         else:
@@ -198,6 +201,7 @@ class OffboardFigure8Node(Node):
             msg = TrajectorySetpoint()
 
             a = (-math.pi) + i * (2.0 * math.pi / self.steps)
+            
 
             msg.position = [r + r * math.cos(a), r * math.sin(a), altitude]
             msg.velocity = [
@@ -235,7 +239,7 @@ class OffboardFigure8Node(Node):
 
         if self.offboard_setpoint_counter < 11:
             self.offboard_setpoint_counter += 1
-
+        
         if self.start_time + 10 > time.time():
             self.publish_takeoff_setpoint(0.0, 0.0, -self.start_altitude)
         else:
@@ -284,15 +288,9 @@ class OffboardFigure8Node(Node):
         self.get_logger().info("Switching to land mode")
         self.taken_off = False
         self.path = []
+        # self.hit_figure_8 = False
 
     def offboard_move_callback(self):
-        if self.offboard_arr_counter in self.stops:
-            self.stop_counter += 1
-            if self.stop_counter < self.stop_duration * self.rate:
-                return
-            else:
-                self.stop_counter = 0
-
         if self.offboard_arr_counter < len(self.path):
             self.trajectory_setpoint_publisher.publish(
                 self.path[self.offboard_arr_counter]
@@ -373,6 +371,7 @@ def main(args=None) -> None:
         offboard_figure8_node.land()
         offboard_figure8_node.destroy_node()
         rclpy.shutdown()
+
 
 if __name__ == "__main__":
     try:
