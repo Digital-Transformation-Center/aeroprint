@@ -87,7 +87,7 @@ class OffboardFigure8Node(Node):
         )
         self.scan_end_pub = self.create_publisher(
             Bool, 
-            "/starling/out/fc/scan_end" ,
+            "/starling/out/fc/scan_end",
             qos_profile_system_default
         )
 
@@ -132,7 +132,7 @@ class OffboardFigure8Node(Node):
             else:
                 inter_lev = max_height - ((lev) * ((max_height - min_height) / (num_circles - 1)))
                 circle_altitudes.append(inter_lev)
-        self.get_logger().info("circle altitudes: "+ str(circle_altitudes))
+        self.get_logger().info("circle altitudes: " + str(circle_altitudes))
         for altitude in circle_altitudes:
             self.init_circle(-altitude)
         
@@ -150,13 +150,14 @@ class OffboardFigure8Node(Node):
 
     def ready_callback(self, msg):
         self.voxl_reset.reset()
-        b = Bool(); b.data  = False
+        b = Bool()
+        b.data = False
         self.scan_start_pub.publish(b)
         self.scan_end_pub.publish(b)
         self.scan_ended = False
         if msg.data:
             self.publish_offboard_control_heartbeat_signal()
-            self.get_logger().info("Recieved ready command.")
+            self.get_logger().info("Received ready command.")
             self.create_path()
             self.engage_offboard_mode()
             self.arm()
@@ -308,6 +309,7 @@ def main(args=None):
     rclpy.spin(offboard_control_node)
     offboard_control_node.destroy_node()
     rclpy.shutdown()
+
 
 if __name__ == "__main__":
     main()
