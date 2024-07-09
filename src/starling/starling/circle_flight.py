@@ -8,10 +8,6 @@ __email__ = "ryan.kuederle@udri.udayton.edu"
 __version__ = "0.1.0"
 __status__ = "Beta"
 
-
-
-# modified original code- original circle flight path code is saved above as a large comment
-# This path will have multiple stops in the circle
 import rclpy
 import math
 import time
@@ -161,10 +157,6 @@ class OffboardFigure8Node(Node):
 
     def ready_callback(self, msg):
         self.voxl_reset.reset()
-        # Reset Path and counters
-        self.path = []
-        self.offboard_setpoint_counter = 0
-        self.offboard_arr_counter = 0
         b = Bool(); b.data  = False
         self.scan_start_pub.publish(b)
         self.scan_end_pub.publish(b)
@@ -178,6 +170,7 @@ class OffboardFigure8Node(Node):
             self.armed = True
             # self.publish_takeoff_setpoint(0.0, 0.0, self.end_altitude)
             self.start_time = time.time()
+            self.offboard_setpoint_counter
             self.timer = self.create_timer(0.1, self.timer_callback)
         else:
             try:
