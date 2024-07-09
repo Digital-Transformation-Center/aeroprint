@@ -534,7 +534,7 @@ class OffboardFigure8Node(Node):
             self.arm()
             self.armed = True
             self.start_time = time.time()
-            self.publish_offboard_control_heartbeat_signal)
+            self.publish_offboard_control_heartbeat_signal()
             self.publish_takeoff_setpoint(0.0, 0.0, -self.start_altitude)
             time.sleep(5)
             self.figure8_timer = self.create_timer(1.0 / self.rate, self.offboard_move_callback)
@@ -558,7 +558,7 @@ class OffboardFigure8Node(Node):
 
         self.offboard_arr_counter += 1
 
-    def init_circle(self, altitude, num_stops=4, pause_duration=2.0):
+    def init_circle(self, altitude, num_stops=10, pause_duration=5.0):
         """Initialize circle trajectory with stops at specified intervals."""
         dt = 1.0 / self.rate
         dadt = (2.0 * math.pi) / self.cycle_s
