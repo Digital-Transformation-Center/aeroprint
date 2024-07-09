@@ -9,10 +9,7 @@ __version__ = "0.1.0"
 __status__ = "Beta"
 
 
-'''
 
-
-'''
 # modified original code- original circle flight path code is saved above as a large comment
 # This path will have multiple stops in the circle
 import rclpy
