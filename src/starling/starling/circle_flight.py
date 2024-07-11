@@ -264,7 +264,7 @@ class OffboardFigure8Node(Node):
         msg.command = VehicleCommand.VEHICLE_CMD_DO_SET_MODE
         msg.param1 = float(1)  # base mode
         msg.param2 = float(6)  # custom main mode
-        self.vehicle_command_publisher.publish(msg)
+        self.vehicle_command_publisher.publish(msg)r
 
     def arm(self):
         msg = VehicleCommand()
