@@ -6,14 +6,16 @@ import os
 from PyQt5.QtCore import pyqtProperty, QPropertyAnimation
 from PyQt5.QtCore import pyqtProperty, QPoint
 from PyQt5.QtCore import QEasingCurve
+from resources.custom_widgets import CenteredButton
 
 class ScrollContainer(QMainWindow):
     def __init__(self):
         super().__init__()
             
-        self.setWindowTitle("Multi-page GUI")
+        self.setWindowTitle("AeroPrint")
         self.setGeometry(100, 100, 400, 300)
         self.index = 0
+        
         # Load style sheet
         path = os.path.dirname(os.path.abspath(__file__))  
         # Split the path into components
@@ -28,7 +30,7 @@ class ScrollContainer(QMainWindow):
             # Construct the truncated path
             truncated_path = os.sep.join(path_parts[:aeroprint_index + 1])
         style_path = os.path.join(truncated_path, "src/host/host/gui/resources/style.qss")
-        
+
         with open(style_path, "r") as fh:
             self.style_sheet = fh.read()
             self.setStyleSheet(self.style_sheet)
@@ -70,14 +72,14 @@ class ScrollContainer(QMainWindow):
         self.ps.update_buttons()
 
     def next_button(self, text="Next"):
-        button = QPushButton(text)
-        button.setObjectName("action-button")
+        button = CenteredButton(text)
+        button.button.setObjectName("action-button")
         button.clicked.connect(self.ps.next)
         return button
 
     def previous_button(self, text="Previous"):
-        button = QPushButton(text)
-        button.setObjectName("action-button")
+        button = CenteredButton(text)
+        button.button.setObjectName("action-button")
         button.clicked.connect(self.ps.previous)
         return button
 

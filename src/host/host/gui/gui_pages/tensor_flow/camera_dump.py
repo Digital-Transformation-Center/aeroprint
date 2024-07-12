@@ -4,8 +4,8 @@ from PyQt5.QtCore import Qt, QTimer, pyqtSignal
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton, QListWidget, QGridLayout, QHBoxLayout
 import os
-from model_generator import ModelGenerator
-from model_tester import ModelTester
+from gui_pages.tensor_flow.model_generator import ModelGenerator
+from gui_pages.tensor_flow.model_tester import ModelTester
 import numpy as np
 import json
 import threading
