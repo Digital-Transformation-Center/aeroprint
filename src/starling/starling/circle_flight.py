@@ -55,7 +55,7 @@ class OffboardFigure8Node(Node):
             qos_profile,
         )
 
-        # Create integrations pubs & subs
+        # Create integrations pubs & subs    Input from GUI
         self.ready_sub = self.create_subscription(
             Bool, 
             "/host/gui/out/ready", 
@@ -90,7 +90,8 @@ class OffboardFigure8Node(Node):
             "/starling/out/fc/scan_end",
             qos_profile_system_default
         )
-
+        # Definitions of variables
+        # Variables with comments come from user interface 
         self.ready = False
 
         self.voxl_reset = VOXLQVIOController()
@@ -121,8 +122,8 @@ class OffboardFigure8Node(Node):
         #
         #        number of circles
         circle_altitudes = []
-        num_circles = 0.25
-        min_height = self.start_height + 0.20
+        num_circles = 1
+        min_height = self.start_height + 0.10
         max_height = self.start_height + self.object_height + 0.2
         self.start_altitude = max_height
         self.end_altitude = min_height
@@ -139,6 +140,8 @@ class OffboardFigure8Node(Node):
         for altitude in circle_altitudes:
             self.init_circle(-altitude)
         
+
+        # Messages sent to termianal about GUI inputs and vehicle status
     def start_height_callback(self, msg):
         self.start_height = msg.data
         self.get_logger().info("Updating start height to " + str(msg.data))
@@ -190,6 +193,12 @@ class OffboardFigure8Node(Node):
 
         self.offboard_arr_counter += 1
 
+
+
+
+
+
+# Adds stops in flight path
     #def init_circle(self, altitude, num_stops=8, pause_duration=5.0):
       #  """Initialize circle trajectory with stops at specified intervals."""
        # dt = 1.0 / self.rate
