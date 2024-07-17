@@ -133,7 +133,7 @@ class OffboardFigure8Node(Node):
                 circle_altitudes.append(max_height)
             elif lev == num_circles - 1:
                 circle_altitudes.append(min_height)
-            elif num_circles > 1:
+            elif num_circles > 1
                 inter_lev = max_height - ((lev) * ((max_height - min_height) / (num_circles - 1)))
                 circle_altitudes.append(inter_lev)
             else:
