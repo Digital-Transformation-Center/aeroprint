@@ -122,7 +122,7 @@ class OffboardFigure8Node(Node):
         #
         #        number of circles
         circle_altitudes = []
-        num_circles = 0
+        num_circles = 1
         min_height = self.start_height + 0.10
         max_height = self.start_height + self.object_height + 0.2
         self.start_altitude = max_height
@@ -207,7 +207,7 @@ class OffboardFigure8Node(Node):
         dadt = (2.0 * math.pi) / self.cycle_s
         r = self.radius
 
-         Calculate the angle interval for stops
+         #Calculate the angle interval for stops
         stop_interval = self.steps // num_stops
         stop_angles = [i * (2.0 * math.pi / num_stops) for i in range(num_stops)]
 
@@ -229,20 +229,20 @@ class OffboardFigure8Node(Node):
                 0.0,
            ]
             msg.yaw = math.atan2(msg.acceleration[1], msg.acceleration[0])
-#
+
            self.path.append(msg)
 
             # Insert pauses at specified stop angles
-  #          if i % stop_interval == 0 and i != 0:
+            if i % stop_interval == 0 and i != 0:
                 # Add pause setpoints
-   #             for _ in range(int(pause_duration * self.rate)):
-    #                pause_msg = TrajectorySetpoint()
-     #               pause_msg.position = msg.position
-      #              pause_msg.velocity = [0.0, 0.0, 0.0]
-       #             pause_msg.acceleration = [0.0, 0.0, 0.0]
-        #            pause_msg.yaw = msg.yaw
-         #           pause_msg.yawspeed = 0.0
-          #          self.path.append(pause_msg)
+                for _ in range(int(pause_duration * self.rate)):
+                    pause_msg = TrajectorySetpoint()
+                    pause_msg.position = msg.position
+                    pause_msg.velocity = [0.0, 0.0, 0.0]
+                    pause_msg.acceleration = [0.0, 0.0, 0.0]
+                    pause_msg.yaw = msg.yaw
+                    pause_msg.yawspeed = 0.0
+                    self.path.append(pause_msg)
 
         # Calculate yawspeed for smooth rotation
         for i in range(len(self.path) - 1):
