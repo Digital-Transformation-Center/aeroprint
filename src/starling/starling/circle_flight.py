@@ -122,7 +122,7 @@ class OffboardFigure8Node(Node):
         #
         #        number of circles
         circle_altitudes = []
-        num_circles = 1
+        num_circles = 0
         min_height = self.start_height + 0.10
         max_height = self.start_height + self.object_height + 0.2
         self.start_altitude = max_height
