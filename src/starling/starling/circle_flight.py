@@ -204,7 +204,7 @@ class OffboardFigure8Node(Node):
     def init_circle(self, altitude, num_stops=8, pause_duration=5.0):
         """Initialize circle trajectory with stops at specified intervals."""
         dt = 1.0 / self.rate
-       dadt = (2.0 * math.pi) / self.cycle_s
+        dadt = (2.0 * math.pi) / self.cycle_s
         r = self.radius
 
          Calculate the angle interval for stops
