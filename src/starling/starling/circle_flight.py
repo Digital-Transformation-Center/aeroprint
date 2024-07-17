@@ -230,7 +230,7 @@ class OffboardFigure8Node(Node):
            ]
             msg.yaw = math.atan2(msg.acceleration[1], msg.acceleration[0])
 
-           self.path.append(msg)
+            self.path.append(msg)
 
             # Insert pauses at specified stop angles
             if i % stop_interval == 0 and i != 0:
