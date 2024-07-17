@@ -201,36 +201,36 @@ class OffboardFigure8Node(Node):
 
 
 # Adds stops in flight path
-    #def init_circle(self, altitude, num_stops=8, pause_duration=5.0):
-      #  """Initialize circle trajectory with stops at specified intervals."""
-       # dt = 1.0 / self.rate
-      #  dadt = (2.0 * math.pi) / self.cycle_s
-      #  r = self.radius
+    def init_circle(self, altitude, num_stops=8, pause_duration=5.0):
+        """Initialize circle trajectory with stops at specified intervals."""
+        dt = 1.0 / self.rate
+       dadt = (2.0 * math.pi) / self.cycle_s
+        r = self.radius
 
-        # Calculate the angle interval for stops
-       # stop_interval = self.steps // num_stops
-        #stop_angles = [i * (2.0 * math.pi / num_stops) for i in range(num_stops)]
-#
- #       for i in range(self.steps):
-  #          msg = TrajectorySetpoint()
+         Calculate the angle interval for stops
+        stop_interval = self.steps // num_stops
+        stop_angles = [i * (2.0 * math.pi / num_stops) for i in range(num_stops)]
+
+        for i in range(self.steps):
+            msg = TrajectorySetpoint()
 
             # Define angle a
-   #         a = (i * (2.0 * math.pi) / self.steps) - math.pi / 2
+            a = (i * (2.0 * math.pi) / self.steps) - math.pi / 2
 
-    #        msg.position = [r * math.cos(a), r * math.sin(a), altitude]
-     #       msg.velocity = [
-      #          dadt * -r * math.sin(a),
-       #         dadt * r * math.cos(a),
-        #        0.0,
-         #   ]
-  #          msg.acceleration = [
-   #             dadt * -r * math.cos(a),
-    #            dadt * -r * math.sin(a),
-     #           0.0,
-      #      ]
-       #     msg.yaw = math.atan2(msg.acceleration[1], msg.acceleration[0])
+            msg.position = [r * math.cos(a), r * math.sin(a), altitude]
+            msg.velocity = [
+                dadt * -r * math.sin(a),
+                dadt * r * math.cos(a),
+                0.0,
+            ]
+            msg.acceleration = [
+                dadt * -r * math.cos(a),
+                dadt * -r * math.sin(a),
+                0.0,
+           ]
+            msg.yaw = math.atan2(msg.acceleration[1], msg.acceleration[0])
 #
- #           self.path.append(msg)
+           self.path.append(msg)
 
             # Insert pauses at specified stop angles
   #          if i % stop_interval == 0 and i != 0:
