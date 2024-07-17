@@ -1,0 +1,53 @@
+QWidget {
+    background-color: black;
+}
+
+
+
+QLineEdit {
+    width: 100%;
+    height: 1.5em;
+    border-radius: 0.1em;
+    background-color: #333333;
+    color: white;
+}
+
+QPushButton {
+    min-width: 1.5em;
+    height: 1.5em;
+    border-radius: 0.5em;
+    background-color: #333333;
+    border: 0.1em solid #e82629;
+    color: white;
+}
+
+QPushButton#action-button {
+    width: 50px;
+    height: 1.5em;
+    background-color: #e82629;
+    color: white;
+}
+
+QPushButton#page-button {
+    min-width: 0px;
+    width: 0.6em;
+    height: 0.6em;
+    border-radius: 0.3em;
+    border: 0.05em solid white;
+}
+
+QPushButton#page-button:hover {
+    background-color: #666666;
+}
+
+QPushButton#page-button:pressed {
+    background-color: #333333;
+}
+
+QPushButton#page-button[current="true"] {
+    background-color: #727272;
+}
+
+QPushButton#page-button[current="false"] {
+    background-color: #c0c0c0;
+}
