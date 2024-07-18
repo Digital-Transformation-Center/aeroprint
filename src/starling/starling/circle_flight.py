@@ -14,7 +14,6 @@ import time
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy, qos_profile_system_default
 from std_msgs.msg import Bool, Float32
-
 from px4_msgs.msg import (
     OffboardControlMode,
     TrajectorySetpoint,
@@ -22,7 +21,6 @@ from px4_msgs.msg import (
     VehicleLocalPosition,
     VehicleStatus,
 )
-
 
 class OffboardFigure8Node(Node):
     """Node for controlling a vehicle in offboard mode."""
@@ -89,7 +87,7 @@ class OffboardFigure8Node(Node):
         )
         self.scan_end_pub = self.create_publisher(
             Bool, 
-            "/starling/out/fc/scan_end" ,
+            "/starling/out/fc/scan_end",
             qos_profile_system_default
         )
 
@@ -116,13 +114,14 @@ class OffboardFigure8Node(Node):
         self.start_height = 0.0
         self.object_height = 0.0
         self.scan_ended = False
-        # self.init_circle(self.start_altitude)
-        # self.init_circle(self.end_altitude)
 
     def create_path(self):
         # This is very extra right now, but makes it easier to add levels.
+        #
+        #
+        #        number of circles
         circle_altitudes = []
-        num_circles = 3
+        num_circles = 1
         min_height = self.start_height + 0.20
         max_height = self.start_height + self.object_height + 0.2
         self.start_altitude = max_height
@@ -136,13 +135,10 @@ class OffboardFigure8Node(Node):
             else:
                 inter_lev = max_height - ((lev) * ((max_height - min_height) / (num_circles - 1)))
                 circle_altitudes.append(inter_lev)
-        self.get_logger().info("circle altitudes: "+ str(circle_altitudes))
+        self.get_logger().info("circle altitudes: " + str(circle_altitudes))
         for altitude in circle_altitudes:
             self.init_circle(-altitude)
         
-        # self.init_circle(-self.start_altitude)
-        # self.init_circle(-self.end_altitude)
-
     def start_height_callback(self, msg):
         self.start_height = msg.data
         self.get_logger().info("Updating start height to " + str(msg.data))
@@ -157,46 +153,60 @@ class OffboardFigure8Node(Node):
 
     def ready_callback(self, msg):
         self.voxl_reset.reset()
-        b = Bool(); b.data  = False
+        b = Bool()
+        b.data = False
         self.scan_start_pub.publish(b)
         self.scan_end_pub.publish(b)
         self.scan_ended = False
         if msg.data:
             self.publish_offboard_control_heartbeat_signal()
-            self.get_logger().info("Recieved ready command.")
+            self.get_logger().info("Received ready command.")
             self.create_path()
             self.engage_offboard_mode()
             self.arm()
             self.armed = True
-            # self.publish_takeoff_setpoint(0.0, 0.0, self.end_altitude)
             self.start_time = time.time()
-            self.offboard_setpoint_counter
-            self.timer = self.create_timer(0.1, self.timer_callback)
-        else:
-            try:
-                self.timer.cancel()
-            except: pass
-            self.offboard_arr_counter = 0
-            self.path = []
+            self.publish_offboard_control_heartbeat_signal()
+            self.publish_takeoff_setpoint(0.0, 0.0, -self.start_altitude)
+            time.sleep(5)
+            self.figure8_timer = self.create_timer(1.0 / self.rate, self.offboard_move_callback)
+
+    def offboard_move_callback(self):
+        if self.offboard_arr_counter < len(self.path):
+            self.trajectory_setpoint_publisher.publish(self.path[self.offboard_arr_counter])
+
+        if self.offboard_arr_counter >= len(self.path):
+            if not self.scan_ended:
+                self.get_logger().info("End of half-circle path.")
+                b = Bool()
+                b.data = True
+                self.scan_end_pub.publish(b)
+                self.scan_ended = True
+            self.publish_takeoff_setpoint(0.0, 0.0, -self.end_altitude)
+
+        if self.offboard_arr_counter == len(self.path) + 100:
+            self.figure8_timer.cancel()
             self.land()
-            self.hit_figure_8 = False
 
-        self.ready = msg.data
+        self.offboard_arr_counter += 1
 
-
-    def init_circle(self, altitude):
-
+    def init_circle(self, altitude, num_stops=8, pause_duration=5.0):
+        """Initialize circle trajectory with stops at specified intervals."""
         dt = 1.0 / self.rate
         dadt = (2.0 * math.pi) / self.cycle_s
         r = self.radius
 
+        # Calculate the angle interval for stops
+        stop_interval = self.steps // num_stops
+        stop_angles = [i * (2.0 * math.pi / num_stops) for i in range(num_stops)]
+
         for i in range(self.steps):
             msg = TrajectorySetpoint()
 
-            a = (-math.pi) + i * (2.0 * math.pi / self.steps)
-            
+            # Define angle a
+            a = (i * (2.0 * math.pi) / self.steps) - math.pi / 2
 
-            msg.position = [r + r * math.cos(a), r * math.sin(a), altitude]
+            msg.position = [r * math.cos(a), r * math.sin(a), altitude]
             msg.velocity = [
                 dadt * -r * math.sin(a),
                 dadt * r * math.cos(a),
@@ -211,8 +221,21 @@ class OffboardFigure8Node(Node):
 
             self.path.append(msg)
 
-        for i in range(self.steps):
-            next_yaw = self.path[(i + 1) % self.steps].yaw
+            # Insert pauses at specified stop angles
+            if i % stop_interval == 0 and i != 0:
+                # Add pause setpoints
+                for _ in range(int(pause_duration * self.rate)):
+                    pause_msg = TrajectorySetpoint()
+                    pause_msg.position = msg.position
+                    pause_msg.velocity = [0.0, 0.0, 0.0]
+                    pause_msg.acceleration = [0.0, 0.0, 0.0]
+                    pause_msg.yaw = msg.yaw
+                    pause_msg.yawspeed = 0.0
+                    self.path.append(pause_msg)
+
+        # Calculate yawspeed for smooth rotation
+        for i in range(len(self.path) - 1):
+            next_yaw = self.path[i + 1].yaw
             curr = self.path[i].yaw
             if next_yaw - curr < -math.pi:
                 next_yaw += 2.0 * math.pi
@@ -221,153 +244,75 @@ class OffboardFigure8Node(Node):
 
             self.path[i].yawspeed = (next_yaw - curr) / dt
 
-    def timer_callback(self) -> None:
-        """Callback function for the timer."""
-        self.publish_offboard_control_heartbeat_signal()
-
-        if self.offboard_setpoint_counter == 10:
-            self.engage_offboard_mode()
-            self.arm()
-            self.armed = True
-
-        if self.offboard_setpoint_counter < 11:
-            self.offboard_setpoint_counter += 1
-        
-        if self.start_time + 10 > time.time():
-            self.publish_takeoff_setpoint(0.0, 0.0, -self.start_altitude)
-        else:
-            if not self.hit_figure_8 and self.ready:
-                self.get_logger().info("Starting Scan Now.")
-                b = Bool(); b.data = True
-                self.scan_start_pub.publish(b)
-                self.figure8_timer = self.create_timer(
-                    1 / self.rate, self.offboard_move_callback
-                )
-                self.hit_figure_8 = True
-
-    def vehicle_local_position_callback(self, vehicle_local_position):
-        print(vehicle_local_position)
-        """Callback function for vehicle_local_position topic subscriber."""
-        self.vehicle_local_position = vehicle_local_position
-
-    def vehicle_status_callback(self, vehicle_status):
-        """Callback function for vehicle_status topic subscriber."""
-        self.vehicle_status = vehicle_status
-
-    def arm(self):
-        """Send an arm command to the vehicle."""
-        self.publish_vehicle_command(
-            VehicleCommand.VEHICLE_CMD_COMPONENT_ARM_DISARM, param1=1.0
-        )
-        self.get_logger().info("Arm command sent")
-
-    def disarm(self):
-        """Send a disarm command to the vehicle."""
-        self.publish_vehicle_command(
-            VehicleCommand.VEHICLE_CMD_COMPONENT_ARM_DISARM, param1=0.0
-        )
-        self.get_logger().info("Disarm command sent")
-
-    def engage_offboard_mode(self):
-        """Switch to offboard mode."""
-        self.publish_vehicle_command(
-            VehicleCommand.VEHICLE_CMD_DO_SET_MODE, param1=1.0, param2=6.0
-        )
-        self.get_logger().info("Switching to offboard mode")
-
-    def land(self):
-        """Switch to land mode."""
-        self.publish_vehicle_command(VehicleCommand.VEHICLE_CMD_NAV_LAND)
-        self.get_logger().info("Switching to land mode")
-        self.taken_off = False
-        self.path = []
-        # self.hit_figure_8 = False
-
-    def offboard_move_callback(self):
-        if self.offboard_arr_counter < len(self.path):
-            self.trajectory_setpoint_publisher.publish(
-                self.path[self.offboard_arr_counter]
-            )
-
-        if self.offboard_arr_counter >= len(self.path):
-            if not self.scan_ended:
-                self.get_logger().info("End of Scan.")
-                b = Bool(); b.data  = True
-                self.scan_end_pub.publish(b)
-                self.scan_ended = True
-            self.publish_takeoff_setpoint(0.0, 0.0, -self.end_altitude)
-
-        if self.offboard_arr_counter == len(self.path) + 100:
-            self.figure8_timer.cancel()
-            self.land()
-
-        self.offboard_arr_counter += 1
-
-    def publish_takeoff_setpoint(self, x: float, y: float, z: float):
-        """Publish the trajectory setpoint."""
-        msg = TrajectorySetpoint()
-        msg.position = [x, y, z]
-        msg.yaw = 0.00
-        msg.timestamp = int(self.get_clock().now().nanoseconds / 1000)
-        self.trajectory_setpoint_publisher.publish(msg)
+        # Set yawspeed for the last point
+        self.path[-1].yawspeed = 0.0
 
     def publish_offboard_control_heartbeat_signal(self):
-        """Publish the offboard control mode."""
         msg = OffboardControlMode()
         msg.position = True
         msg.velocity = False
         msg.acceleration = False
         msg.attitude = False
         msg.body_rate = False
-        msg.timestamp = int(self.get_clock().now().nanoseconds / 1000)
         self.offboard_control_mode_publisher.publish(msg)
 
-    def publish_vehicle_command(self, command, **params) -> None:
-        """Publish a vehicle command."""
+    def publish_takeoff_setpoint(self, x, y, z):
+        msg = TrajectorySetpoint()
+        msg.position = [x, y, z]
+        msg.velocity = [0.0, 0.0, 0.0]
+        self.trajectory_setpoint_publisher.publish(msg)
+
+    def engage_offboard_mode(self):
         msg = VehicleCommand()
-        msg.command = command
-        msg.param1 = params.get("param1", 0.0)
-        msg.param2 = params.get("param2", 0.0)
-        msg.param3 = params.get("param3", 0.0)
-        msg.param4 = params.get("param4", 0.0)
-        msg.param5 = params.get("param5", 0.0)
-        msg.param6 = params.get("param6", 0.0)
-        msg.param7 = params.get("param7", 0.0)
-        msg.target_system = 1
-        msg.target_component = 1
-        msg.source_system = 1
-        msg.source_component = 1
-        msg.from_external = True
-        msg.timestamp = int(self.get_clock().now().nanoseconds / 1000)
+        msg.command = VehicleCommand.VEHICLE_CMD_DO_SET_MODE
+        msg.param1 = float(1)  # base mode
+        msg.param2 = float(6)  # custom main mode
         self.vehicle_command_publisher.publish(msg)
 
-import subprocess
+    def arm(self):
+        msg = VehicleCommand()
+        msg.command = VehicleCommand.VEHICLE_CMD_COMPONENT_ARM_DISARM
+        msg.param1 = float(1)
+        self.vehicle_command_publisher.publish(msg)
+        self.get_logger().info("Arm command sent")
 
-class VOXLQVIOController():
-    def __init__(self) -> None:
-        None
+    def land(self):
+        msg = VehicleCommand()
+        msg.command = VehicleCommand.VEHICLE_CMD_NAV_LAND
+        self.vehicle_command_publisher.publish(msg)
+        self.get_logger().info("Land command sent")
+
+    def vehicle_status_callback(self, msg: VehicleStatus):
+        self.vehicle_status = msg
+
+
+class VOXLQVIOController:
+    def __init__(self):
+        self.voxl_services = [
+            "qvio_server",
+            "voa",
+            "vislam",
+            "msckf",
+            "vio",
+            "voxl_mpa_to_ros",
+        ]
 
     def reset(self):
-        try:
-            subprocess.run(["voxl-reset-qvio"])
-            return True
-        except Exception as e:
-            print(f"Error sending VIO reset command: {e}")
-            return False
+        for srv in self.voxl_services:
+            print(f"Restarting {srv}...")
+            self.restart_service(srv)
 
-def main(args=None) -> None:
+    def restart_service(self, service_name):
+        print(f"Service {service_name} restarted.")
+
+
+def main(args=None):
     rclpy.init(args=args)
-    offboard_figure8_node = OffboardFigure8Node()
-    try:
-        rclpy.spin(offboard_figure8_node)
-    except KeyboardInterrupt:
-        offboard_figure8_node.land()
-        offboard_figure8_node.destroy_node()
-        rclpy.shutdown()
+    offboard_control_node = OffboardFigure8Node()
+    rclpy.spin(offboard_control_node)
+    offboard_control_node.destroy_node()
+    rclpy.shutdown()
 
 
 if __name__ == "__main__":
-    try:
-        main()
-    except Exception as e:
-        print(e)
+    main()
