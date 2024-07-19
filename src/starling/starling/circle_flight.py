@@ -1,11 +1,13 @@
-#!/usr/bin/env python3
+
+
+        #!/usr/bin/env python3
 """
 circle_flight.py: ROS node to perform flight based on scan parameters.
 UDRI DTC AEROPRINT
 """
 __author__ = "Ryan Kuederle, Timothy Marshall"
 __email__ = "ryan.kuederle@udri.udayton.edu"
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 __status__ = "Beta"
 
 import rclpy
@@ -116,8 +118,10 @@ class OffboardFigure8Node(Node):
         self.start_height = 0.0
         self.object_height = 0.0
         self.scan_ended = False
-        # self.init_circle(self.start_altitude)
-        # self.init_circle(self.end_altitude)
+        self.pause_intervals = 200  # Number of steps between pauses
+        self.pause_duration = 5  # Pause duration in seconds
+        self.pausing = False
+        self.pause_start_time = 0
 
     def create_path(self):
         # This is very extra right now, but makes it easier to add levels.
@@ -139,9 +143,6 @@ class OffboardFigure8Node(Node):
         self.get_logger().info("circle altitudes: "+ str(circle_altitudes))
         for altitude in circle_altitudes:
             self.init_circle(-altitude)
-        
-        # self.init_circle(-self.start_altitude)
-        # self.init_circle(-self.end_altitude)
 
     def start_height_callback(self, msg):
         self.start_height = msg.data
@@ -163,12 +164,11 @@ class OffboardFigure8Node(Node):
         self.scan_ended = False
         if msg.data:
             self.publish_offboard_control_heartbeat_signal()
-            self.get_logger().info("Recieved ready command.")
+            self.get_logger().info("Received ready command.")
             self.create_path()
             self.engage_offboard_mode()
             self.arm()
             self.armed = True
-            # self.publish_takeoff_setpoint(0.0, 0.0, self.end_altitude)
             self.start_time = time.time()
             self.offboard_setpoint_counter
             self.timer = self.create_timer(0.1, self.timer_callback)
@@ -183,19 +183,14 @@ class OffboardFigure8Node(Node):
 
         self.ready = msg.data
 
-
     def init_circle(self, altitude):
-
         dt = 1.0 / self.rate
         dadt = (2.0 * math.pi) / self.cycle_s
         r = self.radius
 
         for i in range(self.steps):
             msg = TrajectorySetpoint()
-
             a = (-math.pi) + i * (2.0 * math.pi / self.steps)
-            
-
             msg.position = [r + r * math.cos(a), r * math.sin(a), altitude]
             msg.velocity = [
                 dadt * -r * math.sin(a),
@@ -208,7 +203,6 @@ class OffboardFigure8Node(Node):
                 0.0,
             ]
             msg.yaw = math.atan2(msg.acceleration[1], msg.acceleration[0])
-
             self.path.append(msg)
 
         for i in range(self.steps):
@@ -218,7 +212,6 @@ class OffboardFigure8Node(Node):
                 next_yaw += 2.0 * math.pi
             if next_yaw - curr > math.pi:
                 next_yaw -= 2.0 * math.pi
-
             self.path[i].yawspeed = (next_yaw - curr) / dt
 
     def timer_callback(self) -> None:
@@ -246,7 +239,6 @@ class OffboardFigure8Node(Node):
                 self.hit_figure_8 = True
 
     def vehicle_local_position_callback(self, vehicle_local_position):
-        print(vehicle_local_position)
         """Callback function for vehicle_local_position topic subscriber."""
         self.vehicle_local_position = vehicle_local_position
 
@@ -281,27 +273,33 @@ class OffboardFigure8Node(Node):
         self.get_logger().info("Switching to land mode")
         self.taken_off = False
         self.path = []
-        # self.hit_figure_8 = False
 
     def offboard_move_callback(self):
-        if self.offboard_arr_counter < len(self.path):
-            self.trajectory_setpoint_publisher.publish(
-                self.path[self.offboard_arr_counter]
-            )
+        if self.pausing:
+            if time.time() - self.pause_start_time >= self.pause_duration:
+                self.pausing = False
+        else:
+            if self.offboard_arr_counter < len(self.path):
+                self.trajectory_setpoint_publisher.publish(
+                    self.path[self.offboard_arr_counter]
+                )
+                if self.offboard_arr_counter % self.pause_intervals == 0:
+                    self.pausing = True
+                    self.pause_start_time = time.time()
 
-        if self.offboard_arr_counter >= len(self.path):
-            if not self.scan_ended:
-                self.get_logger().info("End of Scan.")
-                b = Bool(); b.data  = True
-                self.scan_end_pub.publish(b)
-                self.scan_ended = True
-            self.publish_takeoff_setpoint(0.0, 0.0, -self.end_altitude)
+            if self.offboard_arr_counter >= len(self.path):
+                if not self.scan_ended:
+                    self.get_logger().info("End of Scan.")
+                    b = Bool(); b.data  = True
+                    self.scan_end_pub.publish(b)
+                    self.scan_ended = True
+                self.publish_takeoff_setpoint(0.0, 0.0, -self.end_altitude)
 
-        if self.offboard_arr_counter == len(self.path) + 100:
-            self.figure8_timer.cancel()
-            self.land()
+            if self.offboard_arr_counter == len(self.path) + 100:
+                self.figure8_timer.cancel()
+                self.land()
 
-        self.offboard_arr_counter += 1
+            self.offboard_arr_counter += 1
 
     def publish_takeoff_setpoint(self, x: float, y: float, z: float):
         """Publish the trajectory setpoint."""
