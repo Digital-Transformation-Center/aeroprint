@@ -7,6 +7,8 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
 from resources.custom_widgets import CenteredButton
 from gui_pages.tensor_flow.ml_ui import MLUI
+from gui_pages.tensor_flow.model_generator import ModelGenerator
+from gui_pages.tensor_flow.model_tester import ModelTester
 # from gui_pages.tensor_flow.camera_dump import CameraDumpGUI
 
 """

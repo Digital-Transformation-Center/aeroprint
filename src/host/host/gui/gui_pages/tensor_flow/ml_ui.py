@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QApplication, QStackedWidget, QGridLayout, QScrollArea, QSizePolicy, QMessageBox, QLineEdit, QComboBox, QProgressBar
 from PyQt5.QtGui import QPixmap, QIcon, QMovie
-from PyQt5.QtCore import Qt, QSize, QRect, QThread
+from PyQt5.QtCore import Qt, QSize, QRect, QThread, QTimer, QObject, pyqtSignal
 import sys
 import os
 from model_tester import ModelTester
@@ -16,6 +16,8 @@ import threading
 class MLUI(QWidget):
     def __init__(self, scroll_container, dataset, model_name):
         super().__init__()
+        self.signals = WorkerSignals()
+        self.signals.finished.connect(self.on_load_ui_assets)
         self.setMinimumSize(1200, 800)
         self.settings_utility = SettingsUtility()
         self.resource_path = os.path.abspath(self.settings_utility.get_value("resources_file_path"))
@@ -33,6 +35,12 @@ class MLUI(QWidget):
         self.splash_widget.next_button.clicked.connect(self.load_ui)
         self.setLayout(layout)
 
+    def set_model_name(self, model_name):
+        self.model_name = model_name
+
+    def set_dataset(self, dataset): 
+        self.dataset = dataset
+
     def renew(self):
         self.widget_stack.setCurrentIndex(0)
         self.splash_widget = SplashWidget()
@@ -42,13 +50,18 @@ class MLUI(QWidget):
 
     def load_ui(self):
         
-        thread = threading.Thread(target=self.load_ui_assets)
-        thread.start()
-        lp = LoadingPopup()
-        lp.show()
-        thread.join()
-        lp.close_popup()
+        load_ui_thread = threading.Thread(target=self.load_ui_assets)
+        load_ui_thread.start()
+        # self.lp = LoadingPopup()
+        # self.loader_thread = threading.Thread(target=self.present_ui_loader)
+        # self.loader_thread.start()
+        self.present_ui_loader()
+        # self.lp.show_popup()
+        # load_ui_thread.join()
+        # lp.close_popup()
         print("Assets loaded")
+        
+    def on_load_ui_assets(self):
         self.image_scroll_widget = ImageScrollWidget(self.settings_utility, self.dataset, self.model_name, self)
         self.model_interaction_widget = ModelInteractionWidget(self.model_generator, self.model_tester, self.folder_list, self.classes_directory, self.model_name, self.model_export_directory)
         self.model_interaction_widget.show_model_prediction("None", "0", False)
@@ -63,7 +76,11 @@ class MLUI(QWidget):
         self.ui_widget.setLayout(self.ui_layout)
         self.widget_stack.addWidget(self.ui_widget)
         self.widget_stack.setCurrentIndex(1)
-        lp.close_popup()
+        self.lp.close_popup()
+        
+    def present_ui_loader(self):
+        self.lp = LoadingPopup(10) # 6 seconds loading time
+        self.lp.show_popup()
 
     def load_ui_assets(self):
         self.model_directory = os.path.join(self.resource_path, "datasets", self.dataset, "model", "model.keras")
@@ -73,6 +90,9 @@ class MLUI(QWidget):
         self.model_generator = ModelGenerator(folder_count, self.image_directory, self.model_directory)
         self.folder_list = os.listdir(self.classes_directory)
         self.folder_list.reverse()
+        self.signals.finished.emit()
+
+        
         print("YUMMY")
 
     def image_select(self, image_path):
@@ -165,6 +185,8 @@ class ImageScrollWidget(QWidget):
 class ModelInteractionWidget(QWidget):
     def __init__(self, model_generator, model_tester, folder_list, classes_directory, class_name, model_path):
         super().__init__()
+        self.prediction_signal = WorkerSignals()
+        self.prediction_signal.finished.connect(self.load_model_popup)
         self.model_path = model_path
         self.layout = QVBoxLayout()
         self.setLayout(self.layout)
@@ -214,27 +236,57 @@ class ModelInteractionWidget(QWidget):
             predictions.append(folder_list[prediction.argmax()])
 
         best_match = max(set(predictions), key=predictions.count)
-        return best_match
+        self.best_match = best_match
+        self.prediction_signal.finished.emit()
+        # return best_match
     
     def show_training_popup(self):
-        model_prediction = self.get_best_match()
-        print("Model Pred")
-        print(model_prediction)
+        self.model_exists = os.path.exists(self.model_path)
+        if self.model_exists:
+            gbm_thread = threading.Thread(target=self.get_best_match)
+            gbm_thread.start()
+            # self.get_best_match()
+        # model_prediction = self.get_best_match()
+        self.present_prediction_loader()
+        
+
+    def load_model_popup(self):
         popup = QMessageBox()
         popup.setWindowTitle("Training Model")
-        popup.setText("Enter training parameters:")
-        pred_text = QLabel(f"Model prediction: {model_prediction}")
-        options = ["Custom", f"Model Prediction: {model_prediction}"]
+        popup.setText("Enter training parameters:") 
+        if self.model_exists:
+            pred_text = QLabel(f"Model prediction: {self.best_match}")
+            options = ["Custom", f"Model Prediction: {self.best_match}"]
+
+        else:
+            pred_text = QLabel("No model exists")
+            options = ["Custom"]
+            
         selector = QComboBox()
         selector.addItems(options)
+        selector.currentIndexChanged.connect(self.on_selector_changed)
+        
         popup.layout().addWidget(selector)
         popup.layout().addWidget(pred_text)
         popup.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
-        textbox = QLineEdit()
-        popup.layout().addWidget(textbox)
+        self.model_name_textbox = QLineEdit()
+        
+        popup.layout().addWidget(self.model_name_textbox)
         button = popup.button(QMessageBox.Ok)
-        button.clicked.connect(lambda: self.train_model(selector.currentText(), textbox.text(), model_prediction))
+        button.clicked.connect(lambda: self.train_model(selector.currentText(), self.model_name_textbox.text(), self.best_match))
+        self.lp.close_popup()
         popup.exec_()
+
+    def on_selector_changed(self, index):
+        if index == 0:
+            self.model_name_textbox.show()
+        else:
+            self.model_name_textbox.hide()
+
+    def present_prediction_loader(self):
+        self.lp = LoadingPopup(6) # 6 seconds loading time
+        self.lp.show_popup()
+
 
     def train_model(self, selection, custom_text, predicted_name):
         new_model_name = ""
@@ -276,7 +328,7 @@ class ScanOutputWidget(QWidget):
         self.dataset_name_label = QLabel("Current Dataset: " + dataset)
         self.image_count_label = QLabel(str(len(os.listdir(images_file_path))) + " Images")
         self.model_exists_label = QLabel("Dataset Model Present")
-        if os.path.exists(model_path):
+        if not os.path.exists(model_path):
             self.model_exists_label.setText("Model not yet created")
         self.layout = QHBoxLayout()
         self.setLayout(self.layout)
@@ -284,47 +336,47 @@ class ScanOutputWidget(QWidget):
         self.layout.addWidget(self.model_exists_label)
         self.layout.addWidget(self.image_count_label)
 
-class LoadingPopup(QWidget):
-    def __init__(self):
-        super().__init__()
-        # self.popup = QWidget()
-        # self.popup.setWindowFlags(Qt.Window | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
-        self.setMinimumSize(1200, 800)
-        # self.popup.setGeometry(QRect(50, 50, 1000, 600))
-        # self.popup.setStyleSheet("background-color: white; border: 1px solid black;")
-        # self.animation = QMovie(ldg_path)
 
-        self.label = QLabel("Hello")
-        self.button = QPushButton("Close")
-        # self.label.setMinimumSize(QSize(250, 250))
-        # self.label.setGeometry(QRect(50, 50, 500, 300))
-        # self.label.setMovie(self.animation)
-        # self.progress_bar = QProgressBar()
-        # self.progress_bar.setRange(0, 100)
-        # self.progress_bar.setValue(100)
+
+class LoadingPopup(QWidget):
+    def __init__(self, time):
+        super().__init__()
+        self.setWindowFlags(Qt.Window | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
+        self.setMinimumSize(600, 400)
+        self.timeout_time = (time * 1000) / 100
+
+        self.label = QLabel("Loading...")
+        self.progress_bar = QProgressBar()
+        self.progress_bar.setRange(0, 100)
         
         self.popup_layout = QVBoxLayout()
-        # self.popup_layout.addWidget(self.label)
         self.popup_layout.addWidget(self.label)
-        self.popup_layout.addWidget(self.button)
-        # self.popup_layout.addWidget(self.progress_bar)
+        self.popup_layout.addWidget(self.progress_bar)
         self.setLayout(self.popup_layout)
-        # self.popup.setWindowTitle("Loading")
-
 
     def show_popup(self):
-        # thread = threading.Thread(target=self.popup_exec)
-        # thread.start()
-        self.popup_exec()
-        
+        self.show()
+        self.progress_bar.setValue(0)
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.update_progress)
+        print(self.timeout_time)
+        self.timer.start(int(self.timeout_time))
 
-    def popup_exec(self):
-        # self.animation.start()
-        self.popup.show()
+    def update_progress(self):
+        current_value = self.progress_bar.value()
+        if current_value < 100:
+            self.progress_bar.setValue(current_value + 1)
+        else:
+            self.timer.stop()
+            # self.close()
 
     def close_popup(self):
+        self.close()
         # self.animation.stop()
-        self.popup.close()
+        # self.popup.close()
+
+class WorkerSignals(QObject):
+    finished = pyqtSignal()
 
 if __name__ == "__main__":
     from scroll_container import ScrollContainer
