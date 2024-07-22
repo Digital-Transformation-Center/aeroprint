@@ -1,0 +1,34 @@
+name: aeroprint-dev
+version: '0.1'
+summary: ROS 2 Talker/Listener Example
+description: |
+ This example launches a ROS 2 talker and listener.
+ 
+confinement: devmode
+base: core20
+ 
+parts:
+ ros-demos:
+   plugin: colcon
+  #  source: https://github.com/Digital-Transformation-Center/aeroprint.git
+   source-branch: master
+  #  source-subdir: demo_nodes_cpp
+   source: .
+   stage-packages: [ros-foxy-ros2launch]
+   organize:
+    snap/gui/aeroprint-dev.desktop: usr/share/applications/aeroprint-dev.desktop
+ 
+apps:
+#  ros2-talker-listener:
+#    command: opt/ros/foxy/bin/ros2 launch demo_nodes_cpp talker_listener.launch.py
+#    extensions: [ros2-foxy]
+#   #  desktop: usr/share/applications/aeroprint-dev.desktop
+#    plugs:
+#     - desktop
+#     - desktop-legacy
+  host:
+    command: opt/ros/foxy/bin/ros2 launch host host_test_launch.py
+    extensions: [ros2-foxy]
+    plugs:
+      - desktop
+      - desktop-legacy

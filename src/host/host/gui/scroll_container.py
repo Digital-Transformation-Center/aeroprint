@@ -6,7 +6,7 @@ import os
 from PyQt5.QtCore import pyqtProperty, QPropertyAnimation
 from PyQt5.QtCore import pyqtProperty, QPoint
 from PyQt5.QtCore import QEasingCurve
-from resources.custom_widgets import CenteredButton
+from gui.resources.custom_widgets import CenteredButton
 
 class ScrollContainer(QMainWindow):
     def __init__(self):

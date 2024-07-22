@@ -1,14 +1,12 @@
 import sys
 
-from scroll_container import ScrollContainer
+from gui.scroll_container import ScrollContainer
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLineEdit, QPushButton, QApplication, QAction, QToolBar, QDialog, QHBoxLayout
-from gui_pages.settings.settings_widget import SettingsWidget
+from gui.gui_pages.settings.settings_widget import SettingsWidget
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
-from resources.custom_widgets import CenteredButton
-from gui_pages.tensor_flow.ml_ui import MLUI
-from gui_pages.tensor_flow.model_generator import ModelGenerator
-from gui_pages.tensor_flow.model_tester import ModelTester
+from gui.resources.custom_widgets import CenteredButton
+from gui.gui_pages.tensor_flow.ml_ui import MLUI
 # from gui_pages.tensor_flow.camera_dump import CameraDumpGUI
 
 """
@@ -87,5 +85,8 @@ class MainGUIExample:
         self.sc.show()
         sys.exit(self.app.exec_())
 
-if __name__ == "__main__":
+def main():
     MainGUIExample().run()
+
+if __name__ == "__main__":
+    main()

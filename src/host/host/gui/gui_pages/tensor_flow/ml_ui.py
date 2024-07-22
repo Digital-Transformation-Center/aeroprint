@@ -3,9 +3,10 @@ from PyQt5.QtGui import QPixmap, QIcon, QMovie
 from PyQt5.QtCore import Qt, QSize, QRect, QThread, QTimer, QObject, pyqtSignal
 import sys
 import os
-from model_tester import ModelTester
-from model_generator import ModelGenerator
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
+
+from gui_pages.tensor_flow.model_tester import ModelTester
+from gui_pages.tensor_flow.model_generator import ModelGenerator
 from resources.settings_utility import SettingsUtility
 import cv2
 import numpy as np
@@ -27,6 +28,7 @@ class MLUI(QWidget):
         self.model_name = model_name
         self.image_directory = os.path.join(self.resource_path, "datasets", self.dataset, "images", self.model_name)
         self.classes_directory = os.path.join(self.resource_path, "datasets", self.dataset, "images")
+        self.model_directory = os.path.join(self.resource_path, "datasets", self.dataset, "model", "model.keras")
         layout = QVBoxLayout()
         self.splash_widget = SplashWidget()
         self.widget_stack = QStackedWidget()
@@ -34,6 +36,7 @@ class MLUI(QWidget):
         layout.addWidget(self.widget_stack)
         self.splash_widget.next_button.clicked.connect(self.load_ui)
         self.setLayout(layout)
+        self.mit = ModelInteractionToolkit(self.classes_directory, self.image_directory, None, None, self.model_directory)
 
     def set_model_name(self, model_name):
         self.model_name = model_name
@@ -52,18 +55,14 @@ class MLUI(QWidget):
         
         load_ui_thread = threading.Thread(target=self.load_ui_assets)
         load_ui_thread.start()
-        # self.lp = LoadingPopup()
-        # self.loader_thread = threading.Thread(target=self.present_ui_loader)
-        # self.loader_thread.start()
         self.present_ui_loader()
-        # self.lp.show_popup()
-        # load_ui_thread.join()
-        # lp.close_popup()
         print("Assets loaded")
         
     def on_load_ui_assets(self):
         self.image_scroll_widget = ImageScrollWidget(self.settings_utility, self.dataset, self.model_name, self)
-        self.model_interaction_widget = ModelInteractionWidget(self.model_generator, self.model_tester, self.folder_list, self.classes_directory, self.model_name, self.model_export_directory)
+        self.model_interaction_widget = ModelInteractionWidget(self.model_generator, self.model_tester, self.folder_list, self.classes_directory, self.model_name, self.model_export_directory, self.sc.next_button())
+        self.model_interaction_widget.set_mit(self.mit)
+        self.model_interaction_widget.set_prediction(self.test_set_prediction)
         self.model_interaction_widget.show_model_prediction("None", "0", False)
         self.scan_output_widget = ScanOutputWidget(self.image_directory, self.model_directory, self.dataset)
         self.ui_layout = QVBoxLayout()
@@ -86,14 +85,14 @@ class MLUI(QWidget):
         self.model_directory = os.path.join(self.resource_path, "datasets", self.dataset, "model", "model.keras")
         self.model_export_directory = os.path.join(self.resource_path, "datasets", self.dataset, "model")
         self.model_tester = ModelTester(self.model_directory)
+        self.mit.assign_model_tester(self.model_tester)
+        self.test_set_prediction = self.mit.get_best_match()
+        print(self.test_set_prediction)
         folder_count = len(os.listdir(self.image_directory))
         self.model_generator = ModelGenerator(folder_count, self.image_directory, self.model_directory)
         self.folder_list = os.listdir(self.classes_directory)
         self.folder_list.reverse()
         self.signals.finished.emit()
-
-        
-        print("YUMMY")
 
     def image_select(self, image_path):
         if self.model_exists():
@@ -139,10 +138,10 @@ class SplashWidget(QWidget):
         self.layout = QVBoxLayout()
         self.setLayout(self.layout)
 
-        self.label = QLabel("Welcome to AeroPrint AI\nPlease click next to continue.")
+        self.label = QLabel("Welcome to AeroPrint AI\nPlease click Continue to continue.")
         self.label.setAlignment(Qt.AlignCenter)
         self.layout.addWidget(self.label)
-        self.next_button = QPushButton("Next")
+        self.next_button = QPushButton("Continue")
         self.layout.addWidget(self.next_button)
 
 class ImageScrollWidget(QWidget):
@@ -183,7 +182,7 @@ class ImageScrollWidget(QWidget):
                 col = 0
             
 class ModelInteractionWidget(QWidget):
-    def __init__(self, model_generator, model_tester, folder_list, classes_directory, class_name, model_path):
+    def __init__(self, model_generator, model_tester, folder_list, classes_directory, class_name, model_path, next_button=None):
         super().__init__()
         self.prediction_signal = WorkerSignals()
         self.prediction_signal.finished.connect(self.load_model_popup)
@@ -204,8 +203,21 @@ class ModelInteractionWidget(QWidget):
         self.layout.addWidget(self.model_train_button)
         self.train_model_label.hide()
         self.model_train_button.hide()
-        self.next_button = QPushButton("Next")
+        # Change this to be fed a next button from the parent widget
+        self.next_button = next_button
         self.layout.addWidget(self.next_button)
+        self.mit = ModelInteractionToolkit(self.classes_directory, self.images_directory, self.model_tester, self.prediction_signal, self.model_path)
+        self.model_exists = self.mit.model_exists()
+        self.lp = None
+
+    def set_mit(self, mit):
+        self.mit = mit
+        
+    def set_next_button(self, next_button):
+        self.next_button = next_button
+
+    def set_prediction(self, prediction):
+        self.prediction = prediction
 
     def show_model_prediction(self, prediction, certainty, model_exists):
         if model_exists:
@@ -215,66 +227,55 @@ class ModelInteractionWidget(QWidget):
             self.label.hide()
         self.model_train_button.show()
         self.train_model_label.show()
-
-    # A function to get the most common prediction of all opf the images in a directory
-    def get_best_match(self):
-        predictions = []
-        folder_list = os.listdir(self.classes_directory)
-        folder_list.reverse()
-        print("bm_folder_list")
-        print(folder_list)
-
-        image_files = os.listdir(self.images_directory)
-        random_images = random.sample(image_files, 5)
-        for image_file in random_images:
-            image_path = os.path.join(self.images_directory, image_file)
-            print(image_path)
-            image_array = cv2.imread(image_path)
-            image_array = cv2.resize(image_array, (224, 224))
-            img_batch = np.expand_dims(image_array, axis=0)
-            prediction, _ = self.model_tester.test(img_batch)
-            predictions.append(folder_list[prediction.argmax()])
-
-        best_match = max(set(predictions), key=predictions.count)
-        self.best_match = best_match
-        self.prediction_signal.finished.emit()
-        # return best_match
     
     def show_training_popup(self):
-        self.model_exists = os.path.exists(self.model_path)
-        if self.model_exists:
-            gbm_thread = threading.Thread(target=self.get_best_match)
-            gbm_thread.start()
-            # self.get_best_match()
-        # model_prediction = self.get_best_match()
-        self.present_prediction_loader()
+        if self.prediction is not None:
+            self.best_match = self.prediction
+            self.load_model_popup()
+        else:
+            self.model_exists = os.path.exists(self.model_path)
+            if self.model_exists:
+                gbm_thread = threading.Thread(target=self.mit.get_best_match)
+                gbm_thread.start()
+            self.present_prediction_loader()
         
 
     def load_model_popup(self):
         popup = QMessageBox()
         popup.setWindowTitle("Training Model")
-        popup.setText("Enter training parameters:") 
+        training_widget = QWidget()
+        training_layout = QVBoxLayout(training_widget)
+
+        # popup.setText("Enter training parameters:") 
+        description_text = QLabel("Train the model by creating a new class,\nusing the predicted class, or type an\nexisting class name.")
         if self.model_exists:
-            pred_text = QLabel(f"Model prediction: {self.best_match}")
-            options = ["Custom", f"Model Prediction: {self.best_match}"]
+            pred_text = QLabel(f"Model prediction: {self.mit.best_match}")
+            options = ["New Class", f"Model Prediction: {self.mit.best_match}"]
+            # Append options with the name of every directory in classes directory except the predicted one
+            # self.folder_list.remove(self.mit.best_match)
+            options.extend(self.folder_list)
+            options.remove(self.mit.best_match)
 
         else:
             pred_text = QLabel("No model exists")
-            options = ["Custom"]
+            options = ["New Class"]
             
         selector = QComboBox()
         selector.addItems(options)
         selector.currentIndexChanged.connect(self.on_selector_changed)
-        
-        popup.layout().addWidget(selector)
-        popup.layout().addWidget(pred_text)
-        popup.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+        training_layout.addWidget(description_text)
+        training_layout.addWidget(selector)
+        training_layout.addWidget(pred_text)
         self.model_name_textbox = QLineEdit()
         
-        popup.layout().addWidget(self.model_name_textbox)
+        training_layout.addWidget(self.model_name_textbox)
+        popup.layout().addWidget(training_widget)
+        popup.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+        
         button = popup.button(QMessageBox.Ok)
         button.clicked.connect(lambda: self.train_model(selector.currentText(), self.model_name_textbox.text(), self.best_match))
-        self.lp.close_popup()
+        if self.lp is not None:
+            self.lp.close_popup()
         popup.exec_()
 
     def on_selector_changed(self, index):
@@ -289,14 +290,16 @@ class ModelInteractionWidget(QWidget):
 
 
     def train_model(self, selection, custom_text, predicted_name):
-        new_model_name = ""
-        if selection == "Custom":
-            new_model_name = custom_text
+        self.new_model_name = ""
+        if selection == "New Class":
+            self.new_model_name = custom_text
+        elif selection == f"Model Prediction: {predicted_name}":
+            self.new_model_name = predicted_name
         else:
-            new_model_name = predicted_name
+            self.new_model_name = selection
         # Move all files from source directory to destination directory
         source_directory = self.images_directory
-        destination_directory = os.path.join(self.classes_directory, new_model_name)
+        destination_directory = os.path.join(self.classes_directory, self.new_model_name)
         shutil.move(source_directory, destination_directory)
         self.folder_list = os.listdir(self.classes_directory)
         gen = ModelGenerator(len(self.folder_list), self.classes_directory, self.model_path)
@@ -319,6 +322,10 @@ class ModelInteractionWidget(QWidget):
         popup.setWindowTitle("Model Trained")
         popup.setText("Your new image recognition model is complete and ready to use.")
         popup.setStandardButtons(QMessageBox.Ok)
+        self.images_directory = os.path.join(self.classes_directory, self.new_model_name)
+        self.mit = ModelInteractionToolkit(self.classes_directory, self.images_directory, self.model_tester, self.prediction_signal, self.model_path)
+        self.prediction = self.mit.get_best_match()
+
         popup.exec_()
         
 
@@ -375,6 +382,51 @@ class LoadingPopup(QWidget):
         # self.animation.stop()
         # self.popup.close()
 
+class ModelInteractionToolkit():
+    def __init__(self, classes_directory, images_directory, model_tester, prediction_signal, model_directory):
+        self.classes_directory = classes_directory
+        self.images_directory = images_directory
+        self.model_tester = model_tester
+        self.prediction_signal = prediction_signal
+        self.model_directory = model_directory
+        self.best_match = None
+    # A function to get the most common prediction of all opf the images in a directory
+    def get_best_match(self):
+        best_match = None
+        if self.model_exists():
+            print("SHITTING OUT A PREDICTION")
+            predictions = []
+            folder_list = os.listdir(self.classes_directory)
+            folder_list.reverse()
+            print("bm_folder_list")
+            print(folder_list)
+
+            image_files = os.listdir(self.images_directory)
+            random_images = random.sample(image_files, 5)
+            for image_file in random_images:
+                image_path = os.path.join(self.images_directory, image_file)
+                print(image_path)
+                image_array = cv2.imread(image_path)
+                image_array = cv2.resize(image_array, (224, 224))
+                img_batch = np.expand_dims(image_array, axis=0)
+                prediction, _ = self.model_tester.test(img_batch)
+                predictions.append(folder_list[prediction.argmax()])
+
+            best_match = max(set(predictions), key=predictions.count)
+            self.best_match = best_match
+            if self.prediction_signal is not None:
+                self.best_match = best_match
+                self.prediction_signal.finished.emit()
+        self.best_match = best_match
+        return best_match
+
+    def assign_model_tester(self, model_tester):
+        self.model_tester = model_tester
+
+    def model_exists(self):
+        print(self.model_directory)
+        return os.path.exists(self.model_directory)
+
 class WorkerSignals(QObject):
     finished = pyqtSignal()
 
@@ -384,8 +436,10 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     sc = ScrollContainer()
     dataset = "fruits"
-    model_name = "lime"
+    model_name = "junk"
     widget = MLUI(sc, dataset, model_name)
     sc.add_page(widget)
+    sc.add_page(QWidget())
+    sc.create_page_buttons()
     sc.show()
     sys.exit(app.exec_())

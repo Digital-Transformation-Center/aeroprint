@@ -31,7 +31,8 @@ setup(
             "gui = host.aeroprint_gui:main",
             "pc-collection = host.pc_collection:main", 
             "pc-post-processor = host.pc_post_processor:main", 
-            "mesher = host.mesher:main"
+            "mesher = host.mesher:main",
+            "gui_test = host.main_gui_example:main"
         ],
     },
 )

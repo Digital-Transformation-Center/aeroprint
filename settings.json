@@ -11,6 +11,6 @@
         "description": "Enable notifications for the application.",
         "type": "boolean",
         "default_value": true,
-        "value": false
+        "value": true
     }
 }
