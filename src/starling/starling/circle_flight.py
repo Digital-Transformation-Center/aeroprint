@@ -24,10 +24,6 @@ from px4_msgs.msg import (
 )
 
 
-
-
-
-
 class OffboardFigure8Node(Node):
     """Node for controlling a vehicle in offboard mode."""
 
@@ -187,18 +183,18 @@ class OffboardFigure8Node(Node):
 
         self.ready = msg.data
 
+
     def init_circle(self, altitude):
+
         dt = 1.0 / self.rate
         dadt = (2.0 * math.pi) / self.cycle_s
         r = self.radius
-
-        num_stops = 4  # Number of stops you want in the circle
-        stop_interval = self.steps // num_stops  # Interval at which to stop
 
         for i in range(self.steps):
             msg = TrajectorySetpoint()
 
             a = (-math.pi) + i * (2.0 * math.pi / self.steps)
+            
 
             msg.position = [r + r * math.cos(a), r * math.sin(a), altitude]
             msg.velocity = [
@@ -214,11 +210,6 @@ class OffboardFigure8Node(Node):
             msg.yaw = math.atan2(msg.acceleration[1], msg.acceleration[0])
 
             self.path.append(msg)
-
-            # Add stop point by duplicating the current setpoint multiple times
-            if i % stop_interval == 0:
-                for _ in range(10):  # Stop for 10 iterations
-                    self.path.append(msg)
 
         for i in range(self.steps):
             next_yaw = self.path[(i + 1) % self.steps].yaw
@@ -380,9 +371,6 @@ if __name__ == "__main__":
         main()
     except Exception as e:
         print(e)
-
-
-
 
 
 
