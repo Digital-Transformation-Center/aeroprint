@@ -6,7 +6,7 @@ import os
 from PyQt5.QtCore import pyqtProperty, QPropertyAnimation
 from PyQt5.QtCore import pyqtProperty, QPoint
 from PyQt5.QtCore import QEasingCurve
-from gui.resources.custom_widgets import CenteredButton
+from host.gui.resources.custom_widgets import CenteredButton
 
 class ScrollContainer(QMainWindow):
     def __init__(self):
@@ -128,6 +128,7 @@ class PageSwitcher():
     def update_buttons(self):
         for button in self.buttons:
             button.current = False
+        print(self.index)
         self.buttons[self.index].current = True
 
     def set_stacked_widget(self, stacked_widget):

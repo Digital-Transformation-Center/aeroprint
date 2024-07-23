@@ -16,9 +16,9 @@
   <exec_depend>std_msgs</exec_depend>
   <exec_depend>python3-pip</exec_depend>
   <exec_depend>python3-paramiko</exec_depend>
-  <exec_depend>python3-pyqt5</exec_depend>
   <exec_depend>python-tensorflow-pip</exec_depend>
-
+  <exec_depend>python3-pyqt5</exec_depend>
+  
   <export>
     <build_type>ament_python</build_type>
   </export>

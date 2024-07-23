@@ -4,12 +4,12 @@ from PIL import Image
 import numpy as np
 
 class ModelTester():
-    def __init__(self, model_folder):
-      self.model = self.load_model(model_folder)
+    def __init__(self):
+      None
 
     def load_model(self, model_folder):
-        model = tf.keras.models.load_model(model_folder)
-        return model
+        self.model = tf.keras.models.load_model(model_folder)
+        return self.model
 
     def test(self, image):
         # image = Image.open(test_image_path)
@@ -25,3 +25,6 @@ class ModelTester():
         certainty = np.max(prediction[0])
 
         return prediction, certainty
+    
+    def setModel(self, model):
+        self.model = model

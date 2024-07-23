@@ -1,12 +1,17 @@
 import sys
 
-from gui.scroll_container import ScrollContainer
+from host.gui.scroll_container import ScrollContainer
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLineEdit, QPushButton, QApplication, QAction, QToolBar, QDialog, QHBoxLayout
-from gui.gui_pages.settings.settings_widget import SettingsWidget
+from host.gui.gui_pages.settings.settings_widget import SettingsWidget
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
-from gui.resources.custom_widgets import CenteredButton
-from gui.gui_pages.tensor_flow.ml_ui import MLUI
+from host.gui.resources.custom_widgets import CenteredButton
+from host.gui.gui_pages.tensor_flow.ml_ui import MLUI
+from host.gui.gui_pages.flight.flight_widget import FlightWidget
+from host.gui.resources.settings_utility import SettingsUtility
+
+import os
+import rclpy
 # from gui_pages.tensor_flow.camera_dump import CameraDumpGUI
 
 """
@@ -18,7 +23,9 @@ class MainGUIExample:
         self.app = QApplication(sys.argv)
         self.sc = ScrollContainer()
         self.init_menu_bar()
-        
+        self.settings_utility = SettingsUtility()
+        self.resource_path = os.path.abspath(self.settings_utility.get_value("resources_file_path"))
+
     def init_menu_bar(self):
         menu_bar = self.sc.menuBar()
 
@@ -69,6 +76,8 @@ class MainGUIExample:
 
         # Create an instance of MyWidget and add it to the ScrollContainer
         widget0 = MLUI(self.sc, "fruits", "banana")
+        widget00 = FlightWidget(self.resource_path, self.sc, widget0)
+        
         widget = MyWidget()
         # Add a next button to the widget
         widget.layout().addWidget(self.sc.next_button())
@@ -76,7 +85,7 @@ class MainGUIExample:
         # widget3 = CameraDumpGUI()
         # Add a previous button to the widget
         widget2.layout().addWidget(self.sc.previous_button())
-        widgets = [widget0, widget, widget2]
+        widgets = [widget00, widget0, widget, widget2]
         # Add the widgets to the ScrollContainer
         for widget in widgets:
             self.sc.add_page(widget)
@@ -85,7 +94,8 @@ class MainGUIExample:
         self.sc.show()
         sys.exit(self.app.exec_())
 
-def main():
+def main(args=None):
+    rclpy.init(args=args)
     MainGUIExample().run()
 
 if __name__ == "__main__":

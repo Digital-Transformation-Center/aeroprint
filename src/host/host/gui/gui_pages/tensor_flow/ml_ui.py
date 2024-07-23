@@ -5,9 +5,9 @@ import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from gui_pages.tensor_flow.model_tester import ModelTester
-from gui_pages.tensor_flow.model_generator import ModelGenerator
-from resources.settings_utility import SettingsUtility
+from host.gui.gui_pages.tensor_flow.model_tester import ModelTester
+from host.gui.gui_pages.tensor_flow.model_generator import ModelGenerator
+from host.gui.resources.settings_utility import SettingsUtility
 import cv2
 import numpy as np
 import random
@@ -26,9 +26,9 @@ class MLUI(QWidget):
 
         self.dataset = dataset
         self.model_name = model_name
-        self.image_directory = os.path.join(self.resource_path, "datasets", self.dataset, "images", self.model_name)
-        self.classes_directory = os.path.join(self.resource_path, "datasets", self.dataset, "images")
-        self.model_directory = os.path.join(self.resource_path, "datasets", self.dataset, "model", "model.keras")
+        self.set_image_directory()
+        self.set_classes_directory()
+        self.set_model_directory()
         layout = QVBoxLayout()
         self.splash_widget = SplashWidget()
         self.widget_stack = QStackedWidget()
@@ -36,13 +36,40 @@ class MLUI(QWidget):
         layout.addWidget(self.widget_stack)
         self.splash_widget.next_button.clicked.connect(self.load_ui)
         self.setLayout(layout)
-        self.mit = ModelInteractionToolkit(self.classes_directory, self.image_directory, None, None, self.model_directory)
+        self.new_mit()
 
     def set_model_name(self, model_name):
         self.model_name = model_name
+        self.set_image_directory()
 
     def set_dataset(self, dataset): 
         self.dataset = dataset
+        self.set_image_directory()
+        self.set_classes_directory()
+        self.set_model_directory()
+        self.new_mit()
+
+    def with_new(self, dataset, model_name):
+        self.dataset = dataset
+        self.model_name = model_name
+        self.set_image_directory()
+        self.set_classes_directory()
+        self.set_model_directory()
+        self.new_mit()
+
+
+    def set_image_directory(self):
+        self.image_directory = os.path.join(self.resource_path, "datasets", self.dataset, "images", self.model_name)
+
+    def set_classes_directory(self):
+        print("SETTING CLASSES DIRECTORY: " + self.dataset)
+        self.classes_directory = os.path.join(self.resource_path, "datasets", self.dataset, "images")
+
+    def set_model_directory(self):
+        self.model_directory = os.path.join(self.resource_path, "datasets", self.dataset, "model", "model.keras")
+
+    def new_mit(self):
+        self.mit = ModelInteractionToolkit(self.classes_directory, self.image_directory, None, None, self.model_directory)
 
     def renew(self):
         self.widget_stack.setCurrentIndex(0)
@@ -62,7 +89,8 @@ class MLUI(QWidget):
         self.image_scroll_widget = ImageScrollWidget(self.settings_utility, self.dataset, self.model_name, self)
         self.model_interaction_widget = ModelInteractionWidget(self.model_generator, self.model_tester, self.folder_list, self.classes_directory, self.model_name, self.model_export_directory, self.sc.next_button())
         self.model_interaction_widget.set_mit(self.mit)
-        self.model_interaction_widget.set_prediction(self.test_set_prediction)
+        if self.model_exists():
+            self.model_interaction_widget.set_prediction(self.test_set_prediction)
         self.model_interaction_widget.show_model_prediction("None", "0", False)
         self.scan_output_widget = ScanOutputWidget(self.image_directory, self.model_directory, self.dataset)
         self.ui_layout = QVBoxLayout()
@@ -84,10 +112,11 @@ class MLUI(QWidget):
     def load_ui_assets(self):
         self.model_directory = os.path.join(self.resource_path, "datasets", self.dataset, "model", "model.keras")
         self.model_export_directory = os.path.join(self.resource_path, "datasets", self.dataset, "model")
-        self.model_tester = ModelTester(self.model_directory)
+        self.model_tester = ModelTester()
         self.mit.assign_model_tester(self.model_tester)
-        self.test_set_prediction = self.mit.get_best_match()
-        print(self.test_set_prediction)
+        if self.model_exists():
+            self.test_set_prediction = self.mit.get_best_match()
+            print(self.test_set_prediction)
         folder_count = len(os.listdir(self.image_directory))
         self.model_generator = ModelGenerator(folder_count, self.image_directory, self.model_directory)
         self.folder_list = os.listdir(self.classes_directory)
@@ -184,6 +213,8 @@ class ImageScrollWidget(QWidget):
 class ModelInteractionWidget(QWidget):
     def __init__(self, model_generator, model_tester, folder_list, classes_directory, class_name, model_path, next_button=None):
         super().__init__()
+        self.prediction = None
+        self.best_match = None
         self.prediction_signal = WorkerSignals()
         self.prediction_signal.finished.connect(self.load_model_popup)
         self.model_path = model_path
@@ -237,7 +268,10 @@ class ModelInteractionWidget(QWidget):
             if self.model_exists:
                 gbm_thread = threading.Thread(target=self.mit.get_best_match)
                 gbm_thread.start()
-            self.present_prediction_loader()
+                self.present_prediction_loader()
+            else:
+                self.load_model_popup()
+            
         
 
     def load_model_popup(self):
@@ -259,6 +293,7 @@ class ModelInteractionWidget(QWidget):
         else:
             pred_text = QLabel("No model exists")
             options = ["New Class"]
+            options.extend(self.folder_list)
             
         selector = QComboBox()
         selector.addItems(options)
@@ -302,6 +337,8 @@ class ModelInteractionWidget(QWidget):
         destination_directory = os.path.join(self.classes_directory, self.new_model_name)
         shutil.move(source_directory, destination_directory)
         self.folder_list = os.listdir(self.classes_directory)
+        if not os.path.exists(self.model_path):
+            os.makedirs(self.model_path)
         gen = ModelGenerator(len(self.folder_list), self.classes_directory, self.model_path)
         def generate_model():
             gen.generate()
@@ -323,6 +360,7 @@ class ModelInteractionWidget(QWidget):
         popup.setText("Your new image recognition model is complete and ready to use.")
         popup.setStandardButtons(QMessageBox.Ok)
         self.images_directory = os.path.join(self.classes_directory, self.new_model_name)
+        self.model_path = os.path.join(self.model_path, "model.keras")
         self.mit = ModelInteractionToolkit(self.classes_directory, self.images_directory, self.model_tester, self.prediction_signal, self.model_path)
         self.prediction = self.mit.get_best_match()
 
@@ -392,9 +430,9 @@ class ModelInteractionToolkit():
         self.best_match = None
     # A function to get the most common prediction of all opf the images in a directory
     def get_best_match(self):
+        self.model_tester.load_model(self.model_directory)
         best_match = None
         if self.model_exists():
-            print("SHITTING OUT A PREDICTION")
             predictions = []
             folder_list = os.listdir(self.classes_directory)
             folder_list.reverse()
