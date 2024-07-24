@@ -157,10 +157,7 @@ class OffboardFigure8Node(Node):
 
     def ready_callback(self, msg):
         self.voxl_reset.reset()
-        # Reset Path and counters
-        self.path = []
-        self.offboard_setpoint_counter = 0
-        self.offboard_arr_counter = 0
+
         b = Bool(); b.data  = False
         self.scan_start_pub.publish(b)
         self.scan_end_pub.publish(b)
@@ -174,7 +171,7 @@ class OffboardFigure8Node(Node):
             self.armed = True
             # self.publish_takeoff_setpoint(0.0, 0.0, self.end_altitude)
             self.start_time = time.time()
-            # self.offboard_setpoint_counter
+            self.offboard_setpoint_counter
             self.timer = self.create_timer(0.1, self.timer_callback)
         else:
             try:
@@ -211,7 +208,7 @@ class OffboardFigure8Node(Node):
                 dadt * -r * math.sin(a),
                 0.0,
             ]
-            msg.yaw = 0.00 #math.atan2(msg.acceleration[1], msg.acceleration[0])
+            msg.yaw = math.atan2(msg.acceleration[1], msg.acceleration[0])
 
             self.path.append(msg)
 
@@ -311,7 +308,7 @@ class OffboardFigure8Node(Node):
         """Publish the trajectory setpoint."""
         msg = TrajectorySetpoint()
         msg.position = [x, y, z]
-        # msg.yaw = 0.00
+        
         msg.timestamp = int(self.get_clock().now().nanoseconds / 1000)
         self.trajectory_setpoint_publisher.publish(msg)
 
