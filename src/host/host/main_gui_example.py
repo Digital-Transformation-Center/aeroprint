@@ -41,7 +41,7 @@ class MainGUIExample:
         dialog.setWindowTitle("Settings")
         dialog.setFixedSize(800, 900)
 
-        # Add your widget to the dialo g
+        # Add your widget to the dialog
         widget = SettingsWidget()
         layout = QVBoxLayout(dialog)
         layout.addWidget(widget)
