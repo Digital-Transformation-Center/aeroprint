@@ -31,7 +31,7 @@ SPLASH_TIME = 1000 # 3s splash screen
 DTC_BLUE = QColor(0, 189, 247)
 DTC_RED = QColor(232, 37, 41)
 BLACK = QColor(0, 0, 0)
-VIDEO_URL = "http://192.168.8.191/video.html?cam=hires_small_color"
+VIDEO_URL = "rtsp://192.168.8.191:8900/live"
 
 class FlightWidget(QWidget):
     def __init__(self, resources_path, scroll_container, mlui) -> None:

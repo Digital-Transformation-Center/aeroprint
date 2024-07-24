@@ -30,7 +30,7 @@ SPLASH_TIME = 1000 # 3s splash screen
 DTC_BLUE = QColor(0, 189, 247)
 DTC_RED = QColor(232, 37, 41)
 BLACK = QColor(0, 0, 0)
-VIDEO_URL = "http://192.168.8.191/video.html?cam=hires_small_color"
+VIDEO_URL = "http://192.168.8.191/video.html?cam=hires_small_color&start=0"
 
 class FlightWidget(QWidget):
     def __init__(self):
@@ -212,7 +212,7 @@ class QVIOWidget(QWidget):
         self.image_label = QLabel(self)
         self.left, self.top, self.width, self.height = 100, 100, 800, 600
         self.image_label.resize(self.width, self.height)
-        self.cap = cv2.VideoCapture(VIDEO_URL)
+        self.cap = cv2.VideoCapture("rtsp://192.168.8.191:8900/live")
         # self.resize(800, 600)
 
         self.setLayout(layout)
