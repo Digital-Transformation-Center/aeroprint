@@ -9,9 +9,9 @@ __version__ = "0.01.01"
 __status__ = "Beta"
 
 import subprocess
-from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QHBoxLayout, QMainWindow, QVBoxLayout, QDialog
-from PyQt6.QtGui import QPixmap
-from PyQt6.QtCore import Qt, QTimer
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QHBoxLayout, QMainWindow, QVBoxLayout, QDialog, QPushButton
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtCore import Qt, QTimer
 import os
 import paramiko
 import threading
@@ -54,10 +54,15 @@ class MainWindow(QMainWindow):
         central_widget = QWidget()
         
         self.layout = QVBoxLayout()
+
+        self.continue_button = QPushButton("Continue")
+        self.continue_button.clicked.connect(lambda _: self.start_gui(True))
+
         self.layout.addWidget(self.wifi_connection_widget)
         self.layout.addWidget(self.starling_connection_widget)
         self.layout.addWidget(self.starling_started_widget)
         self.layout.addWidget(self.prusa_connection_widget)
+        self.layout.addWidget(self.continue_button)
         central_widget.setLayout(self.layout)
         self.setCentralWidget(central_widget)
         self.checker.add_check("wifi")
@@ -84,7 +89,7 @@ class MainWindow(QMainWindow):
         self.prusa_connection_widget.check_reachability()
         self.start_gui()
     
-    def start_gui(self):
+    def start_gui(self, force = False):
         """
         Starts the GUI if all checks have passed.
 
@@ -100,6 +105,10 @@ class MainWindow(QMainWindow):
         else:
             print("NOT DONE")
             QTimer.singleShot(1000, self.start_gui)
+        if force:
+            launch_command = f'source {self.install_path} && ros2 launch host host_launch.py'
+            subprocess.Popen(launch_command, shell=True, executable='/bin/bash')
+            self.close()
             
 
 class StarlingStartedWidget(QWidget):
@@ -157,14 +166,16 @@ class StarlingStartedWidget(QWidget):
         }
         self.run_ssh_commands("m0054", "root", "oelinux123", starling_command)
 
-    def run_ssh_commands(self, host, username, password, commands):
+    def run_ssh_commands(self, host, username, password, commands, shell_num=0):
         host = "m0054"
         username = "root"
         password = "oelinux123"
         launch_command = "source ~/aeroprint/install/setup.bash && ros2 launch starling starling_launch.py"
+        start_mpa_node_command = "ros2 run voxl_mpa_to_ros2 voxl_mpa_to_ros2_node "
         get_nodes_command = "source /opt/ros/foxy/setup.bash && ros2 node list"
         # Create SSH client
         client = paramiko.SSHClient()
+        transport = client.get_transport()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         # Connect to the host
         client.connect(host, username=username, password=password)
@@ -180,18 +191,23 @@ class StarlingStartedWidget(QWidget):
             warning.show()
             pass
         else: 
+            
             launch_stdin, launch_stdout, launch_stderr = client.exec_command(launch_command)
         print("Ran launch command")
         
         count = 0
         count_max = 30
         while count < count_max:
+            channel_start_mpa = transport.open_session()
+            channel_start_mpa.exec_command(start_mpa_node_command)
             node_stdin, node_stdout, node_stderr = client.exec_command(get_nodes_command)
             if ("starling_fc" in node_stdout.read().decode()):
                 print("YAY")
                 self.starling_started = True
                 count = count_max
             print(node_stdout.read().decode())
+
+        
 
         client.close()
 

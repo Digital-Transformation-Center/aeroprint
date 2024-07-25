@@ -31,7 +31,8 @@ SPLASH_TIME = 1000 # 3s splash screen
 DTC_BLUE = QColor(0, 189, 247)
 DTC_RED = QColor(232, 37, 41)
 BLACK = QColor(0, 0, 0)
-VIDEO_URL = "rtsp://192.168.8.191:8900/live"
+VIDEO_URL = "http://192.168.8.191/video_raw/hires_small_color"
+recording_circle = None
 
 class FlightWidget(QWidget):
     def __init__(self, resources_path, scroll_container, mlui) -> None:
@@ -135,7 +136,11 @@ class ParameterWidget(QWidget):
         self.start_height_spin_box = QDoubleSpinBox(self)
         self.start_height_spin_box.setDecimals(2)  # Scan radius
         self.start_height_spin_box.setRange(0.0, 5.0)  # Set the allowed value range
-        self.print_checkbox = QCheckBox("Send to printer when done", self)
+        # self.print_checkbox = QCheckBox("Send to printer when done", self)
+        global recording_circle
+        recording_circle = CircleWidget()
+        recording_circle.set_size(50, 50)
+        recording_circle.set_color(DTC_BLUE)
         self.scan_title = ""
         self.radius = 0.0
         self.height = 0.0
@@ -149,7 +154,7 @@ class ParameterWidget(QWidget):
         self.height_spin_box.valueChanged.connect(self.update_height)
         self.start_height_spin_box.valueChanged.connect(self.update_start_height)
         self.scan_name_textbox.textChanged.connect(self.update_scan_title)
-        self.print_checkbox.stateChanged.connect(self.print_check)
+        # self.print_checkbox.stateChanged.connect(self.print_check)
 
         # Create layout
         layout = QVBoxLayout()
@@ -165,7 +170,8 @@ class ParameterWidget(QWidget):
         layout.addWidget(self.height_spin_box)
         layout.addWidget(QLabel('Object Starting Height (From ground in Meters): '))
         layout.addWidget(self.start_height_spin_box)
-        layout.addWidget(self.print_checkbox)
+        # layout.addWidget(self.print_checkbox)
+        layout.addWidget(recording_circle)
         layout.addWidget(self.start_description)
         layout.addWidget(self.ready_button)
         layout.addWidget(self.land_button)
@@ -187,12 +193,13 @@ class ParameterWidget(QWidget):
         # self.dataset_name_textbox.hide()
         # self.dataset_dropdown.setDisabled(False)
         self.image_exporter.update_dataset(name)
+        self.g2r.publish_scan_ds(name)
 
     def init_vals(self):
         self.g2r.publish_flight_radius(0.0)
-        # self.g2r.publish_kill(False)
+        self.g2r.publish_kill(False)
         self.g2r.publish_object_height(0.0)
-        # self.g2r.publish_ready(False)
+        self.g2r.publish_ready(False)
         self.g2r.publish_scan_title("")
         self.g2r.publish_start_height(0.0)
         self.g2r.publish_will_print(False)
@@ -223,7 +230,7 @@ class ParameterWidget(QWidget):
         self.scan_title = value
         self.g2r.publish_scan_title(value)
         self.update_start_description()
-        self.image_exporter.update_class(value)
+        self.image_exporter.update_class(value)        
 
     def ready(self):
 
@@ -314,7 +321,7 @@ class ImageExporter():
         self.img_num += 1
 
     def update_export_dir(self):
-        self.image_dump_path = os.path.join(self.resources_path, 'datasets', self.dataset, 'images', self.class_name)
+        self.image_dump_path = os.path.join(self.resources_path, 'datasets', self.dataset, self.class_name, 'images')
 
     def update_class(self, name):
         self.class_name = name
@@ -368,6 +375,11 @@ class GUItoROS(Node):
             "/host/gui/out/scan_title", 
             qos_profile_system_default
         )
+        self.scan_ds_pub = self.create_publisher(
+            String, 
+            "/host/gui/out/scan_ds", 
+            qos_profile_system_default
+        )
         self.ready_pub = self.create_publisher(
             Bool, 
             "/host/gui/out/ready", 
@@ -410,21 +422,25 @@ class GUItoROS(Node):
         self.start_camera_thread()
 
     def scan_start_callback(self, msg):
-        self.info("Scan started")
-        self.image_exporter.set_dump_status(True, 'dataset0', 'class0')
+        if msg.data:
+            recording_circle.set_color(DTC_RED)
+            self.info("Scan started")
+            self.image_exporter.set_dump_status(True)
             
 
     def scan_stop_callback(self, msg):
-        self.info("Scan stopped")
-        print("SETTING DATASET: " + self.image_exporter.get_dataset())
-        self.image_exporter.set_dump_status(False)
-        # self.mlui = MLUI(self.scroll_container, self.image_exporter.get_dataset(), self.image_exporter.get_class())
-        print("SETTING DATASET: " + self.image_exporter.get_dataset())
-        # self.mlui.set_model_name(self.image_exporter.get_class())
-        # self.mlui.set_dataset(self.image_exporter.get_dataset())
-        self.mlui.with_new(self.image_exporter.get_dataset(), self.image_exporter.get_class())
-        self.mlui.renew()
-        self.scroll_container.next()
+        if msg.data:
+            recording_circle.set_color(DTC_BLUE)
+            self.info("Scan stopped")
+            print("SETTING DATASET: " + self.image_exporter.get_dataset())
+            self.image_exporter.set_dump_status(False)
+            # self.mlui = MLUI(self.scroll_container, self.image_exporter.get_dataset(), self.image_exporter.get_class())
+            print("SETTING DATASET: " + self.image_exporter.get_dataset())
+            # self.mlui.set_model_name(self.image_exporter.get_class())
+            # self.mlui.set_dataset(self.image_exporter.get_dataset())
+            self.mlui.with_new(self.image_exporter.get_dataset(), self.image_exporter.get_class())
+            self.mlui.renew()
+            self.scroll_container.next()
 
     def start_camera_thread(self):
         self.camera_thread = threading.Thread(target=self.update_stream)
@@ -463,8 +479,20 @@ class GUItoROS(Node):
         self.info("Publishing start height: " + str(height))
 
     def publish_scan_title(self, title):
+        if self.mlui.set_model_name(title):
+            self.get_logger().info("Model name set to: " + title)
+        else:
+            self.get_logger().info("Failed to set model name")
         self.scan_title_pub.publish(self.create_string(title))
         self.info("Publishing scan title: " + str(title))
+
+    def publish_scan_ds(self, ds):
+        if self.mlui.set_dataset(ds):
+            self.get_logger().info("Dataset set to: " + ds)
+        else:
+            self.get_logger().info("Failed to set dataset")
+        self.scan_ds_pub.publish(self.create_string(ds))
+        self.info("Publishing scan dataset: " + str(ds))
     
     def publish_ready(self, ready):
         self.ready_pub.publish(self.create_bool(ready))
@@ -491,6 +519,43 @@ class GUItoROS(Node):
     
     def info(self, text):
         self.get_logger().info(text)
+
+
+class CircleWidget(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.initUI()
+
+    def initUI(self):
+        self.setMinimumSize(200, 100)
+        self.setMaximumSize(200, 100)
+        self.text = ""
+        self.color = Qt.gray
+
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setPen(Qt.NoPen)
+        painter.setBrush(self.color)
+        painter.drawRoundedRect(0, 0, self.width(), self.height(), 25, 25)
+
+        font = painter.font()
+        font.setPointSize(12)
+        painter.setFont(font)
+        painter.setPen(Qt.black)
+        painter.drawText(event.rect(), Qt.AlignCenter, self.text)
+
+    def set_size(self, width, height):
+        self.setMinimumSize(width, height)
+        self.setMaximumSize(width, height)
+
+    def set_text(self, text):
+        self.text = text
+        self.update()
+
+    def set_color(self, color):
+        self.color = color
+        self.update()
 
 class HeightGraphic(QWidget):
     def __init__(self):

@@ -18,10 +18,12 @@ from rclpy.node import Node
 import numpy as np
 import open3d as o3d
 import os
+from host.file_manager import FileManager
 
 class PCNode(Node):
   """Class for dumping ROS PointCloud2 messages to files"""
   def __init__(self) -> None:
+    self.file_manager = FileManager()
     # Create the node and subscriber
     super().__init__("point_cloud_handler_node")
     self.get_logger().info("Point cloud collector alive")
@@ -51,6 +53,13 @@ class PCNode(Node):
        String, 
        "/host/gui/out/scan_title", 
        self.scan_title_callback, 
+       qos_profile_system_default
+    )
+
+    self.scan_dataset_sub = self.create_subscription(
+       String, 
+       "/host/gui/out/scan_ds", 
+       self.scan_dataset_callback, 
        qos_profile_system_default
     )
     
@@ -95,10 +104,11 @@ class PCNode(Node):
      """Start scanning"""
      self.get_logger().info("Scan start received.")
      try:
+      self.get_logger().info("Attempting to create " + self.dump_dir)
       os.mkdir(self.dump_dir)
       self.get_logger().info("Output Directory: " + str(self.dump_dir))
-     except:
-        self.get_logger().info("Failed to create directory.")
+     except OSError as e:
+        self.get_logger().info(f"Failed to create directory: {e}")
      self.get_logger().info("Dump directory created.")
      self.scan_start = msg.data
      self.scan_end = not self.scan_start
@@ -110,19 +120,29 @@ class PCNode(Node):
    #   dc.data = True
      self.dump_complete_pub.publish(msg)
 
+
   def scan_title_callback(self, msg):
      """Make file directory from title, save and publish to ros."""
      raw_title = msg.data
-     file_directory = raw_title.replace("/", "").replace("\\", "").replace(" ", "-").lower()
-     self.get_logger().info("File directory: " + file_directory)
-     self.dump_dir = os.path.join(self.output_path, file_directory)
+   #   file_directory = raw_title.replace("/", "").replace("\\", "").replace(" ", "-").lower()
+   #   self.get_logger().info("File directory: " + file_directory)
+   #   self.dump_dir = os.path.join(self.output_path, file_directory)
+   
+     self.file_manager.set_class(raw_title)
+     
+     self.dump_dir = self.file_manager.get_pointclouds_path()
      self.get_logger().info("Changing dump directory to: " + str(self.dump_dir))
      dump_dir_ros_msg = String()
      dump_dir_ros_msg.data = self.dump_dir
      self.dump_directory_pub.publish(dump_dir_ros_msg)
 
+  def scan_dataset_callback(self, msg):
+     self.file_manager.set_dataset(msg.data)
+
   def pc2_callback(self, data):
     """Dump point clouds if scan started"""
+    if not os.path.exists(self.dump_dir):
+        os.makedirs(self.dump_dir)
     if self.scan_start and not self.scan_end:
       now = self.get_clock().now().nanoseconds
       if now - self.last_pc >= self.pc_interval * 1e9:

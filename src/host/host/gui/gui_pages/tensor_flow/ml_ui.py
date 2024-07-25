@@ -39,15 +39,19 @@ class MLUI(QWidget):
         self.new_mit()
 
     def set_model_name(self, model_name):
-        self.model_name = model_name
-        self.set_image_directory()
+        self.with_new(self.dataset, model_name)
+        # self.model_name = model_name
+        # self.set_image_directory()
+        return True
 
     def set_dataset(self, dataset): 
-        self.dataset = dataset
-        self.set_image_directory()
-        self.set_classes_directory()
-        self.set_model_directory()
-        self.new_mit()
+        self.with_new(dataset, self.model_name)
+        # self.dataset = dataset
+        # self.set_image_directory()
+        # self.set_classes_directory()
+        # self.set_model_directory()
+        # self.new_mit()
+        return True
 
     def with_new(self, dataset, model_name):
         self.dataset = dataset
@@ -59,11 +63,11 @@ class MLUI(QWidget):
 
 
     def set_image_directory(self):
-        self.image_directory = os.path.join(self.resource_path, "datasets", self.dataset, "images", self.model_name)
+        self.image_directory = os.path.join(self.resource_path, "datasets", self.dataset, self.model_name, "images/")
 
     def set_classes_directory(self):
         print("SETTING CLASSES DIRECTORY: " + self.dataset)
-        self.classes_directory = os.path.join(self.resource_path, "datasets", self.dataset, "images")
+        self.classes_directory = os.path.join(self.resource_path, "datasets", self.dataset)
 
     def set_model_directory(self):
         self.model_directory = os.path.join(self.resource_path, "datasets", self.dataset, "model", "model.keras")
@@ -87,7 +91,8 @@ class MLUI(QWidget):
         
     def on_load_ui_assets(self):
         self.image_scroll_widget = ImageScrollWidget(self.settings_utility, self.dataset, self.model_name, self)
-        self.model_interaction_widget = ModelInteractionWidget(self.model_generator, self.model_tester, self.folder_list, self.classes_directory, self.model_name, self.model_export_directory, self.sc.next_button())
+        model_path = os.path.join(self.model_export_directory, "model.keras")
+        self.model_interaction_widget = ModelInteractionWidget(self.model_generator, self.model_tester, self.folder_list, self.classes_directory, self.model_name, model_path, self.sc.next_button())
         self.model_interaction_widget.set_mit(self.mit)
         if self.model_exists():
             self.model_interaction_widget.set_prediction(self.test_set_prediction)
@@ -111,7 +116,7 @@ class MLUI(QWidget):
 
     def load_ui_assets(self):
         self.model_directory = os.path.join(self.resource_path, "datasets", self.dataset, "model", "model.keras")
-        self.model_export_directory = os.path.join(self.resource_path, "datasets", self.dataset, "model")
+        self.model_export_directory = os.path.join(self.resource_path, "datasets", self.dataset, "model/")
         self.model_tester = ModelTester()
         self.mit.assign_model_tester(self.model_tester)
         if self.model_exists():
@@ -152,14 +157,15 @@ class MLUI(QWidget):
             QMessageBox.warning(self, "Model Not Found", message)
 
     def model_exists(self):
-        return os.path.exists(self.model_directory)
+        model_path = os.path.join(self.model_directory, "model.keras")
+        return os.path.exists(model_path)
 
     def set_dataset(self, dataset):
         self.dataset = dataset
 
     def update_object_scan(self, scan_directory):
         self.scan_directory = scan_directory
-        self.image_directory = os.path.join(self.resource_path, self.dataset, "images")
+        self.image_directory = os.path.join(self.resource_path, self.dataset, "images/")
 
 class SplashWidget(QWidget):
     def __init__(self):
@@ -178,7 +184,7 @@ class ImageScrollWidget(QWidget):
         super().__init__()
         self.parent_widget = parent_widget
         self.settings_utility = settings_utility
-        self.dataaset = dataset
+        self.dataset = dataset
         self.model_name = model_name
         self.layout = QVBoxLayout()
         self.setLayout(self.layout)
@@ -194,7 +200,7 @@ class ImageScrollWidget(QWidget):
         self.load_images()
 
     def load_images(self):
-        image_directory = os.path.join(self.settings_utility.get_value("resources_file_path"), "datasets", self.dataaset, "images", self.model_name)
+        image_directory = os.path.join(self.settings_utility.get_value("resources_file_path"), "datasets", self.dataset, self.model_name, "images")
         image_files = os.listdir(image_directory)
         row = 0
         col = 0
@@ -264,6 +270,7 @@ class ModelInteractionWidget(QWidget):
             self.best_match = self.prediction
             self.load_model_popup()
         else:
+            print("MODEL PATH: " + self.model_path)
             self.model_exists = os.path.exists(self.model_path)
             if self.model_exists:
                 gbm_thread = threading.Thread(target=self.mit.get_best_match)
@@ -430,7 +437,8 @@ class ModelInteractionToolkit():
         self.best_match = None
     # A function to get the most common prediction of all opf the images in a directory
     def get_best_match(self):
-        self.model_tester.load_model(self.model_directory)
+        model_path = os.path.join(self.model_directory, "model.keras")
+        self.model_tester.load_model(model_path)
         best_match = None
         if self.model_exists():
             predictions = []
@@ -462,8 +470,8 @@ class ModelInteractionToolkit():
         self.model_tester = model_tester
 
     def model_exists(self):
-        print(self.model_directory)
-        return os.path.exists(self.model_directory)
+        model_path = os.path.join(self.model_directory, "model.keras")
+        return os.path.exists(model_path)
 
 class WorkerSignals(QObject):
     finished = pyqtSignal()
@@ -474,8 +482,10 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     sc = ScrollContainer()
     dataset = "fruits"
-    model_name = "junk"
+    model_name = "banana"
     widget = MLUI(sc, dataset, model_name)
+    widget.set_dataset("My Dataset")
+    widget.set_model_name("test 3")
     sc.add_page(widget)
     sc.add_page(QWidget())
     sc.create_page_buttons()
