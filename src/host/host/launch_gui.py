@@ -166,16 +166,14 @@ class StarlingStartedWidget(QWidget):
         }
         self.run_ssh_commands("m0054", "root", "oelinux123", starling_command)
 
-    def run_ssh_commands(self, host, username, password, commands, shell_num=0):
+    def run_ssh_commands(self, host, username, password, commands):
         host = "m0054"
         username = "root"
         password = "oelinux123"
         launch_command = "source ~/aeroprint/install/setup.bash && ros2 launch starling starling_launch.py"
-        start_mpa_node_command = "ros2 run voxl_mpa_to_ros2 voxl_mpa_to_ros2_node "
         get_nodes_command = "source /opt/ros/foxy/setup.bash && ros2 node list"
         # Create SSH client
         client = paramiko.SSHClient()
-        transport = client.get_transport()
         client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         # Connect to the host
         client.connect(host, username=username, password=password)
@@ -191,23 +189,18 @@ class StarlingStartedWidget(QWidget):
             warning.show()
             pass
         else: 
-            
             launch_stdin, launch_stdout, launch_stderr = client.exec_command(launch_command)
         print("Ran launch command")
         
         count = 0
         count_max = 30
         while count < count_max:
-            channel_start_mpa = transport.open_session()
-            channel_start_mpa.exec_command(start_mpa_node_command)
             node_stdin, node_stdout, node_stderr = client.exec_command(get_nodes_command)
             if ("starling_fc" in node_stdout.read().decode()):
                 print("YAY")
                 self.starling_started = True
                 count = count_max
             print(node_stdout.read().decode())
-
-        
 
         client.close()
 
@@ -259,6 +252,7 @@ class WifiConnectionWidget(QWidget):
     def check_reachability(self):
         net_requirement = "aeroprint-net"
         wifi_ssid = get_wifi_ssid()
+        print(wifi_ssid)
         try: 
             if net_requirement in wifi_ssid:
                 self.label.setPixmap(QPixmap(self.check_path).scaled(self.icon_size, self.icon_size))
@@ -268,6 +262,8 @@ class WifiConnectionWidget(QWidget):
                 # Wait for 1 second and check again
                 QTimer.singleShot(1000, self.check_reachability)
         except: 
+            QTimer.singleShot(1000, self.check_reachability)
+        if not self.checker.check_passed("wifi"):
             QTimer.singleShot(1000, self.check_reachability)
             
 
