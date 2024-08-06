@@ -98,9 +98,9 @@ class OffboardFigure8Node(Node):
 
         self.voxl_reset = VOXLQVIOController()
         self.voxl_reset.reset()
-        self.rate = 40
-        self.radius = 0.9
-        self.cycle_s = 40
+        self.rate = 20    #update set points
+        self.radius = 0.9 #mess with deleting variable
+        self.cycle_s = 10 #original = 20. Lower number = faster flight
         
         self.steps = self.cycle_s * self.rate
         self.path = []
@@ -112,8 +112,8 @@ class OffboardFigure8Node(Node):
         self.offboard_setpoint_counter = 0
         self.start_time = time.time()
         self.offboard_arr_counter = 0
-        self.start_altitude = 0.6
-        self.end_altitude = 1.1
+        self.start_altitude = 0.6  #mess with deleting variable
+        self.end_altitude = 1.1    #mess with variable
         self.start_height = 0.0
         self.object_height = 0.0
         self.scan_ended = False
