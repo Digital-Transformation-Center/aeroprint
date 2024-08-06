@@ -301,5 +301,5 @@ def main(args=None):
 
 if __name__ == "__main__":
     main()
-        except Exception as e:
-        print(e)
+except Exception as e:
+    print(e)
