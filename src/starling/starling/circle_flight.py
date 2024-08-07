@@ -1,4 +1,6 @@
-#                            --------good circle path code. 2 circles faster flight
+
+
+
 #!/usr/bin/env python3
 """
 circle_flight.py: ROS node to perform flight based on scan parameters.
@@ -23,6 +25,8 @@ from px4_msgs.msg import (
     VehicleLocalPosition,
     VehicleStatus,
 )
+
+
 
 
 class OffboardFigure8Node(Node):
@@ -54,7 +58,7 @@ class OffboardFigure8Node(Node):
         self.vehicle_status_subscriber = self.create_subscription(
             VehicleStatus,
             "/fmu/out/vehicle_status",
-            self.vehicle_status_callback,
+            self.vehicle_status_callback,  # Ensure this callback is defined
             qos_profile,
         )
 
@@ -98,9 +102,9 @@ class OffboardFigure8Node(Node):
 
         self.voxl_reset = VOXLQVIOController()
         self.voxl_reset.reset()
-        self.rate = 20    #update set points
-        self.radius = 0.9 #mess with deleting variable
-        self.cycle_s = 10 #original = 20. Lower number = faster flight
+        self.rate = 40
+        self.radius = 0.9
+        self.cycle_s = 10
         
         self.steps = self.cycle_s * self.rate
         self.path = []
@@ -112,8 +116,8 @@ class OffboardFigure8Node(Node):
         self.offboard_setpoint_counter = 0
         self.start_time = time.time()
         self.offboard_arr_counter = 0
-        self.start_altitude = 0.6  #mess with deleting variable
-        self.end_altitude = 1.1    #mess with variable
+        self.start_altitude = 0.6
+        self.end_altitude = 1.1
         self.start_height = 0.0
         self.object_height = 0.0
         self.scan_ended = False
@@ -184,64 +188,62 @@ class OffboardFigure8Node(Node):
 
         self.ready = msg.data
 
+    def init_circle(self, altitude, num_stops=8, pause_duration=5.0):
+        """Initialize circle trajectory with stops at specified intervals."""
+        dt = 1.0 / self.rate
+        dadt = (2.0 * math.pi) / self.cycle_s
+        r = self.radius
 
-def init_circle(self, altitude, num_stops=8, pause_duration=5.0):
-    """Initialize circle trajectory with stops at specified intervals."""
-    dt = 1.0 / self.rate
-    dadt = (2.0 * math.pi) / self.cycle_s
-    r = self.radius
+        # Calculate the angle interval for stops
+        stop_interval = self.steps // num_stops
+        stop_angles = [i * (2.0 * math.pi / num_stops) for i in range(num_stops)]
 
-    # Calculate the angle interval for stops
-    stop_interval = self.steps // num_stops
-    stop_angles = [i * (2.0 * math.pi / num_stops) for i in range(num_stops)]
+        for i in range(self.steps):
+            msg = TrajectorySetpoint()
 
-    for i in range(self.steps):
-        msg = TrajectorySetpoint()
+            # Define angle a
+            a = (i * (2.0 * math.pi) / self.steps) - math.pi / 2
 
-        # Define angle a
-        a = (i * (2.0 * math.pi) / self.steps) - math.pi / 2
+            msg.position = [r * math.cos(a), r * math.sin(a), altitude]
+            msg.velocity = [
+                dadt * -r * math.sin(a),
+                dadt * r * math.cos(a),
+                0.0,
+            ]
+            msg.acceleration = [
+                dadt * -r * math.cos(a),
+                dadt * -r * math.sin(a),
+                0.0,
+            ]
+            msg.yaw = math.atan2(msg.acceleration[1], msg.acceleration[0])
 
-        msg.position = [r * math.cos(a), r * math.sin(a), altitude]
-        msg.velocity = [
-            dadt * -r * math.sin(a),
-            dadt * r * math.cos(a),
-            0.0,
-        ]
-        msg.acceleration = [
-            dadt * -r * math.cos(a),
-            dadt * -r * math.sin(a),
-            0.0,
-        ]
-        msg.yaw = math.atan2(msg.acceleration[1], msg.acceleration[0])
+            self.path.append(msg)
 
-        self.path.append(msg)
+            # Insert pauses at specified stop angles
+            if i % stop_interval == 0 and i != 0:
+                # Add pause setpoints
+                for _ in range(int(pause_duration * self.rate)):
+                    pause_msg = TrajectorySetpoint()
+                    pause_msg.position = msg.position
+                    pause_msg.velocity = [0.0, 0.0, 0.0]
+                    pause_msg.acceleration = [0.0, 0.0, 0.0]
+                    pause_msg.yaw = msg.yaw
+                    pause_msg.yawspeed = 0.0
+                    self.path.append(pause_msg)
 
-        # Insert pauses at specified stop angles
-        if i % stop_interval == 0 and i != 0:
-            # Add pause setpoints
-            for _ in range(int(pause_duration * self.rate)):
-                pause_msg = TrajectorySetpoint()
-                pause_msg.position = msg.position
-                pause_msg.velocity = [0.0, 0.0, 0.0]
-                pause_msg.acceleration = [0.0, 0.0, 0.0]
-                pause_msg.yaw = msg.yaw
-                pause_msg.yawspeed = 0.0
-                self.path.append(pause_msg)
+        # Calculate yawspeed for smooth rotation
+        for i in range(len(self.path) - 1):
+            next_yaw = self.path[i + 1].yaw
+            curr = self.path[i].yaw
+            if next_yaw - curr < -math.pi:
+                next_yaw += 2.0 * math.pi
+            if next_yaw - curr > math.pi:
+                next_yaw -= 2.0 * math.pi
 
-    # Calculate yawspeed for smooth rotation
-    for i in range(len(self.path) - 1):
-        next_yaw = self.path[i + 1].yaw
-        curr = self.path[i].yaw
-        if next_yaw - curr < -math.pi:
-            next_yaw += 2.0 * math.pi
-        if next_yaw - curr > math.pi:
-            next_yaw -= 2.0 * math.pi
+            self.path[i].yawspeed = (next_yaw - curr) / dt
 
-        self.path[i].yawspeed = (next_yaw - curr) / dt
-
-    # Set yawspeed for the last point
-    self.path[-1].yawspeed = 0.0
-
+        # Set yawspeed for the last point
+        self.path[-1].yawspeed = 0.0
 
     def timer_callback(self) -> None:
         """Callback function for the timer."""
@@ -268,7 +270,6 @@ def init_circle(self, altitude, num_stops=8, pause_duration=5.0):
                 self.hit_figure_8 = True
 
     def vehicle_local_position_callback(self, vehicle_local_position):
-        print(vehicle_local_position)
         """Callback function for vehicle_local_position topic subscriber."""
         self.vehicle_local_position = vehicle_local_position
 
@@ -393,4 +394,3 @@ if __name__ == "__main__":
         main()
     except Exception as e:
         print(e)
-        
