@@ -103,8 +103,8 @@ class OffboardFigure8Node(Node):
         self.voxl_reset = VOXLQVIOController()
         self.voxl_reset.reset()
         self.rate = 40
-        self.radius = 0.9
-        self.cycle_s = 10
+        self.radius = 0.0       #change from 0.9 -> 0.0
+        self.cycle_s = 10       #lower number the drone flys faster
         
         self.steps = self.cycle_s * self.rate
         self.path = []
@@ -116,8 +116,8 @@ class OffboardFigure8Node(Node):
         self.offboard_setpoint_counter = 0
         self.start_time = time.time()
         self.offboard_arr_counter = 0
-        self.start_altitude = 0.6
-        self.end_altitude = 1.1
+        self.start_altitude = 0.0       #change from 0.6 to 0.0
+        self.end_altitude = 0.0         #change from 1.1 to 0.0
         self.start_height = 0.0
         self.object_height = 0.0
         self.scan_ended = False
@@ -127,9 +127,9 @@ class OffboardFigure8Node(Node):
     def create_path(self):
         # This is very extra right now, but makes it easier to add levels.
         circle_altitudes = []
-        num_circles = 2
-        min_height = self.start_height + 0.20
-        max_height = self.start_height + self.object_height + 0.2
+        num_circles = 2                                                     #number of circles in flight path
+        min_height = self.start_height + 0.00                               #change 0.20 to 0.05
+        max_height = self.start_height + self.object_height + 0.0           #change from 0.2 to 0.0
         self.start_altitude = max_height
         self.end_altitude = min_height
         self.get_logger().info("Flying path from " + str(self.start_altitude) + "m.")
@@ -188,7 +188,7 @@ class OffboardFigure8Node(Node):
 
         self.ready = msg.data
 
-    def init_circle(self, altitude, num_stops=8, pause_duration=5.0):
+    def init_circle(self, altitude, num_stops=8, pause_duration=3.0):               #number of stops per circle , pause duration
         """Initialize circle trajectory with stops at specified intervals."""
         dt = 1.0 / self.rate
         dadt = (2.0 * math.pi) / self.cycle_s
