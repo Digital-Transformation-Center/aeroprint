@@ -128,7 +128,7 @@ class OffboardFigure8Node(Node):
         # This is very extra right now, but makes it easier to add levels.
         circle_altitudes = []
         num_circles = 2                                                     #number of circles in flight path
-        min_height = self.start_height + 0.1                               #change 0.20 to 0.1
+        min_height = self.start_height + 0.2                              #change 0.20 to 0.1
         max_height = self.start_height + self.object_height + 0.0           #change from 0.2 to 0.0
         self.start_altitude = max_height
         self.end_altitude = min_height
