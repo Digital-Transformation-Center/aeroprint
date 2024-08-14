@@ -116,8 +116,8 @@ class OffboardFigure8Node(Node):
         self.offboard_setpoint_counter = 0
         self.start_time = time.time()
         self.offboard_arr_counter = 0
-        self.start_altitude = 0.0       #change from 0.6 to 0.0
-        self.end_altitude = 0.0         #change from 1.1 to 0.0
+        self.start_altitude = 0.2       #change from 0.6 to 0.2
+        self.end_altitude = 0.2         #change from 1.1 to 0.2
         self.start_height = 0.0
         self.object_height = 0.0
         self.scan_ended = False
@@ -129,7 +129,7 @@ class OffboardFigure8Node(Node):
         circle_altitudes = []
         num_circles = 2                                                     #number of circles in flight path
         min_height = self.start_height + 0.2                              #change 0.20 to 0.1
-        max_height = self.start_height + self.object_height + 0.0           #change from 0.2 to 0.0
+        max_height = self.start_height + self.object_height + 0.2           #change from 0.2 to 0.0
         self.start_altitude = max_height
         self.end_altitude = min_height
         self.get_logger().info("Flying path from " + str(self.start_altitude) + "m.")
