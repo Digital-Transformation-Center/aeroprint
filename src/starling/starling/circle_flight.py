@@ -128,7 +128,7 @@ class OffboardFigure8Node(Node):
         # This is very extra right now, but makes it easier to add levels.
         circle_altitudes = []
         num_circles = 2                                                     #number of circles in flight path
-        min_height = self.start_height + 0.00                               #change 0.20 to 0.05
+        min_height = self.start_height + 0.1                               #change 0.20 to 0.1
         max_height = self.start_height + self.object_height + 0.0           #change from 0.2 to 0.0
         self.start_altitude = max_height
         self.end_altitude = min_height
@@ -174,7 +174,7 @@ class OffboardFigure8Node(Node):
             self.arm()
             self.armed = True
             # self.publish_takeoff_setpoint(0.0, 0.0, self.end_altitude)
-            self.start_time = time.time()
+            self.start_time = time.time
             self.offboard_setpoint_counter
             self.timer = self.create_timer(0.1, self.timer_callback)
         else:
