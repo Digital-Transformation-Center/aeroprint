@@ -116,8 +116,8 @@ class OffboardFigure8Node(Node):
         self.offboard_setpoint_counter = 0
         self.start_time = time.time()
         self.offboard_arr_counter = 0
-        self.start_altitude = 0.2       #change from 0.6 to 0.2
-        self.end_altitude = 0.2         #change from 1.1 to 0.2
+        self.start_altitude = 0.6       #change from 0.6 to 0.2
+        self.end_altitude = 1.1         #change from 1.1 to 0.2
         self.start_height = 0.0
         self.object_height = 0.0
         self.scan_ended = False
