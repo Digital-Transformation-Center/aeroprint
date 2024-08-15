@@ -7,7 +7,7 @@ circle_flight.py: ROS node to perform flight based on scan parameters.
 UDRI DTC AEROPRINT
 """
 __author__ = "Ryan Kuederle, Timothy Marshall"
-__email__ = "ryan.kuederle@udri.udayton.edu"
+__email__ = "ryan.kuederle@udri.udayton.edu, timothy.marshall@udri.udayton.edu"
 __version__ = "0.1.0"
 __status__ = "Beta"
 
@@ -63,38 +63,38 @@ class OffboardFigure8Node(Node):
         )
 
         # Create integrations pubs & subs
-        self.ready_sub = self.create_subscription(
+        self.ready_sub = self.create_subscription(      
             Bool, 
-            "/host/gui/out/ready", 
+            "/host/gui/out/ready",                               #Subscribe to ready status from GUI
             self.ready_callback, 
             qos_profile_system_default
         )
-        self.radius_sub = self.create_subscription(
+        self.radius_sub = self.create_subscription(         
             Float32, 
-            "/host/gui/out/radius", 
+            "/host/gui/out/radius",                              #Subscribe to radius value from GUI
             self.radius_callback,
             qos_profile_system_default
         )
-        self.object_height_sub = self.create_subscription(
+        self.object_height_sub = self.create_subscription(          
             Float32, 
-            "/host/gui/out/object_height",
+            "/host/gui/out/object_height",                      #Subscribe to object height value (Maximum flight altitude) from GUI
             self.object_height_callback,
             qos_profile_system_default
         )
-        self.start_height_sub = self.create_subscription(
+        self.start_height_sub = self.create_subscription(           
             Float32, 
-            "/host/gui/out/start_height", 
+            "/host/gui/out/start_height",                       #Subscribe to start height value (Minimum flight altitude) from GUI
             self.start_height_callback,
             qos_profile_system_default
         )
         self.scan_start_pub = self.create_publisher(
             Bool, 
-            "/starling/out/fc/scan_start",
+            "/starling/out/fc/scan_start",                      #Publish scan start signal to flight controller
             qos_profile_system_default
         )
         self.scan_end_pub = self.create_publisher(
             Bool, 
-            "/starling/out/fc/scan_end" ,
+            "/starling/out/fc/scan_end" ,                       #Publish scan end signal to flight controller
             qos_profile_system_default
         )
 
@@ -102,7 +102,7 @@ class OffboardFigure8Node(Node):
 
         self.voxl_reset = VOXLQVIOController()
         self.voxl_reset.reset()
-        self.rate = 40
+        self.rate = 40          #how fast the drone sends signals back and forth
         self.radius = 0.0       #change from 0.9 -> 0.0
         self.cycle_s = 10       #lower number the drone flys faster
         
@@ -116,8 +116,8 @@ class OffboardFigure8Node(Node):
         self.offboard_setpoint_counter = 0
         self.start_time = time.time()
         self.offboard_arr_counter = 0
-        self.start_altitude = 0.6       #change from 0.6 to 0.2
-        self.end_altitude = 1.1         #change from 1.1 to 0.2
+        self.start_altitude = 0.2       #change from 0.6 to 0.2
+        self.end_altitude = 0.2        #change from 1.1 to 0.2
         self.start_height = 0.0
         self.object_height = 0.0
         self.scan_ended = False
@@ -128,8 +128,8 @@ class OffboardFigure8Node(Node):
         # This is very extra right now, but makes it easier to add levels.
         circle_altitudes = []
         num_circles = 2                                                     #number of circles in flight path
-        min_height = self.start_height + 0.5                              #change 0.20 to 0.1
-        max_height = self.start_height + self.object_height + 0.2           #change from 0.2 to 0.0
+        min_height = self.start_height + 0.0                              #change 0.20 to 0.0
+        max_height = self.start_height + self.object_height + 0.0           #change from 0.2 to 0.0
         self.start_altitude = max_height
         self.end_altitude = min_height
         self.get_logger().info("Flying path from " + str(self.start_altitude) + "m.")
@@ -188,7 +188,7 @@ class OffboardFigure8Node(Node):
 
         self.ready = msg.data
 
-    def init_circle(self, altitude, num_stops=8, pause_duration=3.0):               #number of stops per circle , pause duration
+    def init_circle(self, altitude, num_stops=4, pause_duration=3.0):               #number of stops per circle , pause duration
         """Initialize circle trajectory with stops at specified intervals."""
         dt = 1.0 / self.rate
         dadt = (2.0 * math.pi) / self.cycle_s
