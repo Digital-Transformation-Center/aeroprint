@@ -188,7 +188,7 @@ class OffboardFigure8Node(Node):
 
         self.ready = msg.data
 
-    def init_circle(self, altitude, num_stops=4, pause_duration=3.0):               #number of stops per circle , pause duration
+    def init_circle(self, altitude, num_stops=2, pause_duration=2.0):               #number of stops per circle , pause duration
         """Initialize circle trajectory with stops at specified intervals."""
         dt = 1.0 / self.rate
         dadt = (2.0 * math.pi) / self.cycle_s
