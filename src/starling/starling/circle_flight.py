@@ -1,13 +1,11 @@
 
-
-
 #!/usr/bin/env python3
 """
 circle_flight.py: ROS node to perform flight based on scan parameters.
 UDRI DTC AEROPRINT
 """
 __author__ = "Ryan Kuederle, Timothy Marshall"
-__email__ = "ryan.kuederle@udri.udayton.edu, timothy.marshall@udri.udayton.edu"
+__email__ = "ryan.kuederle@udri.udayton.edu"
 __version__ = "0.1.0"
 __status__ = "Beta"
 
@@ -25,8 +23,6 @@ from px4_msgs.msg import (
     VehicleLocalPosition,
     VehicleStatus,
 )
-
-
 
 
 class OffboardFigure8Node(Node):
@@ -58,43 +54,43 @@ class OffboardFigure8Node(Node):
         self.vehicle_status_subscriber = self.create_subscription(
             VehicleStatus,
             "/fmu/out/vehicle_status",
-            self.vehicle_status_callback,  # Ensure this callback is defined
+            self.vehicle_status_callback,
             qos_profile,
         )
 
         # Create integrations pubs & subs
-        self.ready_sub = self.create_subscription(      
+        self.ready_sub = self.create_subscription(
             Bool, 
-            "/host/gui/out/ready",                               #Subscribe to ready status from GUI
+            "/host/gui/out/ready", 
             self.ready_callback, 
             qos_profile_system_default
         )
-        self.radius_sub = self.create_subscription(         
+        self.radius_sub = self.create_subscription(
             Float32, 
-            "/host/gui/out/radius",                              #Subscribe to radius value from GUI
+            "/host/gui/out/radius", 
             self.radius_callback,
             qos_profile_system_default
         )
-        self.object_height_sub = self.create_subscription(          
+        self.object_height_sub = self.create_subscription(
             Float32, 
-            "/host/gui/out/object_height",                      #Subscribe to object height value (Maximum flight altitude) from GUI
+            "/host/gui/out/object_height",
             self.object_height_callback,
             qos_profile_system_default
         )
-        self.start_height_sub = self.create_subscription(           
+        self.start_height_sub = self.create_subscription(
             Float32, 
-            "/host/gui/out/start_height",                       #Subscribe to start height value (Minimum flight altitude) from GUI
+            "/host/gui/out/start_height", 
             self.start_height_callback,
             qos_profile_system_default
         )
         self.scan_start_pub = self.create_publisher(
             Bool, 
-            "/starling/out/fc/scan_start",                      #Publish scan start signal to flight controller
+            "/starling/out/fc/scan_start",
             qos_profile_system_default
         )
         self.scan_end_pub = self.create_publisher(
             Bool, 
-            "/starling/out/fc/scan_end" ,                       #Publish scan end signal to flight controller
+            "/starling/out/fc/scan_end" ,
             qos_profile_system_default
         )
 
@@ -102,9 +98,9 @@ class OffboardFigure8Node(Node):
 
         self.voxl_reset = VOXLQVIOController()
         self.voxl_reset.reset()
-        self.rate = 40          #how fast the drone sends signals back and forth
-        self.radius = 0.9       #change from 0.9 -> 0.0
-        self.cycle_s = 10       #lower number the drone flys faster
+        self.rate = 20
+        self.radius = 0.9
+        self.cycle_s = 40
         
         self.steps = self.cycle_s * self.rate
         self.path = []
@@ -116,8 +112,8 @@ class OffboardFigure8Node(Node):
         self.offboard_setpoint_counter = 0
         self.start_time = time.time()
         self.offboard_arr_counter = 0
-        self.start_altitude = 0.6       #change from 0.6 to 0.2
-        self.end_altitude = 1.1     #change from 1.1 to 0.2
+        self.start_altitude = 0.6
+        self.end_altitude = 1.1
         self.start_height = 0.0
         self.object_height = 0.0
         self.scan_ended = False
@@ -127,9 +123,9 @@ class OffboardFigure8Node(Node):
     def create_path(self):
         # This is very extra right now, but makes it easier to add levels.
         circle_altitudes = []
-        num_circles = 2                                                     #number of circles in flight path
-        min_height = self.start_height + 0.2                              #change 0.20 to 0.0
-        max_height = self.start_height + self.object_height + 0.2          #change from 0.2 to 0.0
+        num_circles = 3
+        min_height = self.start_height + 0.20
+        max_height = self.start_height + self.object_height + 0.2
         self.start_altitude = max_height
         self.end_altitude = min_height
         self.get_logger().info("Flying path from " + str(self.start_altitude) + "m.")
@@ -174,7 +170,7 @@ class OffboardFigure8Node(Node):
             self.arm()
             self.armed = True
             # self.publish_takeoff_setpoint(0.0, 0.0, self.end_altitude)
-            self.start_time = time.time
+            self.start_time = time.time()
             self.offboard_setpoint_counter
             self.timer = self.create_timer(0.1, self.timer_callback)
         else:
@@ -188,23 +184,20 @@ class OffboardFigure8Node(Node):
 
         self.ready = msg.data
 
-    def init_circle(self, altitude, num_stops=4, pause_duration=3.0):               #number of stops per circle , pause duration
-        """Initialize circle trajectory with stops at specified intervals."""
+
+    def init_circle(self, altitude):
+
         dt = 1.0 / self.rate
         dadt = (2.0 * math.pi) / self.cycle_s
         r = self.radius
 
-        # Calculate the angle interval for stops
-        stop_interval = self.steps // num_stops
-        stop_angles = [i * (2.0 * math.pi / num_stops) for i in range(num_stops)]
-
         for i in range(self.steps):
             msg = TrajectorySetpoint()
 
-            # Define angle a
-            a = (i * (2.0 * math.pi) / self.steps) - math.pi / 2
+            a = (-math.pi) + i * (2.0 * math.pi / self.steps)
+            
 
-            msg.position = [r * math.cos(a), r * math.sin(a), altitude]
+            msg.position = [r + r * math.cos(a), r * math.sin(a), altitude]
             msg.velocity = [
                 dadt * -r * math.sin(a),
                 dadt * r * math.cos(a),
@@ -219,21 +212,8 @@ class OffboardFigure8Node(Node):
 
             self.path.append(msg)
 
-            # Insert pauses at specified stop angles
-            if i % stop_interval == 0 and i != 0:
-                # Add pause setpoints
-                for _ in range(int(pause_duration * self.rate)):
-                    pause_msg = TrajectorySetpoint()
-                    pause_msg.position = msg.position
-                    pause_msg.velocity = [0.0, 0.0, 0.0]
-                    pause_msg.acceleration = [0.0, 0.0, 0.0]
-                    pause_msg.yaw = msg.yaw
-                    pause_msg.yawspeed = 0.0
-                    self.path.append(pause_msg)
-
-        # Calculate yawspeed for smooth rotation
-        for i in range(len(self.path) - 1):
-            next_yaw = self.path[i + 1].yaw
+        for i in range(self.steps):
+            next_yaw = self.path[(i + 1) % self.steps].yaw
             curr = self.path[i].yaw
             if next_yaw - curr < -math.pi:
                 next_yaw += 2.0 * math.pi
@@ -241,9 +221,6 @@ class OffboardFigure8Node(Node):
                 next_yaw -= 2.0 * math.pi
 
             self.path[i].yawspeed = (next_yaw - curr) / dt
-
-        # Set yawspeed for the last point
-        self.path[-1].yawspeed = 0.0
 
     def timer_callback(self) -> None:
         """Callback function for the timer."""
@@ -270,6 +247,7 @@ class OffboardFigure8Node(Node):
                 self.hit_figure_8 = True
 
     def vehicle_local_position_callback(self, vehicle_local_position):
+        print(vehicle_local_position)
         """Callback function for vehicle_local_position topic subscriber."""
         self.vehicle_local_position = vehicle_local_position
 
