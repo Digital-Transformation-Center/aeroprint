@@ -103,7 +103,7 @@ class OffboardFigure8Node(Node):
         self.voxl_reset = VOXLQVIOController()
         self.voxl_reset.reset()
         self.rate = 40          #how fast the drone sends signals back and forth
-        self.radius = 0.0       #change from 0.9 -> 0.0
+        self.radius = 0.9       #change from 0.9 -> 0.0
         self.cycle_s = 10       #lower number the drone flys faster
         
         self.steps = self.cycle_s * self.rate
@@ -116,8 +116,8 @@ class OffboardFigure8Node(Node):
         self.offboard_setpoint_counter = 0
         self.start_time = time.time()
         self.offboard_arr_counter = 0
-        self.start_altitude = 0.2       #change from 0.6 to 0.2
-        self.end_altitude = 0.2        #change from 1.1 to 0.2
+        self.start_altitude = 0.6       #change from 0.6 to 0.2
+        self.end_altitude = 1.1     #change from 1.1 to 0.2
         self.start_height = 0.0
         self.object_height = 0.0
         self.scan_ended = False
@@ -188,7 +188,7 @@ class OffboardFigure8Node(Node):
 
         self.ready = msg.data
 
-    def init_circle(self, altitude, num_stops=2, pause_duration=2.0):               #number of stops per circle , pause duration
+    def init_circle(self, altitude, num_stops=4, pause_duration=3.0):               #number of stops per circle , pause duration
         """Initialize circle trajectory with stops at specified intervals."""
         dt = 1.0 / self.rate
         dadt = (2.0 * math.pi) / self.cycle_s
