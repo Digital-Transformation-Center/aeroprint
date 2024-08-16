@@ -323,22 +323,14 @@ class OffboardFigure8Node(Node):
             self.land()
 
         self.offboard_arr_counter += 1
-
+    
     def publish_takeoff_setpoint(self, x: float, y: float, z: float):
-    """Publish the trajectory setpoint."""
-    msg = TrajectorySetpoint()
-    msg.position = [self.radius, 0.0, z]  # Start on the circumference at the positive x-axis
-    msg.yaw = 0.00
-    msg.timestamp = int(self.get_clock().now().nanoseconds / 1000)
-    self.trajectory_setpoint_publisher.publish(msg)
-
-    #def publish_takeoff_setpoint(self, x: float, y: float, z: float):
-    #    """Publish the trajectory setpoint."""
-    #    msg = TrajectorySetpoint()
-    #    msg.position = [x, y, z]
-    #    msg.yaw = 0.00
-    #    msg.timestamp = int(self.get_clock().now().nanoseconds / 1000)
-    #    self.trajectory_setpoint_publisher.publish(msg)
+        """Publish the trajectory setpoint."""
+        msg = TrajectorySetpoint()
+        msg.position = [self.radius, 0.0, z]
+        msg.yaw = 0.00
+        msg.timestamp = int(self.get_clock().now().nanoseconds / 1000)
+        self.trajectory_setpoint_publisher.publish(msg)
 
     def publish_offboard_control_heartbeat_signal(self):
         """Publish the offboard control mode."""
