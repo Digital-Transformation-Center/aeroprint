@@ -198,7 +198,7 @@ class OffboardFigure8Node(Node):
             msg = TrajectorySetpoint()
 
             # Define angle a
-            a = (i * (2.0 * math.pi) / self.steps) - math.pi / 2
+            a = (i * (2.0 * math.pi) / self.steps)# - math.pi / 2
 
             msg.position = [r * math.cos(a), r * math.sin(a), altitude]
             msg.velocity = [
@@ -327,7 +327,7 @@ class OffboardFigure8Node(Node):
     def publish_takeoff_setpoint(self, x: float, y: float, z: float):
         """Publish the trajectory setpoint."""
         msg = TrajectorySetpoint()
-        msg.position = [self.radius, y, z]
+        msg.position = [x, y, z]
         msg.yaw = 0.00
         msg.timestamp = int(self.get_clock().now().nanoseconds / 1000)
         self.trajectory_setpoint_publisher.publish(msg)
