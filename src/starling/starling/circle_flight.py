@@ -169,7 +169,7 @@ class OffboardFigure8Node(Node):
             self.engage_offboard_mode()
             self.arm()
             self.armed = True
-            # self.publish_takeoff_setpoint(0.0, 0.0, self.end_altitude)
+            self.publish_takeoff_setpoint(self.radius, 0.0, self.end_altitude)
             self.start_time = time.time()
             self.offboard_setpoint_counter
             self.timer = self.create_timer(0.1, self.timer_callback)
@@ -255,7 +255,7 @@ class OffboardFigure8Node(Node):
             self.offboard_setpoint_counter += 1
         
         if self.start_time + 10 > time.time():
-            self.publish_takeoff_setpoint(0.0, 0.0, -self.start_altitude)
+            self.publish_takeoff_setpoint(self.radius, 0.0, -self.start_altitude)
         else:
             if not self.hit_figure_8 and self.ready:
                 self.get_logger().info("Starting Scan Now.")
@@ -316,7 +316,7 @@ class OffboardFigure8Node(Node):
                 b = Bool(); b.data  = True
                 self.scan_end_pub.publish(b)
                 self.scan_ended = True
-            self.publish_takeoff_setpoint(0.0, 0.0, -self.end_altitude)
+            self.publish_takeoff_setpoint(self.radius, 0.0, -self.end_altitude)
 
         if self.offboard_arr_counter == len(self.path) + 100:
             self.figure8_timer.cancel()
@@ -324,37 +324,14 @@ class OffboardFigure8Node(Node):
 
         self.offboard_arr_counter += 1
     
-
-
-
-
-
-
+    
     def publish_takeoff_setpoint(self, x: float, y: float, z: float):
-    """Publish the trajectory setpoint."""
-    msg = TrajectorySetpoint()
-    msg.position = [x, y, z]
-    msg.yaw = 0.00
-    msg.timestamp = int(self.get_clock().now().nanoseconds / 1000)
-    self.trajectory_setpoint_publisher.publish(msg)
-
-# Example for taking off from the rightmost point of the circle
-takeoff_x = self.radius
-takeoff_y = 0.0
-
-# In the timer_callback() during takeoff:
-self.publish_takeoff_setpoint(takeoff_x, takeoff_y, -self.start_altitude)
-
-# In the offboard_move_callback() for landing:
-self.publish_takeoff_setpoint(takeoff_x, takeoff_y, -self.end_altitude)
-
-    #def publish_takeoff_setpoint(self, x: float, y: float, z: float):
-    #    """Publish the trajectory setpoint."""
-    #    msg = TrajectorySetpoint()
-    #    msg.position = [x, y, z]
-    #    msg.yaw = 0.00
-    #    msg.timestamp = int(self.get_clock().now().nanoseconds / 1000)
-    #    self.trajectory_setpoint_publisher.publish(msg)
+        """Publish the trajectory setpoint."""
+        msg = TrajectorySetpoint()
+        msg.position = [x, y, z]
+        msg.yaw = 0.00
+        msg.timestamp = int(self.get_clock().now().nanoseconds / 1000)
+        self.trajectory_setpoint_publisher.publish(msg)
 
     def publish_offboard_control_heartbeat_signal(self):
         """Publish the offboard control mode."""
