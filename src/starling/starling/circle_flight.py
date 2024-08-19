@@ -324,13 +324,37 @@ class OffboardFigure8Node(Node):
 
         self.offboard_arr_counter += 1
     
+
+
+
+
+
+
     def publish_takeoff_setpoint(self, x: float, y: float, z: float):
-        """Publish the trajectory setpoint."""
-        msg = TrajectorySetpoint()
-        msg.position = [x, y, z]
-        msg.yaw = 0.00
-        msg.timestamp = int(self.get_clock().now().nanoseconds / 1000)
-        self.trajectory_setpoint_publisher.publish(msg)
+    """Publish the trajectory setpoint."""
+    msg = TrajectorySetpoint()
+    msg.position = [x, y, z]
+    msg.yaw = 0.00
+    msg.timestamp = int(self.get_clock().now().nanoseconds / 1000)
+    self.trajectory_setpoint_publisher.publish(msg)
+
+# Example for taking off from the rightmost point of the circle
+takeoff_x = self.radius
+takeoff_y = 0.0
+
+# In the timer_callback() during takeoff:
+self.publish_takeoff_setpoint(takeoff_x, takeoff_y, -self.start_altitude)
+
+# In the offboard_move_callback() for landing:
+self.publish_takeoff_setpoint(takeoff_x, takeoff_y, -self.end_altitude)
+
+    #def publish_takeoff_setpoint(self, x: float, y: float, z: float):
+    #    """Publish the trajectory setpoint."""
+    #    msg = TrajectorySetpoint()
+    #    msg.position = [x, y, z]
+    #    msg.yaw = 0.00
+    #    msg.timestamp = int(self.get_clock().now().nanoseconds / 1000)
+    #    self.trajectory_setpoint_publisher.publish(msg)
 
     def publish_offboard_control_heartbeat_signal(self):
         """Publish the offboard control mode."""
