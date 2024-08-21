@@ -111,7 +111,7 @@ class ParameterWidget(QWidget):
         self.start_height_spin_box.setRange(0.0, 5.0)  # Set the allowed value range
         self.print_checkbox = QCheckBox("Send to printer when done", self)
         self.scan_title = ""
-        self.radius = 0.4                                                           #### changed from 0.0 -> 0.0
+        self.radius = 0.0                                                           #### changed from 0.0 -> 0.0
         self.height = 0.0
         self.start_height = 0.0
         self.start_description = QLabel('')
@@ -144,7 +144,7 @@ class ParameterWidget(QWidget):
         self.init_vals()
 
     def init_vals(self):
-        self.g2r.publish_flight_radius(0.4)                         #changed from 0.0 -> 0.3
+        self.g2r.publish_flight_radius(0.0)                         #changed from 0.0 -> 0.4
         self.g2r.publish_kill(False)
         self.g2r.publish_object_height(0.0)
         self.g2r.publish_ready(False)
