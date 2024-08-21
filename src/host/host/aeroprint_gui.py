@@ -144,7 +144,7 @@ class ParameterWidget(QWidget):
         self.init_vals()
 
     def init_vals(self):
-        self.g2r.publish_flight_radius(0.0)
+        self.g2r.publish_flight_radius(0.3)                         #changed from 0.0 -> 0.3
         self.g2r.publish_kill(False)
         self.g2r.publish_object_height(0.0)
         self.g2r.publish_ready(False)
