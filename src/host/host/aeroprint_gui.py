@@ -111,7 +111,7 @@ class ParameterWidget(QWidget):
         self.start_height_spin_box.setRange(0.0, 5.0)  # Set the allowed value range
         self.print_checkbox = QCheckBox("Send to printer when done", self)
         self.scan_title = ""
-        self.radius = 0.0
+        self.radius = 0.3                                                           #### changed from 0.0 -> 0.3
         self.height = 0.0
         self.start_height = 0.0
         self.start_description = QLabel('')
