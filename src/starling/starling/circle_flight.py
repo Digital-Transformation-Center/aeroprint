@@ -116,8 +116,6 @@ class OffboardFigure8Node(Node):
         self.start_height = 0.0
         self.object_height = 0.0
         self.scan_ended = False
-        # self.init_circle(self.start_altitude)
-        # self.init_circle(self.end_altitude)
 
     def create_path(self):
         # This is very extra right now, but makes it easier to add levels.
@@ -139,9 +137,6 @@ class OffboardFigure8Node(Node):
         self.get_logger().info("circle altitudes: "+ str(circle_altitudes))
         for altitude in circle_altitudes:
             self.init_circle(-altitude)
-        
-        # self.init_circle(-self.start_altitude)
-        # self.init_circle(-self.end_altitude)
 
     def start_height_callback(self, msg):
         self.start_height = msg.data
@@ -156,31 +151,22 @@ class OffboardFigure8Node(Node):
         self.get_logger().info("Updating radius to " + str(msg.data))
 
     def ready_callback(self, msg):
-        self.voxl_reset.reset()
         b = Bool(); b.data  = False
         self.scan_start_pub.publish(b)
         self.scan_end_pub.publish(b)
         self.scan_ended = False
         if msg.data:
-            self.publish_offboard_control_heartbeat_signal()
+            self.voxl_reset.reset()
             self.get_logger().info("Recieved ready command.")
             self.create_path()
-            self.engage_offboard_mode()
-            self.arm()
             self.armed = True
             # self.publish_takeoff_setpoint(0.0, 0.0, self.end_altitude)
             self.start_time = time.time()
-            self.offboard_setpoint_counter
+            
             self.timer = self.create_timer(0.1, self.timer_callback)
         else:
-            try:
-                self.timer.cancel()
-            except: pass
-            self.offboard_arr_counter = 0
-            self.path = []
+            self.reset()
             self.land()
-            self.hit_figure_8 = False
-
         self.ready = msg.data
 
 
@@ -234,6 +220,7 @@ class OffboardFigure8Node(Node):
             self.offboard_setpoint_counter += 1
         
         if self.start_time + 10 > time.time():
+            self.get_logger().info("Taking off to " + str(self.start_altitude))
             self.publish_takeoff_setpoint(0.0, 0.0, -self.start_altitude)
         else:
             if not self.hit_figure_8 and self.ready:
@@ -245,6 +232,17 @@ class OffboardFigure8Node(Node):
                 )
                 self.hit_figure_8 = True
 
+    def reset(self):
+        try:
+            self.timer.cancel()
+            self.figure8_timer.cancel()
+        except: pass
+        self.path = []
+        self.offboard_setpoint_counter = 0
+        self.hit_figure_8 = False
+        self.offboard_setpoint_counter = 0
+        self.clear_trajectory()
+    
     def vehicle_local_position_callback(self, vehicle_local_position):
         print(vehicle_local_position)
         """Callback function for vehicle_local_position topic subscriber."""
@@ -340,6 +338,11 @@ class OffboardFigure8Node(Node):
         msg.from_external = True
         msg.timestamp = int(self.get_clock().now().nanoseconds / 1000)
         self.vehicle_command_publisher.publish(msg)
+
+    def clear_trajectory(self):
+        """Clear the trajectory."""
+        empty_msg = TrajectorySetpoint()
+        self.trajectory_setpoint_publisher.publish(empty_msg)
 
 import subprocess
 
