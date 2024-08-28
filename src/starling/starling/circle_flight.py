@@ -169,7 +169,7 @@ class OffboardFigure8Node(Node):
             self.engage_offboard_mode()
             self.arm()
             self.armed = True
-            self.publish_takeoff_setpoint(self.radius, 0.0, self.end_altitude)          #
+            #self.publish_takeoff_setpoint(self.radius, 0.0, self.end_altitude)          #
             self.start_time = time.time()
             self.offboard_setpoint_counter
             self.timer = self.create_timer(0.1, self.timer_callback)
