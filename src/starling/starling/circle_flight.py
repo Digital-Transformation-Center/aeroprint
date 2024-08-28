@@ -169,7 +169,7 @@ class OffboardFigure8Node(Node):
             self.engage_offboard_mode()
             self.arm()
             self.armed = True
-            self.publish_takeoff_setpoint(self.radius, 0.0, self.end_altitude)
+            self.publish_takeoff_setpoint(self.radius, 0.0, self.end_altitude)          #
             self.start_time = time.time()
             self.offboard_setpoint_counter
             self.timer = self.create_timer(0.1, self.timer_callback)
@@ -258,7 +258,7 @@ class OffboardFigure8Node(Node):
         
         if self.start_time + 10 > time.time():
             # Takeoff to the starting point on the circle's edge
-            self.publish_takeoff_setpoint(0.0, 0.0, -self.start_altitude)               #Radius
+            self.publish_takeoff_setpoint(self.radius, 0.0, -self.start_altitude)               #Radius
         else:
             if not self.hit_figure_8 and self.ready:
                 self.get_logger().info("Starting Scan Now.")
@@ -319,7 +319,7 @@ class OffboardFigure8Node(Node):
                 b = Bool(); b.data  = True
                 self.scan_end_pub.publish(b)
                 self.scan_ended = True
-            self.publish_takeoff_setpoint(0.0, 0.0, -self.end_altitude)             #Radius
+            self.publish_takeoff_setpoint(self.radius, 0.0, -self.end_altitude)             #Radius
 
         if self.offboard_arr_counter == len(self.path) + 100:
             self.figure8_timer.cancel()
