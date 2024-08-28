@@ -258,7 +258,7 @@ class OffboardFigure8Node(Node):
         
         if self.start_time + 10 > time.time():
             # Takeoff to the starting point on the circle's edge
-            self.publish_takeoff_setpoint(0.0, 0.0, -self.start_altitude)               #Radius
+            self.publish_takeoff_setpoint(self.radius, 0.0, -self.start_altitude)               #Radius
         else:
             if not self.hit_figure_8 and self.ready:
                 self.get_logger().info("Starting Scan Now.")
@@ -319,7 +319,7 @@ class OffboardFigure8Node(Node):
                 b = Bool(); b.data  = True
                 self.scan_end_pub.publish(b)
                 self.scan_ended = True
-            self.publish_takeoff_setpoint(0.0, 0.0, -self.end_altitude)             #Radius
+            self.publish_takeoff_setpoint(self.radius, 0.0, -self.end_altitude)             #Radius
 
         if self.offboard_arr_counter == len(self.path) + 100:
             self.figure8_timer.cancel()
@@ -331,7 +331,7 @@ class OffboardFigure8Node(Node):
     def publish_takeoff_setpoint(self, x: float, y: float, z: float):
         """Publish the trajectory setpoint."""
         msg = TrajectorySetpoint()
-        msg.position = [x, y, z]
+        msg.position = [self.radius, y, z]                                  #Radius
         msg.yaw = 0.00
         msg.timestamp = int(self.get_clock().now().nanoseconds / 1000)
         self.trajectory_setpoint_publisher.publish(msg)
