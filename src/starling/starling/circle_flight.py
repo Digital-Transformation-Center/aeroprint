@@ -241,6 +241,7 @@ class OffboardFigure8Node(Node):
         self.offboard_setpoint_counter = 0
         self.hit_figure_8 = False
         self.offboard_setpoint_counter = 0
+        self.taken_off = False
         self.clear_trajectory()
     
     def vehicle_local_position_callback(self, vehicle_local_position):
@@ -275,10 +276,10 @@ class OffboardFigure8Node(Node):
 
     def land(self):
         """Switch to land mode."""
+        self.reset()
         self.publish_vehicle_command(VehicleCommand.VEHICLE_CMD_NAV_LAND)
         self.get_logger().info("Switching to land mode")
-        self.taken_off = False
-        self.path = []
+        
         # self.hit_figure_8 = False
 
     def offboard_move_callback(self):
@@ -296,7 +297,6 @@ class OffboardFigure8Node(Node):
             self.publish_takeoff_setpoint(0.0, 0.0, -self.end_altitude)
 
         if self.offboard_arr_counter == len(self.path) + 100:
-            self.figure8_timer.cancel()
             self.land()
 
         self.offboard_arr_counter += 1
