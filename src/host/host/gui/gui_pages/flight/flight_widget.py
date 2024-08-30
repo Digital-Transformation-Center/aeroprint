@@ -244,7 +244,7 @@ class ParameterWidget(QWidget):
 
     def land(self):
         self.g2r.publish_ready(False)
-        # self.image_exporter.set_dump_status(False)
+        self.image_exporter.set_dump_status(False)
 
     def get_radius(self):
         return self.radius
