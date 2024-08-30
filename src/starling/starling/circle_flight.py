@@ -156,10 +156,10 @@ class OffboardFigure8Node(Node):
         self.scan_end_pub.publish(b)
         self.scan_ended = False
         if msg.data:
-            self.voxl_reset.reset()
+            # self.voxl_reset.reset()
             self.get_logger().info("Recieved ready command.")
             self.create_path()
-            self.armed = True
+            self.armed = False
             # self.publish_takeoff_setpoint(0.0, 0.0, self.end_altitude)
             self.start_time = time.time()
             
@@ -236,13 +236,16 @@ class OffboardFigure8Node(Node):
         try:
             self.timer.cancel()
             self.figure8_timer.cancel()
-        except: pass
+            
+        except: 
+            self.get_logger().info("Failed to cancel timers.")
         self.path = []
         self.offboard_setpoint_counter = 0
         self.hit_figure_8 = False
         self.offboard_setpoint_counter = 0
         self.taken_off = False
-        self.clear_trajectory()
+        # self.clear_trajectory()
+        self.get_logger().info("Reset Flight Control Node.")
     
     def vehicle_local_position_callback(self, vehicle_local_position):
         print(vehicle_local_position)
