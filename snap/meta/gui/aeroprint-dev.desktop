@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=AeroPrint Devel
+Exec=aeroprint-dev.talker
+Icon=${SNAP}/meta/gui/aeroprint-dev.png
+Type=Application
+Terminal=false
+Type=Application
+Categories=Utility;Development;
