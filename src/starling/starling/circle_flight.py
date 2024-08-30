@@ -156,7 +156,7 @@ class OffboardFigure8Node(Node):
         self.scan_end_pub.publish(b)
         self.scan_ended = False
         if msg.data:
-            # self.voxl_reset.reset()
+            self.voxl_reset.reset()
             self.get_logger().info("Recieved ready command.")
             self.create_path()
             self.armed = False
