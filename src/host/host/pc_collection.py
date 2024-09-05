@@ -151,6 +151,8 @@ class PCNode(Node):
           points = np.frombuffer(data.data, dtype=np.float32).reshape(-1, 3)
           o3dpc = o3d.geometry.PointCloud()
           o3dpc.points = o3d.utility.Vector3dVector(points)
+          num_points = len(points)
+          self.get_logger().info("Pointcloud with points: " + str(num_points))
 
           # Write point clouds to files
           o3d.io.write_point_cloud(self.dump_dir + "/pointcloud" + str(data.header.stamp.nanosec) + ".pcd", o3dpc)
