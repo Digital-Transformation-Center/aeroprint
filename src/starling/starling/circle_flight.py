@@ -109,8 +109,8 @@ class OffboardFigure8Node(Node):
         self.hit_figure_8 = False
         self.armed = False
         self.offboard_setpoint_counter = 0
-        self.start_time = time.time()
         self.offboard_arr_counter = 0
+        self.start_time = time.time()
         self.start_altitude = 0.6
         self.end_altitude = 1.1
         self.start_height = 0.0
@@ -157,6 +157,7 @@ class OffboardFigure8Node(Node):
         self.scan_ended = False
         if msg.data:
             self.voxl_reset.reset()
+            self.reset()
             self.get_logger().info("Recieved ready command.")
             self.create_path()
             self.armed = False
@@ -235,15 +236,19 @@ class OffboardFigure8Node(Node):
     def reset(self):
         try:
             self.timer.cancel()
-            self.figure8_timer.cancel()
-            
         except: 
-            self.get_logger().info("Failed to cancel timers.")
+            self.get_logger().info("Failed to cancel timer.")
+        try:
+            self.figure8_timer.cancel()
+        except: 
+            self.get_logger().info("Failed to cancel fig timer.")
+        self.scan_ended = False
         self.path = []
         self.offboard_setpoint_counter = 0
         self.hit_figure_8 = False
-        self.offboard_setpoint_counter = 0
         self.taken_off = False
+        self.armed = False
+        self.offboard_arr_counter = 0
         # self.clear_trajectory()
         self.get_logger().info("Reset Flight Control Node.")
     
