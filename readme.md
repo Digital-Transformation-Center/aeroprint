@@ -1,4 +1,15 @@
 # Aeroprint Project Resources
+AeroPrint is a software and hardware system designed to convey the power of the digital thread. This project is made in partnership with the [DAFDTO](https://dafdto.com/). This system is designed to perform autonomous 3D scanning of any object, of any size, anywhere, at any time, and quickly. This allows for rapid integration of live digital representations of physical objects to be generated at the press of a button. 
+
+Currently AeroPrint is in its infancy. While our product is functional, it has a long way to come. 
+## Navigation
+Are you a visitor looking for guidance on how to navigate this project? Look no further.
+
+This GitHub repository serves as the main resource and code base for AeroPrint. If you are looking for detailed development information, please visit the [Wiki section](https://github.com/Digital-Transformation-Center/aeroprint/wiki) and click the pages dropdown to see all of our Wiki pages. A formal Wiki page is in progress and can be found [here](https://digital-transformation-center.github.io/aeroprint/).
+### Hot Links
+TODO
+
+Additional resources and information are available upon request. Please contact [kuederler1@udayton.edu](kuederler1@udayton.edu).
 
 ## Getting Started
 

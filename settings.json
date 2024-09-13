@@ -1,0 +1,16 @@
+{
+    "resources_file_path": {
+        "display_name": "Resources File Path",
+        "description": "The path to the resources files. This will is where images will be stored, tf models, etc.",
+        "type": "file_path",
+        "default_value": "~/Documents/AeroPrint/",
+        "value": "/home/ryan/Documents/AeroPrint"
+    },
+    "enable_notifications": {
+        "display_name": "Enable Notifications",
+        "description": "Enable notifications for the application.",
+        "type": "boolean",
+        "default_value": true,
+        "value": false
+    }
+}
