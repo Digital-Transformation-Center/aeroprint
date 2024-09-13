@@ -110,7 +110,10 @@ class ParameterWidget(QWidget):
         self.dataset_dropdown = QComboBox(self)
         self.dataset_dropdown.addItem("Select Dataset")
         # Get the list of folders in the dataset class
-        dataset_folders = os.listdir(os.path.join(self.resources_path, 'datasets'))
+        datasets_path = os.path.join(self.resources_path, 'datasets')
+        if not os.path.exists(datasets_path):
+            os.makedirs(datasets_path)
+        dataset_folders = os.listdir(datasets_path)
         # Add each folder to the dropdown
         for folder in dataset_folders:
             self.dataset_dropdown.addItem(folder)

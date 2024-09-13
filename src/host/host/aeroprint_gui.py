@@ -25,6 +25,12 @@ class MainGUIExample:
         self.init_menu_bar()
         self.settings_utility = SettingsUtility()
         self.resource_path = os.path.abspath(self.settings_utility.get_value("resources_file_path"))
+        try:
+            os.listdir(self.resource_path)
+        except:
+            self.resource_path = os.path.expanduser("~/aeroprint/")
+        
+        
 
     def init_menu_bar(self):
         menu_bar = self.sc.menuBar()
