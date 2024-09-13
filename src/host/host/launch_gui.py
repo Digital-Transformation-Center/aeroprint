@@ -9,9 +9,9 @@ __version__ = "0.01.01"
 __status__ = "Beta"
 
 import subprocess
-from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QHBoxLayout, QMainWindow, QVBoxLayout, QDialog
-from PyQt6.QtGui import QPixmap
-from PyQt6.QtCore import Qt, QTimer
+from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QHBoxLayout, QMainWindow, QVBoxLayout, QDialog, QPushButton
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtCore import Qt, QTimer
 import os
 import paramiko
 import threading
@@ -48,19 +48,27 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("AeroPrint Startup")
         self.starling_connection_widget = StarlingConnectionWidget(self.checker)
         self.wifi_connection_widget = WifiConnectionWidget(self.checker)
+        self.prusa_connection_widget = PrusaConnectionWidget(self.checker)
         self.warning = Warning("")
         self.starling_started_widget = StarlingStartedWidget(self.starling_connection_widget, self.checker)
         central_widget = QWidget()
         
         self.layout = QVBoxLayout()
+
+        self.continue_button = QPushButton("Continue")
+        self.continue_button.clicked.connect(lambda _: self.start_gui(True))
+
         self.layout.addWidget(self.wifi_connection_widget)
         self.layout.addWidget(self.starling_connection_widget)
         self.layout.addWidget(self.starling_started_widget)
+        self.layout.addWidget(self.prusa_connection_widget)
+        self.layout.addWidget(self.continue_button)
         central_widget.setLayout(self.layout)
         self.setCentralWidget(central_widget)
         self.checker.add_check("wifi")
         self.checker.add_check("starling_connection")
         self.checker.add_check("starling_started")
+        self.checker.add_check("prusa_connection")
 
         run_checks_thread = threading.Thread(target=self.run_checks)
         run_checks_thread.start()
@@ -78,9 +86,10 @@ class MainWindow(QMainWindow):
         self.wifi_connection_widget.check_reachability()
         self.starling_connection_widget.check_reachability()
         self.starling_started_widget.check_reachability()
+        self.prusa_connection_widget.check_reachability()
         self.start_gui()
     
-    def start_gui(self):
+    def start_gui(self, force = False):
         """
         Starts the GUI if all checks have passed.
 
@@ -96,6 +105,10 @@ class MainWindow(QMainWindow):
         else:
             print("NOT DONE")
             QTimer.singleShot(1000, self.start_gui)
+        if force:
+            launch_command = f'source {self.install_path} && ros2 launch host host_launch.py'
+            subprocess.Popen(launch_command, shell=True, executable='/bin/bash')
+            self.close()
             
 
 class StarlingStartedWidget(QWidget):
@@ -118,8 +131,8 @@ class StarlingStartedWidget(QWidget):
             # Construct the truncated path
             truncated_path = os.sep.join(path_parts[:aeroprint_index + 1])
         self.text_label = QLabel(self)
-        self.text_label.setText("Starling started")
-        self.text_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.text_label.setText("Starling Started")
+        self.text_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
         self.check_path = os.path.join(truncated_path, 'src/host/images/check.png')  
         self.x_path = os.path.join(truncated_path, 'src/host/images/x.png')  
         self.label = QLabel(self)
@@ -226,7 +239,7 @@ class WifiConnectionWidget(QWidget):
             truncated_path = os.sep.join(path_parts[:aeroprint_index + 1])
         self.text_label = QLabel(self)
         self.text_label.setText("AeroPrint Network Connected")
-        self.text_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.text_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
         self.check_path = os.path.join(truncated_path, 'src/host/images/check.png')  
         self.x_path = os.path.join(truncated_path, 'src/host/images/x.png')  
         self.label = QLabel(self)
@@ -239,6 +252,7 @@ class WifiConnectionWidget(QWidget):
     def check_reachability(self):
         net_requirement = "aeroprint-net"
         wifi_ssid = get_wifi_ssid()
+        print(wifi_ssid)
         try: 
             if net_requirement in wifi_ssid:
                 self.label.setPixmap(QPixmap(self.check_path).scaled(self.icon_size, self.icon_size))
@@ -248,6 +262,8 @@ class WifiConnectionWidget(QWidget):
                 # Wait for 1 second and check again
                 QTimer.singleShot(1000, self.check_reachability)
         except: 
+            QTimer.singleShot(1000, self.check_reachability)
+        if not self.checker.check_passed("wifi"):
             QTimer.singleShot(1000, self.check_reachability)
             
 
@@ -297,7 +313,56 @@ class StarlingConnectionWidget(QWidget):
             self.label.setPixmap(QPixmap(self.x_path).scaled(self.icon_size, self.icon_size))
             # Wait for 1 second and check again
             QTimer.singleShot(1000, self.check_reachability)
-        
+
+
+
+class PrusaConnectionWidget(QWidget):
+    def __init__(self, checker):
+        super().__init__()
+        self.checker = checker
+        self.icon_size = 50
+        layout = QHBoxLayout()
+
+        path = os.path.dirname(os.path.abspath(__file__))  
+        # Split the path into components
+        path_parts = path.split(os.sep)
+
+        # Find the index of 'aeroprint' in the path
+        try:
+            aeroprint_index = path_parts.index("aeroprint")
+        except ValueError:
+            print("Error: 'aeroprint' not found in the path")
+        else:
+            # Construct the truncated path
+            truncated_path = os.sep.join(path_parts[:aeroprint_index + 1])
+        self.text_label = QLabel(self)
+        self.text_label.setText("Prusa Connected")
+        self.text_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.check_path = os.path.join(truncated_path, 'src/host/images/check.png')  
+        self.x_path = os.path.join(truncated_path, 'src/host/images/x.png')  
+        self.label = QLabel(self)
+        self.label.setPixmap(QPixmap(self.x_path).scaled(self.icon_size, self.icon_size))
+        self.label.setAlignment(Qt.AlignmentFlag.AlignRight)
+        layout.addWidget(self.text_label)
+        layout.addWidget(self.label)
+        self.setLayout(layout)
+        self.reached = False
+        self.check_reachability()
+
+    def get_reached(self):
+        return self.reached
+
+    def check_reachability(self):
+        host = "192.168.8.181"
+        if is_reachable(host):
+            self.label.setPixmap(QPixmap(self.check_path).scaled(self.icon_size, self.icon_size))
+            self.checker.pass_check("prusa_connection")
+            self.reached = True
+        else:
+            self.label.setPixmap(QPixmap(self.x_path).scaled(self.icon_size, self.icon_size))
+            # Wait for 1 second and check again
+            QTimer.singleShot(1000, self.check_reachability)
+                    
 class Checker():
     def __init__(self):
         self.checks = {}

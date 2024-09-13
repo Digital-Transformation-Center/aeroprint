@@ -1,0 +1,5 @@
+[Desktop Entry]
+Name=AeroPrint
+Exec=aeroprint-dev.host
+Icon=${SNAP}/meta/gui/aeroprint-dev.png
+Type=Application

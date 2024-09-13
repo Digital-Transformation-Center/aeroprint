@@ -17,7 +17,7 @@ class PrinterController(Node):
             qos_profile_system_default
         )
         self.get_logger().info("Initializing Printer")
-        self.prusaMK4 = PrusaLinkPy.PrusaLinkPy("192.168.8.181", "9BQHmQ5SRVc5RRE")
+        self.prusaMK4 = PrusaLinkPy.PrusaLinkPy("192.168.8.181", "vWDzCjgQmUxfemt")
         self.printer = self.prusaMK4.get_printer()
         self.get_logger().info("Printer Initialized")
         self.gcode_path = ""
@@ -79,7 +79,7 @@ class PrinterController(Node):
     def print_gcode(self):
         printer_gcode_path = "/aeroprint/" + self.filename + ".gcode"
         self.get_logger().info("Initializing Printer")
-        self.prusaMK4 = PrusaLinkPy.PrusaLinkPy("192.168.8.181", "9BQHmQ5SRVc5RRE")
+        self.prusaMK4 = PrusaLinkPy.PrusaLinkPy("192.168.8.181", "vWDzCjgQmUxfemt")
         self.printer = self.prusaMK4.get_printer()
         self.get_logger().info("Printer Initialized")
         self.get_logger().info("Using file: " + self.gcode_path)
