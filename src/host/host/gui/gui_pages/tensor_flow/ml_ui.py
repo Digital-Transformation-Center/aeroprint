@@ -471,6 +471,11 @@ class ModelInteractionToolkit():
 
     def model_exists(self):
         model_path = os.path.join(self.model_directory, "model.keras")
+        try:
+            temp_mt = ModelTester()
+            temp_mt.load_model(model_path)
+        except:
+            return False
         return os.path.exists(model_path)
 
 class WorkerSignals(QObject):
