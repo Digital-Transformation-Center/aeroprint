@@ -200,8 +200,8 @@ class OffboardFigure8Node(Node):
             # Define angle a
             #a = (i * (2.0 * math.pi) / self.steps) - math.pi / 2                #newer path
             a = (-math.pi) + i * (2.0 * math.pi / self.steps)                   #Original circular path
-
-            msg.position = [r * math.cos(a), r * math.sin(a), altitude]
+            #msg.position = [r + r * math.cos(a), r * math.sin(a), altitude]    #Original circular path
+            msg.position = [r * math.cos(a), r * math.sin(a), altitude]         #New path
             msg.velocity = [
                 dadt * -r * math.sin(a),
                 dadt * r * math.cos(a),
@@ -229,6 +229,8 @@ class OffboardFigure8Node(Node):
                     self.path.append(pause_msg)
 
         # Calculate yawspeed for smooth rotation
+        #for i in range(self.steps):                                    #Original
+        #    next_yaw = self.path[(i + 1) % self.steps].yaw             #Original
         for i in range(len(self.path) - 1):
             next_yaw = self.path[i + 1].yaw
             curr = self.path[i].yaw
