@@ -100,7 +100,7 @@ class OffboardFigure8Node(Node):
         self.voxl_reset.reset()
         self.rate = 20
         self.radius = 0.0                               #from 0.9 to 0.0
-        self.cycle_s = 20                                # Lower INT = Faster flight speed 10 is quick
+        self.cycle_s = 80                                # Lower INT = Faster flight speed 10 is quick
         
         self.steps = self.cycle_s * self.rate
         self.path = []
