@@ -151,7 +151,7 @@ class OffboardFigure8Node(Node):
         self.get_logger().info("Updating radius to " + str(msg.data))
 
     def ready_callback(self, msg):
-        self.voxl_reset.reset()
+        # self.voxl_reset.reset()
 
         b = Bool(); b.data  = False
         self.scan_start_pub.publish(b)
