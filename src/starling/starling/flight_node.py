@@ -92,7 +92,7 @@ class OffboardFigure8Node(Node):
             # yaw = math.atan2(vel_y, vel_x)
 
             # Yaw in direction of center
-            yaw = math.atan2(acc_x, acc_y)
+            yaw = math.atan2(acc_y, acc_x)
 
             msg.position = [pos_x, pos_y, pos_z]
             msg.velocity = [vel_x, vel_y, vel_z]
