@@ -117,51 +117,6 @@ class OffboardFigure8Node(Node):
     def init_path(self):
         self.path = self.get_circle(self.altitude, self.radius, self.cycle_s, self.rate)
         print(len(self.path))
-        
-        # dt = 1.0 / self.rate
-        # dadt = (2.0 * math.pi) / self.cycle_s
-        # r = self.radius
-
-        # for i in range(self.steps):
-        #     msg = TrajectorySetpoint()
-
-        #     a = (-math.pi / 2.0) + i * (2.0 * math.pi / self.steps)
-        #     c = math.cos(a)
-        #     c2a = math.cos(2.0 * a)
-        #     c4a = math.cos(4.0 * a)
-        #     c2am3 = c2a - 3.0
-        #     c2am3_cubed = c2am3 * c2am3 * c2am3
-        #     s = math.sin(a)
-        #     cc = c * c
-        #     ss = s * s
-        #     sspo = (s * s) + 1.0
-        #     ssmo = (s * s) - 1.0
-        #     sspos = sspo * sspo
-
-        #     msg.position = [-(r * c * s) / sspo, (r * c) / sspo, self.altitude]
-        #     msg.velocity = [
-        #         dadt * r * (ss * ss + ss + ssmo * cc) / sspos,
-        #         -dadt * r * s * (ss + 2.0 * cc + 1.0) / sspos,
-        #         0.0,
-        #     ]
-        #     msg.acceleration = [
-        #         -dadt * dadt * 8.0 * r * s * c * ((3.0 * c2a) + 7.0) / (c2am3_cubed),
-        #         dadt * dadt * r * c * ((44.0 * c2a) + c4a - 21.0) / (c2am3_cubed),
-        #         0.0,
-        #     ]
-        #     msg.yaw = math.atan2(msg.velocity[1], msg.velocity[0])
-
-        #     self.path.append(msg)
-
-        # for i in range(self.steps):
-        #     next_yaw = self.path[(i + 1) % self.steps].yaw
-        #     curr = self.path[i].yaw
-        #     if next_yaw - curr < -math.pi:
-        #         next_yaw += 2.0 * math.pi
-        #     if next_yaw - curr > math.pi:
-        #         next_yaw -= 2.0 * math.pi
-
-        #     self.path[i].yawspeed = (next_yaw - curr) / dt
 
     def timer_callback(self) -> None:
         """Callback function for the timer."""
@@ -221,7 +176,7 @@ class OffboardFigure8Node(Node):
         self.publish_vehicle_command(VehicleCommand.VEHICLE_CMD_NAV_LAND)
         self.get_logger().info("Switching to land mode")
         self.taken_off = False
-        # self.hit_figure_8 = False
+        self.hit_figure_8 = False
 
     def offboard_move_callback(self):
         if self.offboard_arr_counter < len(self.path):
