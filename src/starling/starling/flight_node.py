@@ -105,9 +105,6 @@ class OffboardFigure8Node(Node):
             acc_y = dadt * dadt * -r * math.sin(a)
             acc_z = 0.0
 
-            # Yaw in direction of flight
-            # yaw = math.atan2(vel_y, vel_x)
-
             # Yaw in direction of center
             yaw = math.atan2(acc_y, acc_x)
 
@@ -150,6 +147,7 @@ class OffboardFigure8Node(Node):
 
         if self.start_time + 10 > time.time():
             self.get_logger().info("Taking off to " + str(self.altitude))
+            self.get_logger().info("Initial position: " + str(self.initial_position))
             self.publish_takeoff_setpoint(self.get_offset_x(0.0), self.get_offset_y(0.0), self.get_offset_z(self.altitude))
         else:
             if not self.hit_figure_8:
