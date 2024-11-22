@@ -106,6 +106,7 @@ class OffboardFigure8Node(Node):
             if next_yaw - curr > math.pi:
                 next_yaw -= 2.0 * math.pi
             circle_path[i].yawspeed = (next_yaw - curr) / dt
+        return circle_path
 
 
 
