@@ -74,6 +74,7 @@ class OffboardFigure8Node(Node):
         while not self.vehicle_position_has_updated:
             rclpy.spin_once(self, timeout_sec=0.1)
             self.get_logger().info("Waiting for initial position...")
+        self.initial_position = self.vehicle_position
         self.get_logger().info("Initial position acquired.")
 
         self.init_path()
@@ -137,7 +138,6 @@ class OffboardFigure8Node(Node):
         self.publish_offboard_control_heartbeat_signal()
 
         if self.offboard_setpoint_counter == 10:
-            self.initial_position = self.vehicle_position
             self.engage_offboard_mode()
             self.arm()
             self.armed = True
