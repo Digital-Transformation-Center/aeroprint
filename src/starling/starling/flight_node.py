@@ -112,6 +112,8 @@ class OffboardFigure8Node(Node):
 
     def init_path(self):
         self.path = self.get_circle(self.altitude, self.radius, self.cycle_s, self.rate)
+        print(len(self.path))
+        
         # dt = 1.0 / self.rate
         # dadt = (2.0 * math.pi) / self.cycle_s
         # r = self.radius
