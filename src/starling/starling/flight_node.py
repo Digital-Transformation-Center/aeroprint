@@ -60,13 +60,17 @@ class OffboardFigure8Node(Node):
         self.path = []
         self.vehicle_local_position = VehicleLocalPosition()
         self.vehicle_status = VehicleStatus()
-        self.vehicle_odometry = [0.0, 0.0, 0.0]
+        self.vehicle_position = [0.0, 0.0, 0.0]
+        self.initial_position = [0.0, 0.0, 0.0]
         self.taken_off = False
         self.hit_figure_8 = False
         self.armed = False
         self.offboard_setpoint_counter = 0
         self.start_time = time.time()
         self.offboard_arr_counter = 0
+        self.vehicle_position_has_updated = False
+        while not self.vehicle_position_has_updated: None
+        self.get_logger().info("Initial position acquired.")
         self.init_path()
 
         self.timer = self.create_timer(0.1, self.timer_callback)
@@ -102,7 +106,7 @@ class OffboardFigure8Node(Node):
             # Yaw in direction of center
             yaw = math.atan2(acc_y, acc_x)
 
-            msg.position = [pos_x, pos_y, pos_z]
+            msg.position = [self.get_offset_x(pos_x), self.get_offset_y(pos_y), self.get_offset_z(pos_z)]
             msg.velocity = [vel_x, vel_y, vel_z]
             msg.acceleration = [acc_x, acc_y, acc_z]
             msg.yaw = yaw
@@ -131,6 +135,7 @@ class OffboardFigure8Node(Node):
         self.publish_offboard_control_heartbeat_signal()
 
         if self.offboard_setpoint_counter == 10:
+            self.initial_position = self.vehicle_position
             self.engage_offboard_mode()
             self.arm()
             self.armed = True
@@ -140,7 +145,7 @@ class OffboardFigure8Node(Node):
 
         if self.start_time + 10 > time.time():
             self.get_logger().info("Taking off to " + str(self.altitude))
-            self.publish_takeoff_setpoint(0.0, 0.0, self.altitude)
+            self.publish_takeoff_setpoint(self.get_offset_x(0.0), self.get_offset_y(0.0), self.get_offset_z(self.altitude))
         else:
             if not self.hit_figure_8:
                 self.get_logger().info("Doing figure 8 now")
@@ -148,6 +153,15 @@ class OffboardFigure8Node(Node):
                     1 / self.rate, self.offboard_move_callback
                 )
                 self.hit_figure_8 = True
+
+    def get_offset_x(self, x):
+        return x - self.initial_position[0]
+
+    def get_offset_y(self, y):
+        return y - self.initial_position[1]
+
+    def get_offset_z(self, z):
+        return z - self.initial_position[2]
 
     def vehicle_local_position_callback(self, vehicle_local_position):
         print(vehicle_local_position)
@@ -193,7 +207,7 @@ class OffboardFigure8Node(Node):
             )
 
         if self.offboard_arr_counter >= len(self.path):
-            self.publish_takeoff_setpoint(0.0, 0.0, self.altitude)
+            self.publish_takeoff_setpoint(self.get_offset_x(0.0), self.get_offset_y(0.0), self.get_offset_z(self.altitude))
 
         if self.offboard_arr_counter == len(self.path) + 100:
             self.figure8_timer.cancel()
@@ -241,13 +255,10 @@ class OffboardFigure8Node(Node):
 
     def vehicle_odometry_callback(self, vehicle_odometry):
         """Callback function for vehicle_odometry topic subscriber."""
-        self.vehicle_odometry[0] = vehicle_odometry.position[0]
-        self.vehicle_odometry[1] = vehicle_odometry.position[1]
-        self.vehicle_odometry[2] = vehicle_odometry.position[2]
-
-        self.get_logger().info(
-            f"Odometry: {self.vehicle_odometry[0]}, {self.vehicle_odometry[1]}, {self.vehicle_odometry[2]}"
-        )
+        self.vehicle_position[0] = vehicle_odometry.position[0]
+        self.vehicle_position[1] = vehicle_odometry.position[1]
+        self.vehicle_position[2] = vehicle_odometry.position[2]
+        self.vehicle_position_has_updated = True
 
 
 def main(args=None) -> None:
