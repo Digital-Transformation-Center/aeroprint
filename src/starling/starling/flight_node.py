@@ -74,7 +74,8 @@ class OffboardFigure8Node(Node):
         while not self.vehicle_position_has_updated:
             rclpy.spin_once(self, timeout_sec=0.1)
             self.get_logger().info("Waiting for initial position...")
-        self.initial_position = self.vehicle_position
+        for i in range(3):
+            self.initial_position[i] = self.vehicle_position[i]
         self.get_logger().info("Initial position acquired.")
 
         self.init_path()
