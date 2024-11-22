@@ -69,9 +69,9 @@ class OffboardFigure8Node(Node):
         self.start_time = time.time()
         self.offboard_arr_counter = 0
         self.vehicle_position_has_updated = False
-        while not self.vehicle_position_has_updated:
-            self.get_logger().info("Waiting for initial position...")
-        self.get_logger().info("Initial position acquired.")
+        # while not self.vehicle_position_has_updated:
+        #     self.get_logger().info("Waiting for initial position...")
+        
         self.init_path()
 
         self.timer = self.create_timer(0.1, self.timer_callback)
@@ -260,6 +260,7 @@ class OffboardFigure8Node(Node):
         self.vehicle_position[1] = vehicle_odometry.position[1]
         self.vehicle_position[2] = vehicle_odometry.position[2]
         self.vehicle_position_has_updated = True
+        self.get_logger().info("Initial position acquired.")
 
 
 def main(args=None) -> None:
