@@ -29,6 +29,7 @@ setup(
             "test_pub = starling.test_pub:main",
             "circle-flight = starling.circle_flight:main",
             "custom-pc-pub = starling.custom_pc_publisher:main",
+            "flight-node = starling.flight_node:main",
         ],
     },
 )
