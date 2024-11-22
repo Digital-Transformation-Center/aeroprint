@@ -64,7 +64,7 @@ class OffboardFigure8Node(Node):
         self.timer = self.create_timer(0.1, self.timer_callback)
 
     def get_circle(self, altitude, radius, cycle_s, rate):
-        self.get_logger.info(f"local position: {self.vehicle_local_position.x}, {self.vehicle_local_position.y}, {self.vehicle_local_position.z}")
+        self.get_logger().info(f"local position: {self.vehicle_local_position.x}, {self.vehicle_local_position.y}, {self.vehicle_local_position.z}")
         circle_path = []
         dt = 1.0 / rate
         dadt = (2.0 * math.pi) / cycle_s
