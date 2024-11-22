@@ -9,6 +9,7 @@ from px4_msgs.msg import (
     VehicleCommand,
     VehicleLocalPosition,
     VehicleStatus,
+    VehicleOdometry
 )
 
 
@@ -44,6 +45,12 @@ class OffboardFigure8Node(Node):
             self.vehicle_status_callback,
             qos_profile,
         )
+        self.vehicle_odometry_subscriber = self.create_subscription(
+            VehicleOdometry,
+            "/fmu/out/vehicle_odometry",
+            self.vehicle_odometry_callback,
+            qos_profile,
+        )
 
         self.rate = 20
         self.radius = 1
@@ -53,6 +60,7 @@ class OffboardFigure8Node(Node):
         self.path = []
         self.vehicle_local_position = VehicleLocalPosition()
         self.vehicle_status = VehicleStatus()
+        self.vehicle_odometry = [0.0, 0.0, 0.0]
         self.taken_off = False
         self.hit_figure_8 = False
         self.armed = False
@@ -64,7 +72,6 @@ class OffboardFigure8Node(Node):
         self.timer = self.create_timer(0.1, self.timer_callback)
 
     def get_circle(self, altitude, radius, cycle_s, rate):
-        self.get_logger().info(f"local position: {self.vehicle_local_position.x}, {self.vehicle_local_position.y}, {self.vehicle_local_position.z}")
         circle_path = []
         dt = 1.0 / rate
         dadt = (2.0 * math.pi) / cycle_s
@@ -231,6 +238,16 @@ class OffboardFigure8Node(Node):
         msg.from_external = True
         msg.timestamp = int(self.get_clock().now().nanoseconds / 1000)
         self.vehicle_command_publisher.publish(msg)
+
+    def vehicle_odometry_callback(self, vehicle_odometry):
+        """Callback function for vehicle_odometry topic subscriber."""
+        self.vehicle_odometry[0] = vehicle_odometry.position[0]
+        self.vehicle_odometry[1] = vehicle_odometry.position[1]
+        self.vehicle_odometry[2] = vehicle_odometry.position[2]
+
+        self.get_logger().info(
+            f"Odometry: {self.vehicle_odometry[0]}, {self.vehicle_odometry[1]}, {self.vehicle_odometry[2]}"
+        )
 
 
 def main(args=None) -> None:
