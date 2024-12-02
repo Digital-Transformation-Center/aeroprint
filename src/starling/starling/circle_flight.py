@@ -95,8 +95,8 @@ class OffboardFigure8Node(Node):
 
         self.ready = False
 
-        # self.voxl_reset = VOXLQVIOController()
-        # self.voxl_reset.reset()
+        self.voxl_reset = VOXLQVIOController()
+        self.voxl_reset.reset()
         self.rate = 20
         self.radius = 0.9
         self.cycle_s = 40
@@ -156,7 +156,7 @@ class OffboardFigure8Node(Node):
         self.scan_end_pub.publish(b)
         self.scan_ended = False
         if msg.data:
-            # self.voxl_reset.reset()
+            self.voxl_reset.reset()
             self.reset()
             self.get_logger().info("Recieved ready command.")
             self.create_path()
