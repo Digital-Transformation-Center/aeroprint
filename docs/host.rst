@@ -1,8 +1,13 @@
-Host Code
-==========
+.. _host:
 
-.. autosummary::
-   :toctree: api_autogen
-   
-   :recursive:
-   host
+Host Package Documentation
+==========================
+.. automodule:: host.host.mesher
+   :members:
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`

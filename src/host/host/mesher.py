@@ -17,7 +17,22 @@ from std_msgs.msg import String, Bool
 import rclpy
 
 class Mesher(Node):
-    """Mesher node"""
+    """
+    Mesher class responsible for processing point cloud data into a mesh and exporting it.
+    Methods
+    -------
+    __init__() -> None
+        Initializes the Mesher node, sets up subscriptions and publishers.
+    dump_directory_callback(msg: String) -> None
+        Callback function for handling the dump directory message.
+    export_complete_callback(msg: Bool) -> None
+        Callback function for handling the export complete message.
+    process() -> None
+        Processes the point cloud data to generate a mesh and saves it to a file.
+    save() -> None
+        Processes the mesh, saves it to a file, and publishes the file path.
+    """
+
     def __init__(self) -> None:
         super().__init__("mesher")
         self.get_logger().info("Mesher alive")
@@ -46,19 +61,51 @@ class Mesher(Node):
         self.pc_file_location = ""
 
     def dump_directory_callback(self, msg):
-        """Callback for dump directory"""
+        """
+        Callback function to handle directory dump messages.
+        This function sets the directory and point cloud file location based on the incoming message data.
+        Args:
+            msg (Message): The message containing the directory path data.
+        """
+
         self.directory = msg.data
         self.pc_file_location = msg.data + "/combined_filtered.pcd"
     
     def export_complete_callback(self, msg):
-        """Callback for export complete"""
+        """
+        Callback function that is triggered when the export process is complete.
+        Args:
+            msg (Message): The message object containing the export status.
+        Logs:
+            - "Export complete callback: <msg.data>" to indicate the callback has been triggered.
+            - "Meshing..." if the export was successful.
+        Actions:
+            - Calls the save() method if the export was successful.
+        """
+
         self.get_logger().info("Export complete callback: " + str(msg.data))
         if msg.data:
             self.get_logger().info("Meshing...")
             self.save()
 
     def process(self):
-        """Function to process mesh"""
+        """
+        Processes a point cloud file to generate a smoothed and filtered 3D mesh.
+        Steps:
+        1. Reads the point cloud from the specified file location.
+        2. Estimates normals for the point cloud.
+        3. Creates a triangle mesh from the point cloud using alpha shapes.
+        4. Smooths the mesh using Laplacian smoothing.
+        5. Clusters connected triangles and removes small clusters.
+        6. Computes vertex normals for the final mesh.
+        7. Exports the final mesh to an STL file.
+        Attributes:
+        - self.pc_file_location (str): The file location of the point cloud.
+        - self.directory (str): The directory where the output STL file will be saved.
+        Returns:
+        None
+        """
+
         pcd = o3d.io.read_point_cloud(self.pc_file_location)
         pcd.estimate_normals(o3d.geometry.KDTreeSearchParamHybrid(radius=0.05, max_nn=30))
         mesh = o3d.geometry.TriangleMesh.create_from_point_cloud_alpha_shape(
@@ -97,7 +144,13 @@ class Mesher(Node):
         mesh.compute_vertex_normals()
         o3d.io.write_triangle_mesh(self.directory + "-output.stl", mesh)
     def save(self):
-        """Process, save and publish path of mesh"""
+        """
+        Processes the mesh and saves the output to a file.
+        This method processes the mesh, constructs the output file path,
+        logs the output path, publishes the file directory, and logs the
+        completion of the mesh processing.
+        """
+
         self.process()
         output_path = String()
         output_path.data = self.directory + "-output.stl"
