@@ -66,14 +66,16 @@ class PCNode(Node):
     2. Calculates the time difference between the pose and point cloud data.
     3. Checks if the current time minus the last published time is greater than the publishing rate and if the time difference is within the allowed maximum.
     4. If conditions are met, it processes the point cloud data:
+     
       - Converts the PointCloud2 data to a numpy array and then to an Open3D point cloud.
       - Rotates and translates the point cloud based on the pose's position and orientation.
       - Converts the transformed point cloud back to PointCloud2 format.
       - Publishes the transformed point cloud data.
       - Updates the last published time.
+      
     5. If conditions are not met, it logs a message indicating a bad scan.
-    """
 
+    """
     try:
       pc_time = data.header.stamp.nanosec
       pose = self.pose_node.find(data.header.stamp.nanosec)

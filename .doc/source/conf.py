@@ -35,6 +35,10 @@ autodoc_mock_imports = [
     'px4_msgs',
     'open3d',
     'cv2',
+    'tensorflow',
+    'PIL',
+    'trimesh',
+
 ]
 
 templates_path = ['_templates']

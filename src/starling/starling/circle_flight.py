@@ -24,7 +24,7 @@ from px4_msgs.msg import (
 )
 
 
-class OffboardFigure8Node(Node):
+class OffboardStarlingNode(Node):
     """Node for controlling a vehicle in offboard mode."""
 
     def __init__(self) -> None:
@@ -536,7 +536,7 @@ def main(args=None) -> None:
     Main function to initialize the ROS node and start the flight control node.
     """
     rclpy.init(args=args)
-    offboard_figure8_node = OffboardFigure8Node()
+    offboard_figure8_node = OffboardStarlingNode()
     try:
         rclpy.spin(offboard_figure8_node)
     except KeyboardInterrupt:

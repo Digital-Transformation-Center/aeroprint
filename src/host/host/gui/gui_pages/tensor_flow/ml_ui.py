@@ -221,8 +221,8 @@ class ModelInteractionWidget(QWidget):
         super().__init__()
         self.prediction = None
         self.best_match = None
-        self.prediction_signal = WorkerSignals()
-        self.prediction_signal.finished.connect(self.load_model_popup)
+        self.prediction_signal = pyqtSignal()
+        self.prediction_signal.connect(self.load_model_popup)
         self.model_path = model_path
         self.layout = QVBoxLayout()
         self.setLayout(self.layout)
@@ -462,7 +462,7 @@ class ModelInteractionToolkit():
             self.best_match = best_match
             if self.prediction_signal is not None:
                 self.best_match = best_match
-                self.prediction_signal.finished.emit()
+                self.prediction_signal.emit()
         self.best_match = best_match
         return best_match
 
@@ -472,9 +472,6 @@ class ModelInteractionToolkit():
     def model_exists(self):
         model_path = os.path.join(self.model_directory, "model.keras")
         return os.path.exists(model_path)
-
-class WorkerSignals(QObject):
-    finished = pyqtSignal()
 
 if __name__ == "__main__":
     from scroll_container import ScrollContainer

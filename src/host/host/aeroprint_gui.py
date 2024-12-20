@@ -1,5 +1,4 @@
 import sys
-
 from host.gui.scroll_container import ScrollContainer
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLineEdit, QPushButton, QApplication, QAction, QToolBar, QDialog, QHBoxLayout
 from host.gui.gui_pages.settings.settings_widget import SettingsWidget
@@ -14,11 +13,18 @@ import os
 import rclpy
 # from gui_pages.tensor_flow.camera_dump import CameraDumpGUI
 
-"""
-This script demonstrates how to use the ScrollContainer class to create a multi-page GUI.
-"""
 
-class MainGUIExample:
+class AeroPrintGUI:
+    """
+    AeroPrintGUI is a class that creates a GUI application using PyQt5. It initializes the application, sets up a menu bar, 
+    and provides functionality to open a settings dialog. The class also creates custom widgets and adds them to a ScrollContainer.
+    
+    Attributes:
+        app (QApplication): The main application instance.
+        sc (ScrollContainer): The main scroll container for the GUI.
+        settings_utility (SettingsUtility): Utility for accessing settings.
+        resource_path (str): Path to the resources file.
+    """
     def __init__(self):
         self.app = QApplication(sys.argv)
         self.sc = ScrollContainer()
@@ -27,6 +33,13 @@ class MainGUIExample:
         self.resource_path = os.path.abspath(self.settings_utility.get_value("resources_file_path"))
 
     def init_menu_bar(self):
+        """
+        Initializes the menu bar for the AeroPrint GUI.
+        This method creates a menu bar and adds an "AeroPrint" menu to it. 
+        It also adds a "Settings" action to the "AeroPrint" menu, which 
+        triggers the open_settings method when selected.
+        """
+
         menu_bar = self.sc.menuBar()
 
         aeroprint_menu = menu_bar.addMenu("AeroPrint")
@@ -37,6 +50,12 @@ class MainGUIExample:
         aeroprint_menu.addAction(settings_action)
 
     def open_settings(self):
+        """
+        Opens the settings dialog.
+        This method creates and displays a modal dialog window with the title "Settings".
+        The dialog contains a SettingsWidget and has a fixed size of 800x900 pixels.
+        """
+
         dialog = QDialog(self.sc)
         dialog.setWindowTitle("Settings")
         dialog.setFixedSize(800, 900)
@@ -48,6 +67,33 @@ class MainGUIExample:
 
         dialog.exec_()
     def run(self):
+        """
+        Runs the main application logic.
+        This method creates custom widgets, adds them to a ScrollContainer, and sets up navigation buttons.
+        It initializes and displays the GUI, then starts the application's event loop.
+        
+        Custom Widgets:
+
+            - MyWidget: A custom widget with a text box and a centered button.
+            - MLUI: A widget initialized with specific parameters.
+            - FlightWidget: A widget initialized with resource path and other parameters.
+        
+        Navigation:
+
+            - Adds a "Next" button to the first custom widget.
+            - Adds a "Previous" button to the second custom widget.
+        
+        ScrollContainer:
+
+            - Adds the custom widgets to the ScrollContainer.
+            - Creates page buttons for navigation.
+            - Displays the ScrollContainer.
+        
+        Exits:
+
+            - Terminates the application when the event loop ends.
+        """
+
         # Create a custom widget that will be added to the ScrollContainer
         class MyWidget(QWidget):
             def __init__(self):
@@ -96,7 +142,7 @@ class MainGUIExample:
 
 def main(args=None):
     rclpy.init(args=args)
-    MainGUIExample().run()
+    AeroPrintGUI().run()
 
 if __name__ == "__main__":
     main()

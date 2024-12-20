@@ -19,18 +19,6 @@ import rclpy
 class Mesher(Node):
     """
     Mesher class responsible for processing point cloud data into a mesh and exporting it.
-    Methods
-    -------
-    __init__() -> None
-        Initializes the Mesher node, sets up subscriptions and publishers.
-    dump_directory_callback(msg: String) -> None
-        Callback function for handling the dump directory message.
-    export_complete_callback(msg: Bool) -> None
-        Callback function for handling the export complete message.
-    process() -> None
-        Processes the point cloud data to generate a mesh and saves it to a file.
-    save() -> None
-        Processes the mesh, saves it to a file, and publishes the file path.
     """
 
     def __init__(self) -> None:
@@ -92,6 +80,7 @@ class Mesher(Node):
         """
         Processes a point cloud file to generate a smoothed and filtered 3D mesh.
         Steps:
+
         1. Reads the point cloud from the specified file location.
         2. Estimates normals for the point cloud.
         3. Creates a triangle mesh from the point cloud using alpha shapes.
@@ -99,9 +88,10 @@ class Mesher(Node):
         5. Clusters connected triangles and removes small clusters.
         6. Computes vertex normals for the final mesh.
         7. Exports the final mesh to an STL file.
+        
         Attributes:
-        - self.pc_file_location (str): The file location of the point cloud.
-        - self.directory (str): The directory where the output STL file will be saved.
+            self.pc_file_location (str): The file location of the point cloud.
+            self.directory (str): The directory where the output STL file will be saved.
         Returns:
         None
         """
