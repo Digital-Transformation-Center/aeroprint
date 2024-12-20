@@ -222,6 +222,26 @@ class QVIOWidget(QWidget):
     
 
 class GUItoROS(Node):
+    """
+    A ROS2 Node class that interfaces between a GUI and ROS topics.
+    This class is responsible for publishing various types of messages from the GUI to ROS topics and subscribing to 
+    image data to update the GUI display.
+    
+    Attributes:
+
+        qvio_widget (QWidget): The widget in the GUI that displays the QVIO image.
+        flight_radius_pub (Publisher): Publisher for flight radius.
+        object_height_pub (Publisher): Publisher for object height.
+        start_height_pub (Publisher): Publisher for start height.
+        scan_title_pub (Publisher): Publisher for scan title.
+        ready_pub (Publisher): Publisher for ready status.
+        kill_pub (Publisher): Publisher for kill signal.
+        will_print_pub (Publisher): Publisher for will print status.
+        qos_profile (QoSProfile): Quality of Service profile for subscriptions.
+        qvio_sub (Subscription): Subscription for QVIO image data.
+
+    """
+
     def __init__(self, qvio_widget:QWidget) -> None:
         super().__init__("gui_node")
         self.qvio_widget = qvio_widget

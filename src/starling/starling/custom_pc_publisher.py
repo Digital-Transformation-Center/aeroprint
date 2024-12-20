@@ -49,7 +49,31 @@ class PCNode(Node):
 
 
   def callback(self, data):
-    """Transform and publish recieved PointCloud2 message."""
+    """
+    Callback function to process incoming point cloud data and publish transformed data.
+    
+    Args:
+      
+      data (sensor_msgs.msg.PointCloud2): The incoming point cloud data.
+    
+    Raises:
+      
+      Exception: If any error occurs during processing, it logs the exception message.
+    
+    The function performs the following steps:
+
+    1. Extracts the timestamp from the incoming data and finds the corresponding pose.
+    2. Calculates the time difference between the pose and point cloud data.
+    3. Checks if the current time minus the last published time is greater than the publishing rate and if the time difference is within the allowed maximum.
+    4. If conditions are met, it processes the point cloud data:
+      - Converts the PointCloud2 data to a numpy array and then to an Open3D point cloud.
+      - Rotates and translates the point cloud based on the pose's position and orientation.
+      - Converts the transformed point cloud back to PointCloud2 format.
+      - Publishes the transformed point cloud data.
+      - Updates the last published time.
+    5. If conditions are not met, it logs a message indicating a bad scan.
+    """
+
     try:
       pc_time = data.header.stamp.nanosec
       pose = self.pose_node.find(data.header.stamp.nanosec)
@@ -97,7 +121,23 @@ class PCNode(Node):
        self.get_logger().info(str(e))
 
 class PoseNode(Node):
-  """Node for acquiring pose data from VOXL MPA."""
+  """
+  Node for acquiring and managing pose data from VOXL MPA.
+
+  This class subscribes to a specific topic to receive pose data in the form of PoseStamped messages.
+  It maintains a dictionary of received poses keyed by their timestamp for quick lookup and retrieval.
+
+  As Starling pose data and ToF data are recieved by ROS, we need to ensure the pose is as close to the
+  pose in the particular ToF frame. So we keep a dictionary of recent ToF frames and use the one that
+  most closely matches the pose timestamp.
+
+  Attributes:
+
+    sub (Subscription): The subscription to the pose topic.
+    lookup (dict): A dictionary to store pose messages keyed by their timestamp.
+    pose (PoseStamped): The most recently received pose message.
+
+  """
   def __init__(self) -> None:
     super().__init__("pose_handler_node")
     topic = "/vvhub_body_wrt_fixed"
