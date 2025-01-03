@@ -38,6 +38,9 @@ autodoc_mock_imports = [
     'tensorflow',
     'PIL',
     'trimesh',
+    'std_msgs',
+    'PyQt5',
+    'sensor_msgs'
 
 ]
 
