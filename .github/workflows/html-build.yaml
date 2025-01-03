@@ -36,14 +36,14 @@ jobs:
           pip install sphinx sphinx-rtd-theme
       - name: Sphinx build
         run:  |
-          sphinx-build docs docs/_build
+          sphinx-build docs .docs/_build
       - name: Setup Pages
         uses: actions/configure-pages@v3
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
           # Upload entire repository
-          path: 'docs/_build'
+          path: '.docs/_build'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v2
