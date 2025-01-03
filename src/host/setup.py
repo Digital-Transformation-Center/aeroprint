@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 import os
 from glob import glob
 
@@ -7,7 +7,7 @@ package_name = "host"
 setup(
     name=package_name,
     version="0.0.0",
-    packages=[package_name],
+    packages=['host', 'host.gui', 'host.gui.gui_pages', 'host.gui.gui_pages.tensor_flow', 'host.gui.resources', 'host.gui.gui_pages.settings', 'host.gui.gui_pages.flight'],
     data_files=[
         ("share/ament_index/resource_index/packages", ["resource/" + package_name]),
         ("share/" + package_name, ["package.xml"]),
@@ -31,7 +31,8 @@ setup(
             "gui = host.aeroprint_gui:main",
             "pc-collection = host.pc_collection:main", 
             "pc-post-processor = host.pc_post_processor:main", 
-            "mesher = host.mesher:main"
+            "mesher = host.mesher:main",
+            "legacy_gui = host.legacy_aeroprint_gui:main"
         ],
     },
 )

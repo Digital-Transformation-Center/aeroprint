@@ -3,14 +3,12 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to AeroPrint's documentation!
+AeroPrint Docs
 =====================================
-
 .. toctree::
+   intro
    launch_assist
    host
-   starling
-   printer
    :maxdepth: 2
    :caption: Contents:
 

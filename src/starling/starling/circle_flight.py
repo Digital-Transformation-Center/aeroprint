@@ -24,7 +24,7 @@ from px4_msgs.msg import (
 )
 
 
-class OffboardFigure8Node(Node):
+class OffboardStarlingNode(Node):
     """Node for controlling a vehicle in offboard mode."""
 
     def __init__(self) -> None:
@@ -118,6 +118,30 @@ class OffboardFigure8Node(Node):
         self.scan_ended = False
 
     def create_path(self):
+        """
+        Creates a flight path consisting of multiple circular levels at different altitudes.
+        This method calculates a series of altitudes for circular flight paths, starting from a maximum height
+        and descending to a minimum height. The number of circular levels is determined by `num_circles`.
+        The altitudes are stored in the `circle_altitudes` list and are used to initialize circular flight paths.
+        
+        Attributes:
+
+            circle_altitudes (list): A list to store the altitudes for each circular level.
+            num_circles (int): The number of circular levels to create.
+            min_height (float): The minimum altitude for the flight path.
+            max_height (float): The maximum altitude for the flight path.
+            start_altitude (float): The starting altitude for the flight path.
+            end_altitude (float): The ending altitude for the flight path.
+        
+        Logs:
+
+            Logs the starting altitude and the list of calculated circle altitudes.
+        
+        Calls:
+
+            self.init_circle(altitude): Initializes a circular flight path at the given altitude.
+        """
+
         # This is very extra right now, but makes it easier to add levels.
         circle_altitudes = []
         num_circles = 3
@@ -139,18 +163,67 @@ class OffboardFigure8Node(Node):
             self.init_circle(-altitude)
 
     def start_height_callback(self, msg):
+        """
+        Callback function to update the start height.
+        
+        This function is triggered when a new message is received. It updates the 
+        start height with the data from the message and logs the updated height.
+        
+        Args:
+
+            msg: The message containing the new start height data. It is expected 
+                 to have a 'data' attribute that holds the height value.
+        """
+
         self.start_height = msg.data
         self.get_logger().info("Updating start height to " + str(msg.data))
 
     def object_height_callback(self, msg):
+        """
+        Callback function to update the object's height.
+
+        This function is triggered when a new message is received. It updates the 
+        object's height attribute with the data from the message and logs the update.
+        
+        Args:
+
+            msg: The message containing the new height data. It is expected to have 
+                 a 'data' attribute that holds the height value.
+        """
+
         self.object_height = msg.data
         self.get_logger().info("Updating object height to " + str(msg.data))
 
     def radius_callback(self, msg):
+        """
+        Callback function to update the radius based on the received message.
+        
+        Args:
+
+            msg (Message): The message containing the new radius value.
+        
+        Returns:
+
+            None
+        """
+
         self.radius = msg.data
         self.get_logger().info("Updating radius to " + str(msg.data))
 
     def ready_callback(self, msg):
+        """
+        Callback function that is triggered when a ready message is received.
+        This function handles the initialization and reset of various components
+        based on the received message. If the message indicates readiness, it 
+        resets the system, logs the event, creates a flight path, and starts a 
+        timer for periodic callbacks. If the message does not indicate readiness, 
+        it resets the system and initiates landing.
+        
+        Args:
+
+            msg (std_msgs.msg.Bool): A message indicating whether the system is ready.
+        """
+
         b = Bool(); b.data  = False
         self.scan_start_pub.publish(b)
         self.scan_end_pub.publish(b)
@@ -172,6 +245,24 @@ class OffboardFigure8Node(Node):
 
 
     def init_circle(self, altitude):
+        """
+        Initializes a circular flight path at a given altitude.
+        
+        Args:
+
+            altitude (float): The altitude at which the circular flight path should be initialized.
+        
+        This method calculates the trajectory setpoints for a circular flight path based on the 
+        specified altitude, radius, rate, and cycle duration. It computes the position, velocity, 
+        acceleration, and yaw for each step in the circular path and appends the resulting 
+        TrajectorySetpoint messages to the path list. Additionally, it calculates the yawspeed 
+        for smooth transitions between yaw angles.
+        
+        Attributes:
+            
+            self.path (list): A list of TrajectorySetpoint messages representing the circular flight path.
+        """
+
 
         dt = 1.0 / self.rate
         dadt = (2.0 * math.pi) / self.cycle_s
@@ -209,7 +300,29 @@ class OffboardFigure8Node(Node):
             self.path[i].yawspeed = (next_yaw - curr) / dt
 
     def timer_callback(self) -> None:
-        """Callback function for the timer."""
+        """
+        Timer callback function that handles offboard control and flight operations.
+        This function is periodically called to:
+        
+        - Publish offboard control heartbeat signals.
+        - Engage offboard mode and arm the vehicle after a certain number of setpoints.
+        - Increment the offboard setpoint counter.
+        - Publish takeoff setpoints for the vehicle to reach the start altitude.
+        - Initiate a scan operation and start a figure-8 flight pattern if conditions are met.
+        
+        The function performs the following steps:
+        
+        1. Publishes offboard control heartbeat signals.
+        2. Engages offboard mode and arms the vehicle when the offboard setpoint counter reaches 10.
+        3. Increments the offboard setpoint counter if it is less than 11.
+        4. Publishes takeoff setpoints until 10 seconds have passed since the start time.
+        5. Initiates a scan operation and starts a figure-8 flight pattern if the vehicle is ready and the figure-8 pattern has not been started.
+        
+        Returns:
+
+            None
+        """
+
         self.publish_offboard_control_heartbeat_signal()
 
         if self.offboard_setpoint_counter == 10:
@@ -234,6 +347,23 @@ class OffboardFigure8Node(Node):
                 self.hit_figure_8 = True
 
     def reset(self):
+        """
+        Resets the flight control node to its initial state.
+
+        This method performs the following actions:
+
+        - Attempts to cancel the current timer. Logs a message if it fails.
+        - Attempts to cancel the figure-8 timer. Logs a message if it fails.
+        - Sets the scan_ended flag to False.
+        - Clears the flight path.
+        - Resets the offboard setpoint counter.
+        - Sets the hit_figure_8 flag to False.
+        - Sets the taken_off flag to False.
+        - Sets the armed flag to False.
+        - Resets the offboard arrival counter.
+        - Logs a message indicating that the flight control node has been reset.
+        """
+
         try:
             self.timer.cancel()
         except: 
@@ -291,6 +421,34 @@ class OffboardFigure8Node(Node):
         # self.hit_figure_8 = False
 
     def offboard_move_callback(self):
+        """
+        Callback function to handle offboard movement.
+        This function is called periodically to publish the next setpoint in the 
+        offboard path. It also handles the end of the scan by publishing a 
+        scan end message and initiating a landing sequence after a certain 
+        number of iterations.
+
+        Behavior:
+
+        - Publishes the next trajectory setpoint if the counter is within the path length.
+        - If the counter exceeds the path length and the scan has not ended, it logs the end of the scan,
+          publishes a scan end message, and sets the scan ended flag.
+        - Publishes a takeoff setpoint with the end altitude.
+        - Initiates landing if the counter exceeds the path length by 100.
+        
+        Attributes:
+        
+        - self.offboard_arr_counter (int): Counter to track the current position in the path.
+        - self.path (list): List of trajectory setpoints.
+        - self.scan_ended (bool): Flag to indicate if the scan has ended.
+        - self.end_altitude (float): Altitude to use for the takeoff setpoint at the end of the scan.
+        - self.trajectory_setpoint_publisher (Publisher): Publisher for trajectory setpoints.
+        - self.scan_end_pub (Publisher): Publisher for scan end messages.
+        - self.get_logger (function): Function to get the logger instance.
+        - self.publish_takeoff_setpoint (function): Function to publish the takeoff setpoint.
+        - self.land (function): Function to initiate landing.
+        """
+
         if self.offboard_arr_counter < len(self.path):
             self.trajectory_setpoint_publisher.publish(
                 self.path[self.offboard_arr_counter]
@@ -313,7 +471,7 @@ class OffboardFigure8Node(Node):
         """Publish the trajectory setpoint."""
         msg = TrajectorySetpoint()
         msg.position = [x, y, z]
-        msg.yaw = 0.00
+        
         msg.timestamp = int(self.get_clock().now().nanoseconds / 1000)
         self.trajectory_setpoint_publisher.publish(msg)
 
@@ -355,10 +513,17 @@ class OffboardFigure8Node(Node):
 import subprocess
 
 class VOXLQVIOController():
+    """
+    Controller class for handling VOXL QVIO (Visual-Inertial Odometry) operations.
+    """
+
     def __init__(self) -> None:
         None
 
     def reset(self):
+        """
+        Sends a reset command to the VOXL QVIO system.
+        """
         try:
             subprocess.run(["voxl-reset-qvio"])
             return True
@@ -367,8 +532,11 @@ class VOXLQVIOController():
             return False
 
 def main(args=None) -> None:
+    """
+    Main function to initialize the ROS node and start the flight control node.
+    """
     rclpy.init(args=args)
-    offboard_figure8_node = OffboardFigure8Node()
+    offboard_figure8_node = OffboardStarlingNode()
     try:
         rclpy.spin(offboard_figure8_node)
     except KeyboardInterrupt:

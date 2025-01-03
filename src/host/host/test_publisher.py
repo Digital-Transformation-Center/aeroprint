@@ -138,6 +138,23 @@ def main(args=None) -> None:
 
 if __name__ == "__main__":
     main()
-    
+
+"""
+/host/gui/out/flight_radius
+/host/gui/out/object_height
+/host/gui/out/start_height
+/host/gui/out/scan_title
+/host/gui/out/scan_ds
+/host/gui/out/ready
+/host/out/gui/kill
+/starling/out/fc/scan_start
+/starling/out/fc/scan_end
+/starling/out/start_dump
+/starling/out/posed_pc
+/host/out/pcc/dump_complete
+/host/out/pcc/dump_directory
+/host/out/pcpp/export_complete
+/host/out/mesher/file_directory
+"""
         
 
