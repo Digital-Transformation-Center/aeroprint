@@ -1,0 +1,2184 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Host Package documentation &mdash; AeroPrint 1.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=292eb321"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Starling Package documentation" href="starling.html" />
+    <link rel="prev" title="AeroPrint documentation" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            AeroPrint
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Code Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Host Package documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#aeroprint-gui">AeroPrint GUI</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#host.aeroprint_gui.AeroPrintGUI"><code class="docutils literal notranslate"><span class="pre">AeroPrintGUI</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#host.aeroprint_gui.AeroPrintGUI.app"><code class="docutils literal notranslate"><span class="pre">AeroPrintGUI.app</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.aeroprint_gui.AeroPrintGUI.sc"><code class="docutils literal notranslate"><span class="pre">AeroPrintGUI.sc</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.aeroprint_gui.AeroPrintGUI.settings_utility"><code class="docutils literal notranslate"><span class="pre">AeroPrintGUI.settings_utility</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.aeroprint_gui.AeroPrintGUI.resource_path"><code class="docutils literal notranslate"><span class="pre">AeroPrintGUI.resource_path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.aeroprint_gui.AeroPrintGUI.init_menu_bar"><code class="docutils literal notranslate"><span class="pre">AeroPrintGUI.init_menu_bar()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.aeroprint_gui.AeroPrintGUI.open_settings"><code class="docutils literal notranslate"><span class="pre">AeroPrintGUI.open_settings()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.aeroprint_gui.AeroPrintGUI.run"><code class="docutils literal notranslate"><span class="pre">AeroPrintGUI.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#host.aeroprint_gui.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#settings-wdget">Settings Wdget</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#host.gui.gui_pages.settings.settings_widget.SettingWidget"><code class="docutils literal notranslate"><span class="pre">SettingWidget</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.settings.settings_widget.SettingWidget.setting"><code class="docutils literal notranslate"><span class="pre">SettingWidget.setting</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.settings.settings_widget.SettingWidget.display_name"><code class="docutils literal notranslate"><span class="pre">SettingWidget.display_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.settings.settings_widget.SettingWidget.description"><code class="docutils literal notranslate"><span class="pre">SettingWidget.description</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.settings.settings_widget.SettingWidget.default_value"><code class="docutils literal notranslate"><span class="pre">SettingWidget.default_value</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.settings.settings_widget.SettingWidget.value"><code class="docutils literal notranslate"><span class="pre">SettingWidget.value</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.settings.settings_widget.SettingWidget.type"><code class="docutils literal notranslate"><span class="pre">SettingWidget.type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.settings.settings_widget.SettingWidget.layout"><code class="docutils literal notranslate"><span class="pre">SettingWidget.layout</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.settings.settings_widget.SettingWidget.name_widget"><code class="docutils literal notranslate"><span class="pre">SettingWidget.name_widget</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.settings.settings_widget.SettingWidget.edit_widget"><code class="docutils literal notranslate"><span class="pre">SettingWidget.edit_widget</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.settings.settings_widget.SettingWidget.description_widget"><code class="docutils literal notranslate"><span class="pre">SettingWidget.description_widget</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.settings.settings_widget.SettingWidget.FilePickerWidget"><code class="docutils literal notranslate"><span class="pre">SettingWidget.FilePickerWidget</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.settings.settings_widget.SettingWidget.create_edit_widget"><code class="docutils literal notranslate"><span class="pre">SettingWidget.create_edit_widget()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.settings.settings_widget.SettingWidget.get_setting"><code class="docutils literal notranslate"><span class="pre">SettingWidget.get_setting()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.settings.settings_widget.SettingWidget.save_value"><code class="docutils literal notranslate"><span class="pre">SettingWidget.save_value()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#host.gui.gui_pages.settings.settings_widget.SettingsWidget"><code class="docutils literal notranslate"><span class="pre">SettingsWidget</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.settings.settings_widget.SettingsWidget.layout"><code class="docutils literal notranslate"><span class="pre">SettingsWidget.layout</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.settings.settings_widget.SettingsWidget.settings"><code class="docutils literal notranslate"><span class="pre">SettingsWidget.settings</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.settings.settings_widget.SettingsWidget.json_path"><code class="docutils literal notranslate"><span class="pre">SettingsWidget.json_path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.settings.settings_widget.SettingsWidget.load_settings"><code class="docutils literal notranslate"><span class="pre">SettingsWidget.load_settings()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.settings.settings_widget.SettingsWidget.save_settings"><code class="docutils literal notranslate"><span class="pre">SettingsWidget.save_settings()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.settings.settings_widget.SettingsWidget.update_setting"><code class="docutils literal notranslate"><span class="pre">SettingsWidget.update_setting()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#flight-widget">Flight Widget</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.CircleWidget"><code class="docutils literal notranslate"><span class="pre">CircleWidget</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.CircleWidget.color"><code class="docutils literal notranslate"><span class="pre">CircleWidget.color</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.CircleWidget.initUI"><code class="docutils literal notranslate"><span class="pre">CircleWidget.initUI()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.CircleWidget.paintEvent"><code class="docutils literal notranslate"><span class="pre">CircleWidget.paintEvent()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.CircleWidget.set_color"><code class="docutils literal notranslate"><span class="pre">CircleWidget.set_color()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.CircleWidget.set_size"><code class="docutils literal notranslate"><span class="pre">CircleWidget.set_size()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.CircleWidget.set_text"><code class="docutils literal notranslate"><span class="pre">CircleWidget.set_text()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.FlightWidget"><code class="docutils literal notranslate"><span class="pre">FlightWidget</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.FlightWidget.resources_path"><code class="docutils literal notranslate"><span class="pre">FlightWidget.resources_path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.FlightWidget.scroll_container"><code class="docutils literal notranslate"><span class="pre">FlightWidget.scroll_container</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.FlightWidget.mlui"><code class="docutils literal notranslate"><span class="pre">FlightWidget.mlui</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.FlightWidget.splash_path"><code class="docutils literal notranslate"><span class="pre">FlightWidget.splash_path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.FlightWidget.image_exporter"><code class="docutils literal notranslate"><span class="pre">FlightWidget.image_exporter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.FlightWidget.layout"><code class="docutils literal notranslate"><span class="pre">FlightWidget.layout</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.FlightWidget.qvio_widget"><code class="docutils literal notranslate"><span class="pre">FlightWidget.qvio_widget</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.FlightWidget.g2r"><code class="docutils literal notranslate"><span class="pre">FlightWidget.g2r</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.FlightWidget.parameter_widget"><code class="docutils literal notranslate"><span class="pre">FlightWidget.parameter_widget</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.FlightWidget.splash"><code class="docutils literal notranslate"><span class="pre">FlightWidget.splash</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.FlightWidget.flashSplash"><code class="docutils literal notranslate"><span class="pre">FlightWidget.flashSplash()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.FlightWidget.show"><code class="docutils literal notranslate"><span class="pre">FlightWidget.show()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.FlightWidget.start_ros_thread"><code class="docutils literal notranslate"><span class="pre">FlightWidget.start_ros_thread()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.FlightWidget.update_from_ros"><code class="docutils literal notranslate"><span class="pre">FlightWidget.update_from_ros()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS"><code class="docutils literal notranslate"><span class="pre">GUItoROS</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.image_exporter"><code class="docutils literal notranslate"><span class="pre">GUItoROS.image_exporter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.scroll_container"><code class="docutils literal notranslate"><span class="pre">GUItoROS.scroll_container</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.mlui"><code class="docutils literal notranslate"><span class="pre">GUItoROS.mlui</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.flight_radius_pub"><code class="docutils literal notranslate"><span class="pre">GUItoROS.flight_radius_pub</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.object_height_pub"><code class="docutils literal notranslate"><span class="pre">GUItoROS.object_height_pub</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.start_height_pub"><code class="docutils literal notranslate"><span class="pre">GUItoROS.start_height_pub</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.scan_title_pub"><code class="docutils literal notranslate"><span class="pre">GUItoROS.scan_title_pub</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.scan_ds_pub"><code class="docutils literal notranslate"><span class="pre">GUItoROS.scan_ds_pub</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.ready_pub"><code class="docutils literal notranslate"><span class="pre">GUItoROS.ready_pub</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.kill_pub"><code class="docutils literal notranslate"><span class="pre">GUItoROS.kill_pub</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.will_print_pub"><code class="docutils literal notranslate"><span class="pre">GUItoROS.will_print_pub</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.scan_start_sub"><code class="docutils literal notranslate"><span class="pre">GUItoROS.scan_start_sub</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.scan_stop_sub"><code class="docutils literal notranslate"><span class="pre">GUItoROS.scan_stop_sub</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.qos_profile"><code class="docutils literal notranslate"><span class="pre">GUItoROS.qos_profile</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.camera_thread"><code class="docutils literal notranslate"><span class="pre">GUItoROS.camera_thread</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.format"><code class="docutils literal notranslate"><span class="pre">GUItoROS.format</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.qimage"><code class="docutils literal notranslate"><span class="pre">GUItoROS.qimage</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.pixmap"><code class="docutils literal notranslate"><span class="pre">GUItoROS.pixmap</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.create_bool"><code class="docutils literal notranslate"><span class="pre">GUItoROS.create_bool()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.create_float32"><code class="docutils literal notranslate"><span class="pre">GUItoROS.create_float32()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.create_string"><code class="docutils literal notranslate"><span class="pre">GUItoROS.create_string()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.info"><code class="docutils literal notranslate"><span class="pre">GUItoROS.info()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.publish_flight_radius"><code class="docutils literal notranslate"><span class="pre">GUItoROS.publish_flight_radius()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.publish_kill"><code class="docutils literal notranslate"><span class="pre">GUItoROS.publish_kill()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.publish_object_height"><code class="docutils literal notranslate"><span class="pre">GUItoROS.publish_object_height()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.publish_ready"><code class="docutils literal notranslate"><span class="pre">GUItoROS.publish_ready()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.publish_scan_ds"><code class="docutils literal notranslate"><span class="pre">GUItoROS.publish_scan_ds()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.publish_scan_title"><code class="docutils literal notranslate"><span class="pre">GUItoROS.publish_scan_title()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.publish_start_height"><code class="docutils literal notranslate"><span class="pre">GUItoROS.publish_start_height()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.publish_will_print"><code class="docutils literal notranslate"><span class="pre">GUItoROS.publish_will_print()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.qvio_callback"><code class="docutils literal notranslate"><span class="pre">GUItoROS.qvio_callback()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.scan_start_callback"><code class="docutils literal notranslate"><span class="pre">GUItoROS.scan_start_callback()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.scan_stop_callback"><code class="docutils literal notranslate"><span class="pre">GUItoROS.scan_stop_callback()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.start_camera_thread"><code class="docutils literal notranslate"><span class="pre">GUItoROS.start_camera_thread()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.update_stream"><code class="docutils literal notranslate"><span class="pre">GUItoROS.update_stream()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.HeightGraphic"><code class="docutils literal notranslate"><span class="pre">HeightGraphic</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.HeightGraphic.paintEvent"><code class="docutils literal notranslate"><span class="pre">HeightGraphic.paintEvent()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.HeightGraphic.set_line_endpoints"><code class="docutils literal notranslate"><span class="pre">HeightGraphic.set_line_endpoints()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.HeightGraphic.start_ros"><code class="docutils literal notranslate"><span class="pre">HeightGraphic.start_ros()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ImageExporter"><code class="docutils literal notranslate"><span class="pre">ImageExporter</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ImageExporter.dataset"><code class="docutils literal notranslate"><span class="pre">ImageExporter.dataset</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ImageExporter.class_name"><code class="docutils literal notranslate"><span class="pre">ImageExporter.class_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ImageExporter.img_num"><code class="docutils literal notranslate"><span class="pre">ImageExporter.img_num</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ImageExporter.gap"><code class="docutils literal notranslate"><span class="pre">ImageExporter.gap</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ImageExporter.ready_to_dump"><code class="docutils literal notranslate"><span class="pre">ImageExporter.ready_to_dump</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ImageExporter.image_dump_path"><code class="docutils literal notranslate"><span class="pre">ImageExporter.image_dump_path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ImageExporter.export_image"><code class="docutils literal notranslate"><span class="pre">ImageExporter.export_image()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ImageExporter.get_class"><code class="docutils literal notranslate"><span class="pre">ImageExporter.get_class()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ImageExporter.get_dataset"><code class="docutils literal notranslate"><span class="pre">ImageExporter.get_dataset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ImageExporter.get_dump_status"><code class="docutils literal notranslate"><span class="pre">ImageExporter.get_dump_status()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ImageExporter.set_dump_status"><code class="docutils literal notranslate"><span class="pre">ImageExporter.set_dump_status()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ImageExporter.update_class"><code class="docutils literal notranslate"><span class="pre">ImageExporter.update_class()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ImageExporter.update_dataset"><code class="docutils literal notranslate"><span class="pre">ImageExporter.update_dataset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ImageExporter.update_export_dir"><code class="docutils literal notranslate"><span class="pre">ImageExporter.update_export_dir()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget"><code class="docutils literal notranslate"><span class="pre">ParameterWidget</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.g2r"><code class="docutils literal notranslate"><span class="pre">ParameterWidget.g2r</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.image_exporter"><code class="docutils literal notranslate"><span class="pre">ParameterWidget.image_exporter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.resources_path"><code class="docutils literal notranslate"><span class="pre">ParameterWidget.resources_path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.dataset_dropdown"><code class="docutils literal notranslate"><span class="pre">ParameterWidget.dataset_dropdown</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.dataset_name_textbox"><code class="docutils literal notranslate"><span class="pre">ParameterWidget.dataset_name_textbox</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.scan_name_textbox"><code class="docutils literal notranslate"><span class="pre">ParameterWidget.scan_name_textbox</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.ready_button"><code class="docutils literal notranslate"><span class="pre">ParameterWidget.ready_button</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.land_button"><code class="docutils literal notranslate"><span class="pre">ParameterWidget.land_button</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.radius_spin_box"><code class="docutils literal notranslate"><span class="pre">ParameterWidget.radius_spin_box</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.height_spin_box"><code class="docutils literal notranslate"><span class="pre">ParameterWidget.height_spin_box</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.start_height_spin_box"><code class="docutils literal notranslate"><span class="pre">ParameterWidget.start_height_spin_box</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.start_description"><code class="docutils literal notranslate"><span class="pre">ParameterWidget.start_description</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.scan_title"><code class="docutils literal notranslate"><span class="pre">ParameterWidget.scan_title</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.radius"><code class="docutils literal notranslate"><span class="pre">ParameterWidget.radius</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.height"><code class="docutils literal notranslate"><span class="pre">ParameterWidget.height</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.start_height"><code class="docutils literal notranslate"><span class="pre">ParameterWidget.start_height</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.dataset_selection_changed"><code class="docutils literal notranslate"><span class="pre">ParameterWidget.dataset_selection_changed()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.get_height"><code class="docutils literal notranslate"><span class="pre">ParameterWidget.get_height()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.get_radius"><code class="docutils literal notranslate"><span class="pre">ParameterWidget.get_radius()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.get_scan_title"><code class="docutils literal notranslate"><span class="pre">ParameterWidget.get_scan_title()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.get_start_height"><code class="docutils literal notranslate"><span class="pre">ParameterWidget.get_start_height()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.init_vals"><code class="docutils literal notranslate"><span class="pre">ParameterWidget.init_vals()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.land"><code class="docutils literal notranslate"><span class="pre">ParameterWidget.land()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.print_check"><code class="docutils literal notranslate"><span class="pre">ParameterWidget.print_check()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.ready"><code class="docutils literal notranslate"><span class="pre">ParameterWidget.ready()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.update_dataset_name"><code class="docutils literal notranslate"><span class="pre">ParameterWidget.update_dataset_name()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.update_height"><code class="docutils literal notranslate"><span class="pre">ParameterWidget.update_height()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.update_radius"><code class="docutils literal notranslate"><span class="pre">ParameterWidget.update_radius()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.update_scan_title"><code class="docutils literal notranslate"><span class="pre">ParameterWidget.update_scan_title()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.update_start_description"><code class="docutils literal notranslate"><span class="pre">ParameterWidget.update_start_description()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.update_start_height"><code class="docutils literal notranslate"><span class="pre">ParameterWidget.update_start_height()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.QVIOWidget"><code class="docutils literal notranslate"><span class="pre">QVIOWidget</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.QVIOWidget.image_exporter"><code class="docutils literal notranslate"><span class="pre">QVIOWidget.image_exporter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.QVIOWidget.image_label"><code class="docutils literal notranslate"><span class="pre">QVIOWidget.image_label</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.QVIOWidget.left"><code class="docutils literal notranslate"><span class="pre">QVIOWidget.left</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.QVIOWidget.top"><code class="docutils literal notranslate"><span class="pre">QVIOWidget.top</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.QVIOWidget.width"><code class="docutils literal notranslate"><span class="pre">QVIOWidget.width</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.QVIOWidget.height"><code class="docutils literal notranslate"><span class="pre">QVIOWidget.height</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.QVIOWidget.cap"><code class="docutils literal notranslate"><span class="pre">QVIOWidget.cap</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.QVIOWidget.dump_images"><code class="docutils literal notranslate"><span class="pre">QVIOWidget.dump_images</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.QVIOWidget.img_num"><code class="docutils literal notranslate"><span class="pre">QVIOWidget.img_num</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.QVIOWidget.start_image_dump"><code class="docutils literal notranslate"><span class="pre">QVIOWidget.start_image_dump()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.QVIOWidget.stop_image_dump"><code class="docutils literal notranslate"><span class="pre">QVIOWidget.stop_image_dump()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.QVIOWidget.update_frame"><code class="docutils literal notranslate"><span class="pre">QVIOWidget.update_frame()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.QVIOWidget.update_image_display"><code class="docutils literal notranslate"><span class="pre">QVIOWidget.update_image_display()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#tensorflow-widget">TensorFlow Widget</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#host.gui.gui_pages.tensor_flow.ml_ui.ImageScrollWidget"><code class="docutils literal notranslate"><span class="pre">ImageScrollWidget</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.tensor_flow.ml_ui.ImageScrollWidget.load_images"><code class="docutils literal notranslate"><span class="pre">ImageScrollWidget.load_images()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#host.gui.gui_pages.tensor_flow.ml_ui.LoadingPopup"><code class="docutils literal notranslate"><span class="pre">LoadingPopup</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.tensor_flow.ml_ui.LoadingPopup.close_popup"><code class="docutils literal notranslate"><span class="pre">LoadingPopup.close_popup()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.tensor_flow.ml_ui.LoadingPopup.show_popup"><code class="docutils literal notranslate"><span class="pre">LoadingPopup.show_popup()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.tensor_flow.ml_ui.LoadingPopup.update_progress"><code class="docutils literal notranslate"><span class="pre">LoadingPopup.update_progress()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#host.gui.gui_pages.tensor_flow.ml_ui.MLUI"><code class="docutils literal notranslate"><span class="pre">MLUI</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.tensor_flow.ml_ui.MLUI.image_select"><code class="docutils literal notranslate"><span class="pre">MLUI.image_select()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.tensor_flow.ml_ui.MLUI.load_ui"><code class="docutils literal notranslate"><span class="pre">MLUI.load_ui()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.tensor_flow.ml_ui.MLUI.load_ui_assets"><code class="docutils literal notranslate"><span class="pre">MLUI.load_ui_assets()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.tensor_flow.ml_ui.MLUI.model_exists"><code class="docutils literal notranslate"><span class="pre">MLUI.model_exists()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.tensor_flow.ml_ui.MLUI.new_mit"><code class="docutils literal notranslate"><span class="pre">MLUI.new_mit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.tensor_flow.ml_ui.MLUI.on_load_ui_assets"><code class="docutils literal notranslate"><span class="pre">MLUI.on_load_ui_assets()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.tensor_flow.ml_ui.MLUI.present_ui_loader"><code class="docutils literal notranslate"><span class="pre">MLUI.present_ui_loader()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.tensor_flow.ml_ui.MLUI.renew"><code class="docutils literal notranslate"><span class="pre">MLUI.renew()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.tensor_flow.ml_ui.MLUI.set_classes_directory"><code class="docutils literal notranslate"><span class="pre">MLUI.set_classes_directory()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.tensor_flow.ml_ui.MLUI.set_dataset"><code class="docutils literal notranslate"><span class="pre">MLUI.set_dataset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.tensor_flow.ml_ui.MLUI.set_image_directory"><code class="docutils literal notranslate"><span class="pre">MLUI.set_image_directory()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.tensor_flow.ml_ui.MLUI.set_model_directory"><code class="docutils literal notranslate"><span class="pre">MLUI.set_model_directory()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.tensor_flow.ml_ui.MLUI.set_model_name"><code class="docutils literal notranslate"><span class="pre">MLUI.set_model_name()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.tensor_flow.ml_ui.MLUI.update_object_scan"><code class="docutils literal notranslate"><span class="pre">MLUI.update_object_scan()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.tensor_flow.ml_ui.MLUI.with_new"><code class="docutils literal notranslate"><span class="pre">MLUI.with_new()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionToolkit"><code class="docutils literal notranslate"><span class="pre">ModelInteractionToolkit</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionToolkit.assign_model_tester"><code class="docutils literal notranslate"><span class="pre">ModelInteractionToolkit.assign_model_tester()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionToolkit.get_best_match"><code class="docutils literal notranslate"><span class="pre">ModelInteractionToolkit.get_best_match()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionToolkit.model_exists"><code class="docutils literal notranslate"><span class="pre">ModelInteractionToolkit.model_exists()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionWidget"><code class="docutils literal notranslate"><span class="pre">ModelInteractionWidget</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionWidget.load_model_popup"><code class="docutils literal notranslate"><span class="pre">ModelInteractionWidget.load_model_popup()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionWidget.on_selector_changed"><code class="docutils literal notranslate"><span class="pre">ModelInteractionWidget.on_selector_changed()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionWidget.present_prediction_loader"><code class="docutils literal notranslate"><span class="pre">ModelInteractionWidget.present_prediction_loader()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionWidget.set_mit"><code class="docutils literal notranslate"><span class="pre">ModelInteractionWidget.set_mit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionWidget.set_next_button"><code class="docutils literal notranslate"><span class="pre">ModelInteractionWidget.set_next_button()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionWidget.set_prediction"><code class="docutils literal notranslate"><span class="pre">ModelInteractionWidget.set_prediction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionWidget.show_model_prediction"><code class="docutils literal notranslate"><span class="pre">ModelInteractionWidget.show_model_prediction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionWidget.show_training_complete_popup"><code class="docutils literal notranslate"><span class="pre">ModelInteractionWidget.show_training_complete_popup()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionWidget.show_training_popup"><code class="docutils literal notranslate"><span class="pre">ModelInteractionWidget.show_training_popup()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionWidget.train_model"><code class="docutils literal notranslate"><span class="pre">ModelInteractionWidget.train_model()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#host.gui.gui_pages.tensor_flow.ml_ui.ScanOutputWidget"><code class="docutils literal notranslate"><span class="pre">ScanOutputWidget</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#host.gui.gui_pages.tensor_flow.ml_ui.SplashWidget"><code class="docutils literal notranslate"><span class="pre">SplashWidget</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#mesher">Mesher</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#host.mesher.Mesher"><code class="docutils literal notranslate"><span class="pre">Mesher</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#host.mesher.Mesher.dump_directory_callback"><code class="docutils literal notranslate"><span class="pre">Mesher.dump_directory_callback()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.mesher.Mesher.export_complete_callback"><code class="docutils literal notranslate"><span class="pre">Mesher.export_complete_callback()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.mesher.Mesher.process"><code class="docutils literal notranslate"><span class="pre">Mesher.process()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#host.mesher.Mesher.save"><code class="docutils literal notranslate"><span class="pre">Mesher.save()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#host.mesher.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="starling.html">Starling Package documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">AeroPrint</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Host Package documentation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/host.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="host-package-documentation">
+<h1>Host Package documentation<a class="headerlink" href="#host-package-documentation" title="Link to this heading"></a></h1>
+<section id="aeroprint-gui">
+<span id="module-host.aeroprint_gui"></span><h2>AeroPrint GUI<a class="headerlink" href="#aeroprint-gui" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="host.aeroprint_gui.AeroPrintGUI">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">host.aeroprint_gui.</span></span><span class="sig-name descname"><span class="pre">AeroPrintGUI</span></span><a class="headerlink" href="#host.aeroprint_gui.AeroPrintGUI" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>AeroPrintGUI is a class that creates a GUI application using PyQt5. It initializes the application, sets up a menu bar,
+and provides functionality to open a settings dialog. The class also creates custom widgets and adds them to a ScrollContainer.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.aeroprint_gui.AeroPrintGUI.app">
+<span class="sig-name descname"><span class="pre">app</span></span><a class="headerlink" href="#host.aeroprint_gui.AeroPrintGUI.app" title="Link to this definition"></a></dt>
+<dd><p>The main application instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>QApplication</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.aeroprint_gui.AeroPrintGUI.sc">
+<span class="sig-name descname"><span class="pre">sc</span></span><a class="headerlink" href="#host.aeroprint_gui.AeroPrintGUI.sc" title="Link to this definition"></a></dt>
+<dd><p>The main scroll container for the GUI.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ScrollContainer</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.aeroprint_gui.AeroPrintGUI.settings_utility">
+<span class="sig-name descname"><span class="pre">settings_utility</span></span><a class="headerlink" href="#host.aeroprint_gui.AeroPrintGUI.settings_utility" title="Link to this definition"></a></dt>
+<dd><p>Utility for accessing settings.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>SettingsUtility</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.aeroprint_gui.AeroPrintGUI.resource_path">
+<span class="sig-name descname"><span class="pre">resource_path</span></span><a class="headerlink" href="#host.aeroprint_gui.AeroPrintGUI.resource_path" title="Link to this definition"></a></dt>
+<dd><p>Path to the resources file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.aeroprint_gui.AeroPrintGUI.init_menu_bar">
+<span class="sig-name descname"><span class="pre">init_menu_bar</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.aeroprint_gui.AeroPrintGUI.init_menu_bar" title="Link to this definition"></a></dt>
+<dd><p>Initializes the menu bar for the AeroPrint GUI.
+This method creates a menu bar and adds an “AeroPrint” menu to it.
+It also adds a “Settings” action to the “AeroPrint” menu, which
+triggers the open_settings method when selected.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.aeroprint_gui.AeroPrintGUI.open_settings">
+<span class="sig-name descname"><span class="pre">open_settings</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.aeroprint_gui.AeroPrintGUI.open_settings" title="Link to this definition"></a></dt>
+<dd><p>Opens the settings dialog.
+This method creates and displays a modal dialog window with the title “Settings”.
+The dialog contains a SettingsWidget and has a fixed size of 800x900 pixels.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.aeroprint_gui.AeroPrintGUI.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.aeroprint_gui.AeroPrintGUI.run" title="Link to this definition"></a></dt>
+<dd><p>Runs the main application logic.
+This method creates custom widgets, adds them to a ScrollContainer, and sets up navigation buttons.
+It initializes and displays the GUI, then starts the application’s event loop.</p>
+<p>Custom Widgets:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>MyWidget: A custom widget with a text box and a centered button.</p></li>
+<li><p>MLUI: A widget initialized with specific parameters.</p></li>
+<li><p>FlightWidget: A widget initialized with resource path and other parameters.</p></li>
+</ul>
+</div></blockquote>
+<p>Navigation:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Adds a “Next” button to the first custom widget.</p></li>
+<li><p>Adds a “Previous” button to the second custom widget.</p></li>
+</ul>
+</div></blockquote>
+<p>ScrollContainer:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Adds the custom widgets to the ScrollContainer.</p></li>
+<li><p>Creates page buttons for navigation.</p></li>
+<li><p>Displays the ScrollContainer.</p></li>
+</ul>
+</div></blockquote>
+<p>Exits:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Terminates the application when the event loop ends.</p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="host.aeroprint_gui.main">
+<span class="sig-prename descclassname"><span class="pre">host.aeroprint_gui.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.aeroprint_gui.main" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="settings-wdget">
+<span id="module-host.gui.gui_pages.settings.settings_widget"></span><h2>Settings Wdget<a class="headerlink" href="#settings-wdget" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="host.gui.gui_pages.settings.settings_widget.SettingWidget">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">host.gui.gui_pages.settings.settings_widget.</span></span><span class="sig-name descname"><span class="pre">SettingWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">setting</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.settings.settings_widget.SettingWidget" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QWidget</span></code></p>
+<p>A widget for displaying and editing a setting.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.settings.settings_widget.SettingWidget.setting">
+<span class="sig-name descname"><span class="pre">setting</span></span><a class="headerlink" href="#host.gui.gui_pages.settings.settings_widget.SettingWidget.setting" title="Link to this definition"></a></dt>
+<dd><p>A dictionary containing the setting details.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.settings.settings_widget.SettingWidget.display_name">
+<span class="sig-name descname"><span class="pre">display_name</span></span><a class="headerlink" href="#host.gui.gui_pages.settings.settings_widget.SettingWidget.display_name" title="Link to this definition"></a></dt>
+<dd><p>The display name of the setting.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.settings.settings_widget.SettingWidget.description">
+<span class="sig-name descname"><span class="pre">description</span></span><a class="headerlink" href="#host.gui.gui_pages.settings.settings_widget.SettingWidget.description" title="Link to this definition"></a></dt>
+<dd><p>The description of the setting.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.settings.settings_widget.SettingWidget.default_value">
+<span class="sig-name descname"><span class="pre">default_value</span></span><a class="headerlink" href="#host.gui.gui_pages.settings.settings_widget.SettingWidget.default_value" title="Link to this definition"></a></dt>
+<dd><p>The default value of the setting.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>any</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.settings.settings_widget.SettingWidget.value">
+<span class="sig-name descname"><span class="pre">value</span></span><a class="headerlink" href="#host.gui.gui_pages.settings.settings_widget.SettingWidget.value" title="Link to this definition"></a></dt>
+<dd><p>The current value of the setting.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>any</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.settings.settings_widget.SettingWidget.type">
+<span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#host.gui.gui_pages.settings.settings_widget.SettingWidget.type" title="Link to this definition"></a></dt>
+<dd><p>The type of the setting (e.g., “text”, “number”, “boolean”, “file_path”).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.settings.settings_widget.SettingWidget.layout">
+<span class="sig-name descname"><span class="pre">layout</span></span><a class="headerlink" href="#host.gui.gui_pages.settings.settings_widget.SettingWidget.layout" title="Link to this definition"></a></dt>
+<dd><p>The layout of the widget.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>QVBoxLayout</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.settings.settings_widget.SettingWidget.name_widget">
+<span class="sig-name descname"><span class="pre">name_widget</span></span><a class="headerlink" href="#host.gui.gui_pages.settings.settings_widget.SettingWidget.name_widget" title="Link to this definition"></a></dt>
+<dd><p>The label displaying the setting’s name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>QLabel</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.settings.settings_widget.SettingWidget.edit_widget">
+<span class="sig-name descname"><span class="pre">edit_widget</span></span><a class="headerlink" href="#host.gui.gui_pages.settings.settings_widget.SettingWidget.edit_widget" title="Link to this definition"></a></dt>
+<dd><p>The widget for editing the setting’s value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>QWidget</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.settings.settings_widget.SettingWidget.description_widget">
+<span class="sig-name descname"><span class="pre">description_widget</span></span><a class="headerlink" href="#host.gui.gui_pages.settings.settings_widget.SettingWidget.description_widget" title="Link to this definition"></a></dt>
+<dd><p>The label displaying the setting’s description.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>QLabel</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="host.gui.gui_pages.settings.settings_widget.SettingWidget.FilePickerWidget">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">FilePickerWidget</span></span><a class="headerlink" href="#host.gui.gui_pages.settings.settings_widget.SettingWidget.FilePickerWidget" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QWidget</span></code></p>
+<p>A custom widget that allows the user to select a folder from the file system.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.settings.settings_widget.SettingWidget.FilePickerWidget.layout">
+<span class="sig-name descname"><span class="pre">layout</span></span><a class="headerlink" href="#host.gui.gui_pages.settings.settings_widget.SettingWidget.FilePickerWidget.layout" title="Link to this definition"></a></dt>
+<dd><p>The horizontal box layout for the widget.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>QHBoxLayout</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.settings.settings_widget.SettingWidget.FilePickerWidget.file_path_widget">
+<span class="sig-name descname"><span class="pre">file_path_widget</span></span><a class="headerlink" href="#host.gui.gui_pages.settings.settings_widget.SettingWidget.FilePickerWidget.file_path_widget" title="Link to this definition"></a></dt>
+<dd><p>The line edit widget to display the selected folder path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>QLineEdit</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.settings.settings_widget.SettingWidget.FilePickerWidget.file_picker_button">
+<span class="sig-name descname"><span class="pre">file_picker_button</span></span><a class="headerlink" href="#host.gui.gui_pages.settings.settings_widget.SettingWidget.FilePickerWidget.file_picker_button" title="Link to this definition"></a></dt>
+<dd><p>The button to open the file dialog for folder selection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>QPushButton</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.settings.settings_widget.SettingWidget.FilePickerWidget.open_file_dialog">
+<span class="sig-name descname"><span class="pre">open_file_dialog</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.settings.settings_widget.SettingWidget.FilePickerWidget.open_file_dialog" title="Link to this definition"></a></dt>
+<dd><p>Opens a file dialog for the user to select a folder. If a folder is selected,
+the file path is set to the text of the file_path_widget.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.settings.settings_widget.SettingWidget.FilePickerWidget.set_text">
+<span class="sig-name descname"><span class="pre">set_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.settings.settings_widget.SettingWidget.FilePickerWidget.set_text" title="Link to this definition"></a></dt>
+<dd><p>Sets the text of the file_path_widget.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>text</strong> (<em>str</em>) – The text to set in the file_path_widget.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.settings.settings_widget.SettingWidget.FilePickerWidget.text">
+<span class="sig-name descname"><span class="pre">text</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.settings.settings_widget.SettingWidget.FilePickerWidget.text" title="Link to this definition"></a></dt>
+<dd><p>Retrieve the text from the file path widget.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The text from the file path widget.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.settings.settings_widget.SettingWidget.create_edit_widget">
+<span class="sig-name descname"><span class="pre">create_edit_widget</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.settings.settings_widget.SettingWidget.create_edit_widget" title="Link to this definition"></a></dt>
+<dd><p>Creates and returns a widget for editing based on the type of the setting.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><p>A widget appropriate for the type of the setting.</p>
+<ul class="simple">
+<li><p>QLineEdit: If the type is “text” or “number”.</p></li>
+<li><p>QCheckBox: If the type is “boolean”.</p></li>
+<li><p>FilePickerWidget: If the type is “file_path”.</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>QWidget</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.settings.settings_widget.SettingWidget.get_setting">
+<span class="sig-name descname"><span class="pre">get_setting</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.settings.settings_widget.SettingWidget.get_setting" title="Link to this definition"></a></dt>
+<dd><p>Retrieve the current setting.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The current setting.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.settings.settings_widget.SettingWidget.save_value">
+<span class="sig-name descname"><span class="pre">save_value</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.settings.settings_widget.SettingWidget.save_value" title="Link to this definition"></a></dt>
+<dd><p>Save the value from the edit widget to the setting dictionary based on the type.
+The method updates the ‘value’ key in the ‘setting’ dictionary with the current value
+from the ‘edit_widget’. The type of the value is determined by the ‘type’ attribute.</p>
+<p>Supported types:</p>
+<ul class="simple">
+<li><p>“text”: Saves the text from the edit widget.</p></li>
+<li><p>“number”: Converts the text from the edit widget to an integer and saves it.</p></li>
+<li><p>“boolean”: Saves the checked state of the edit widget.</p></li>
+<li><p>“file_path”: Saves the text from the edit widget as a file path.</p></li>
+</ul>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="host.gui.gui_pages.settings.settings_widget.SettingsWidget">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">host.gui.gui_pages.settings.settings_widget.</span></span><span class="sig-name descname"><span class="pre">SettingsWidget</span></span><a class="headerlink" href="#host.gui.gui_pages.settings.settings_widget.SettingsWidget" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QWidget</span></code></p>
+<p>A widget for displaying and managing application settings.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.settings.settings_widget.SettingsWidget.layout">
+<span class="sig-name descname"><span class="pre">layout</span></span><a class="headerlink" href="#host.gui.gui_pages.settings.settings_widget.SettingsWidget.layout" title="Link to this definition"></a></dt>
+<dd><p>The main layout of the widget.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>QVBoxLayout</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.settings.settings_widget.SettingsWidget.settings">
+<span class="sig-name descname"><span class="pre">settings</span></span><a class="headerlink" href="#host.gui.gui_pages.settings.settings_widget.SettingsWidget.settings" title="Link to this definition"></a></dt>
+<dd><p>A dictionary to store the settings loaded from a JSON file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.settings.settings_widget.SettingsWidget.json_path">
+<span class="sig-name descname"><span class="pre">json_path</span></span><a class="headerlink" href="#host.gui.gui_pages.settings.settings_widget.SettingsWidget.json_path" title="Link to this definition"></a></dt>
+<dd><p>The path to the settings JSON file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.settings.settings_widget.SettingsWidget.load_settings">
+<span class="sig-name descname"><span class="pre">load_settings</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.settings.settings_widget.SettingsWidget.load_settings" title="Link to this definition"></a></dt>
+<dd><p>Load settings from a JSON file located in the ‘aeroprint’ directory.
+This method constructs the path to the ‘settings.json’ file by finding the
+‘aeroprint’ directory in the current file’s path. It then attempts to load
+the settings from this JSON file and assigns them to the ‘settings’ attribute.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ValueError</strong> – If the ‘aeroprint’ directory is not found in the path.</p></li>
+<li><p><strong>FileNotFoundError</strong> – If the ‘settings.json’ file is not found.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Displays:</p>
+<blockquote>
+<div><p>QMessageBox.warning: If the ‘settings.json’ file is not found.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.settings.settings_widget.SettingsWidget.save_settings">
+<span class="sig-name descname"><span class="pre">save_settings</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.settings.settings_widget.SettingsWidget.save_settings" title="Link to this definition"></a></dt>
+<dd><p>Save the current settings to a JSON file.
+This method iterates through all widgets in the layout, checks if they are instances of SettingWidget,
+and calls their save_value method. It then attempts to write the settings to a file named ‘settings.json’.
+If the operation is successful, a success message is displayed. If an error occurs, an error message is shown.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Exception</strong> – If there is an error while saving the settings to the file.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.settings.settings_widget.SettingsWidget.update_setting">
+<span class="sig-name descname"><span class="pre">update_setting</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.settings.settings_widget.SettingsWidget.update_setting" title="Link to this definition"></a></dt>
+<dd><p>Update the setting with the given key to the specified value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<em>str</em>) – The key of the setting to update.</p></li>
+<li><p><strong>value</strong> (<em>Any</em>) – The new value for the setting.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<p id="module-host.gui.gui_pages.flight.flight_widget">aeroprint_gui.py: PyQt GUI with ROS node for initiating scans.
+UDRI DTC AEROPRINT</p>
+<section id="flight-widget">
+<h2>Flight Widget<a class="headerlink" href="#flight-widget" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.CircleWidget">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">host.gui.gui_pages.flight.flight_widget.</span></span><span class="sig-name descname"><span class="pre">CircleWidget</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.CircleWidget" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QWidget</span></code></p>
+<p>A custom QWidget that displays a colored circle with text centered inside it.
+.. attribute:: text</p>
+<blockquote>
+<div><p>The text to be displayed in the center of the circle.</p>
+<dl class="field-list simple">
+<dt class="field-odd">type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.CircleWidget.color">
+<span class="sig-name descname"><span class="pre">color</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.CircleWidget.color" title="Link to this definition"></a></dt>
+<dd><p>The color of the circle.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>QColor</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.CircleWidget.initUI">
+<span class="sig-name descname"><span class="pre">initUI</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.CircleWidget.initUI" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.CircleWidget.paintEvent">
+<span class="sig-name descname"><span class="pre">paintEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPaintEvent</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.CircleWidget.paintEvent" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.CircleWidget.set_color">
+<span class="sig-name descname"><span class="pre">set_color</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">color</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.CircleWidget.set_color" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.CircleWidget.set_size">
+<span class="sig-name descname"><span class="pre">set_size</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.CircleWidget.set_size" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.CircleWidget.set_text">
+<span class="sig-name descname"><span class="pre">set_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.CircleWidget.set_text" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.FlightWidget">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">host.gui.gui_pages.flight.flight_widget.</span></span><span class="sig-name descname"><span class="pre">FlightWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resources_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scroll_container</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mlui</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.FlightWidget" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QWidget</span></code></p>
+<p>A widget for the AEROPRINT application that integrates various components
+such as image exporting, parameter configuration, and ROS communication.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.FlightWidget.resources_path">
+<span class="sig-name descname"><span class="pre">resources_path</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.FlightWidget.resources_path" title="Link to this definition"></a></dt>
+<dd><p>Path to the resources directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.FlightWidget.scroll_container">
+<span class="sig-name descname"><span class="pre">scroll_container</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.FlightWidget.scroll_container" title="Link to this definition"></a></dt>
+<dd><p>The scroll container widget.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>QWidget</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.FlightWidget.mlui">
+<span class="sig-name descname"><span class="pre">mlui</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.FlightWidget.mlui" title="Link to this definition"></a></dt>
+<dd><p>An instance of the MLUI class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.FlightWidget.splash_path">
+<span class="sig-name descname"><span class="pre">splash_path</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.FlightWidget.splash_path" title="Link to this definition"></a></dt>
+<dd><p>Path to the splash image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.FlightWidget.image_exporter">
+<span class="sig-name descname"><span class="pre">image_exporter</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.FlightWidget.image_exporter" title="Link to this definition"></a></dt>
+<dd><p>An instance of the ImageExporter class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ImageExporter" title="host.gui.gui_pages.flight.flight_widget.ImageExporter">ImageExporter</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.FlightWidget.layout">
+<span class="sig-name descname"><span class="pre">layout</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.FlightWidget.layout" title="Link to this definition"></a></dt>
+<dd><p>The layout manager for the widget.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>QGridLayout</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.FlightWidget.qvio_widget">
+<span class="sig-name descname"><span class="pre">qvio_widget</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.FlightWidget.qvio_widget" title="Link to this definition"></a></dt>
+<dd><p>The QVIO widget for visual odometry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.QVIOWidget" title="host.gui.gui_pages.flight.flight_widget.QVIOWidget">QVIOWidget</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.FlightWidget.g2r">
+<span class="sig-name descname"><span class="pre">g2r</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.FlightWidget.g2r" title="Link to this definition"></a></dt>
+<dd><p>An instance of the GUItoROS class for ROS communication.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS" title="host.gui.gui_pages.flight.flight_widget.GUItoROS">GUItoROS</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.FlightWidget.parameter_widget">
+<span class="sig-name descname"><span class="pre">parameter_widget</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.FlightWidget.parameter_widget" title="Link to this definition"></a></dt>
+<dd><p>The widget for parameter configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget" title="host.gui.gui_pages.flight.flight_widget.ParameterWidget">ParameterWidget</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.FlightWidget.splash">
+<span class="sig-name descname"><span class="pre">splash</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.FlightWidget.splash" title="Link to this definition"></a></dt>
+<dd><p>The splash screen widget.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>QSplashScreen</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.FlightWidget.flashSplash">
+<span class="sig-name descname"><span class="pre">flashSplash</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.FlightWidget.flashSplash" title="Link to this definition"></a></dt>
+<dd><p>Displays a splash screen for a specified duration.
+This method creates a QSplashScreen using the image specified by
+<cite>self.splash_path</cite>, shows it, and then closes it after a predefined
+amount of time (<cite>SPLASH_TIME</cite>).</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.FlightWidget.self.splash_path">
+<span class="sig-prename descclassname"><span class="pre">self.</span></span><span class="sig-name descname"><span class="pre">splash_path</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.FlightWidget.self.splash_path" title="Link to this definition"></a></dt>
+<dd><p>Path to the splash screen image.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.FlightWidget.SPLASH_TIME">
+<span class="sig-name descname"><span class="pre">SPLASH_TIME</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.FlightWidget.SPLASH_TIME" title="Link to this definition"></a></dt>
+<dd><p>Duration in milliseconds for which the splash
+screen is displayed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.FlightWidget.show">
+<span class="sig-name descname"><span class="pre">show</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.FlightWidget.show" title="Link to this definition"></a></dt>
+<dd><p>Displays the widget. If the splash screen is enabled, it shows the splash screen
+for a specified duration before displaying the main widget.
+If the splash screen is not enabled, it directly displays the main widget.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.FlightWidget.start_ros_thread">
+<span class="sig-name descname"><span class="pre">start_ros_thread</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.FlightWidget.start_ros_thread" title="Link to this definition"></a></dt>
+<dd><p>Starts a new thread to update from ROS (Robot Operating System).
+This method initializes a new thread that runs the <cite>update_from_ros</cite> method.
+Optionally, it can take arguments to initialize the ROS client library.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>args</strong> (<em>list</em><em>, </em><em>optional</em>) – A list of command-line arguments to initialize the ROS client library. Defaults to None.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.FlightWidget.update_from_ros">
+<span class="sig-name descname"><span class="pre">update_from_ros</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.FlightWidget.update_from_ros" title="Link to this definition"></a></dt>
+<dd><p>Spins the ROS node to process incoming messages, then destroys the node and shuts down the ROS client library.</p>
+<p>This method performs the following steps:</p>
+<ol class="arabic simple">
+<li><p>Spins the ROS node to process incoming messages.</p></li>
+<li><p>Destroys the ROS node.</p></li>
+<li><p>Shuts down the ROS client library.</p></li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This method blocks until the node is destroyed.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.GUItoROS">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">host.gui.gui_pages.flight.flight_widget.</span></span><span class="sig-name descname"><span class="pre">GUItoROS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Node</span></code></p>
+<p>A ROS2 node that interfaces with a GUI to publish and subscribe to various topics.
+.. attribute:: qvio_widget</p>
+<blockquote>
+<div><p>The widget for visual odometry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>QWidget</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.GUItoROS.image_exporter">
+<span class="sig-name descname"><span class="pre">image_exporter</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.image_exporter" title="Link to this definition"></a></dt>
+<dd><p>The object responsible for exporting images.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.GUItoROS.scroll_container">
+<span class="sig-name descname"><span class="pre">scroll_container</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.scroll_container" title="Link to this definition"></a></dt>
+<dd><p>The container for scrolling through UI elements.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.GUItoROS.mlui">
+<span class="sig-name descname"><span class="pre">mlui</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.mlui" title="Link to this definition"></a></dt>
+<dd><p>The machine learning UI component.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.GUItoROS.flight_radius_pub">
+<span class="sig-name descname"><span class="pre">flight_radius_pub</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.flight_radius_pub" title="Link to this definition"></a></dt>
+<dd><p>Publisher for flight radius.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Publisher</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.GUItoROS.object_height_pub">
+<span class="sig-name descname"><span class="pre">object_height_pub</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.object_height_pub" title="Link to this definition"></a></dt>
+<dd><p>Publisher for object height.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Publisher</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.GUItoROS.start_height_pub">
+<span class="sig-name descname"><span class="pre">start_height_pub</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.start_height_pub" title="Link to this definition"></a></dt>
+<dd><p>Publisher for start height.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Publisher</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.GUItoROS.scan_title_pub">
+<span class="sig-name descname"><span class="pre">scan_title_pub</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.scan_title_pub" title="Link to this definition"></a></dt>
+<dd><p>Publisher for scan title.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Publisher</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.GUItoROS.scan_ds_pub">
+<span class="sig-name descname"><span class="pre">scan_ds_pub</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.scan_ds_pub" title="Link to this definition"></a></dt>
+<dd><p>Publisher for scan dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Publisher</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.GUItoROS.ready_pub">
+<span class="sig-name descname"><span class="pre">ready_pub</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.ready_pub" title="Link to this definition"></a></dt>
+<dd><p>Publisher for ready status.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Publisher</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.GUItoROS.kill_pub">
+<span class="sig-name descname"><span class="pre">kill_pub</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.kill_pub" title="Link to this definition"></a></dt>
+<dd><p>Publisher for kill signal.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Publisher</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.GUItoROS.will_print_pub">
+<span class="sig-name descname"><span class="pre">will_print_pub</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.will_print_pub" title="Link to this definition"></a></dt>
+<dd><p>Publisher for print status.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Publisher</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.GUItoROS.scan_start_sub">
+<span class="sig-name descname"><span class="pre">scan_start_sub</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.scan_start_sub" title="Link to this definition"></a></dt>
+<dd><p>Subscription for scan start signal.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Subscription</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.GUItoROS.scan_stop_sub">
+<span class="sig-name descname"><span class="pre">scan_stop_sub</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.scan_stop_sub" title="Link to this definition"></a></dt>
+<dd><p>Subscription for scan stop signal.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Subscription</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.GUItoROS.qos_profile">
+<span class="sig-name descname"><span class="pre">qos_profile</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.qos_profile" title="Link to this definition"></a></dt>
+<dd><p>Quality of Service profile for subscriptions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>QoSProfile</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.GUItoROS.camera_thread">
+<span class="sig-name descname"><span class="pre">camera_thread</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.camera_thread" title="Link to this definition"></a></dt>
+<dd><p>Thread for updating the camera stream.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Thread</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.GUItoROS.format">
+<span class="sig-name descname"><span class="pre">format</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.format" title="Link to this definition"></a></dt>
+<dd><p>Image format for QVIO callback.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.GUItoROS.qimage">
+<span class="sig-name descname"><span class="pre">qimage</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.qimage" title="Link to this definition"></a></dt>
+<dd><p>QImage object for QVIO callback.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.GUItoROS.pixmap">
+<span class="sig-name descname"><span class="pre">pixmap</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.pixmap" title="Link to this definition"></a></dt>
+<dd><p>QPixmap object for QVIO callback.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.GUItoROS.create_bool">
+<span class="sig-name descname"><span class="pre">create_bool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.create_bool" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.GUItoROS.create_float32">
+<span class="sig-name descname"><span class="pre">create_float32</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.create_float32" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.GUItoROS.create_string">
+<span class="sig-name descname"><span class="pre">create_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.create_string" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.GUItoROS.info">
+<span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.info" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.GUItoROS.publish_flight_radius">
+<span class="sig-name descname"><span class="pre">publish_flight_radius</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rad</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.publish_flight_radius" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.GUItoROS.publish_kill">
+<span class="sig-name descname"><span class="pre">publish_kill</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kill</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.publish_kill" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.GUItoROS.publish_object_height">
+<span class="sig-name descname"><span class="pre">publish_object_height</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">height</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.publish_object_height" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.GUItoROS.publish_ready">
+<span class="sig-name descname"><span class="pre">publish_ready</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ready</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.publish_ready" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.GUItoROS.publish_scan_ds">
+<span class="sig-name descname"><span class="pre">publish_scan_ds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.publish_scan_ds" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.GUItoROS.publish_scan_title">
+<span class="sig-name descname"><span class="pre">publish_scan_title</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">title</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.publish_scan_title" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.GUItoROS.publish_start_height">
+<span class="sig-name descname"><span class="pre">publish_start_height</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">height</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.publish_start_height" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.GUItoROS.publish_will_print">
+<span class="sig-name descname"><span class="pre">publish_will_print</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.publish_will_print" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.GUItoROS.qvio_callback">
+<span class="sig-name descname"><span class="pre">qvio_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_msg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Image</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.qvio_callback" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.GUItoROS.scan_start_callback">
+<span class="sig-name descname"><span class="pre">scan_start_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.scan_start_callback" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.GUItoROS.scan_stop_callback">
+<span class="sig-name descname"><span class="pre">scan_stop_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.scan_stop_callback" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.GUItoROS.start_camera_thread">
+<span class="sig-name descname"><span class="pre">start_camera_thread</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.start_camera_thread" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.GUItoROS.update_stream">
+<span class="sig-name descname"><span class="pre">update_stream</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.update_stream" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.HeightGraphic">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">host.gui.gui_pages.flight.flight_widget.</span></span><span class="sig-name descname"><span class="pre">HeightGraphic</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.HeightGraphic" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QWidget</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.HeightGraphic.paintEvent">
+<span class="sig-name descname"><span class="pre">paintEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPaintEvent</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.HeightGraphic.paintEvent" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.HeightGraphic.set_line_endpoints">
+<span class="sig-name descname"><span class="pre">set_line_endpoints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_point</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_point</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.HeightGraphic.set_line_endpoints" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.HeightGraphic.start_ros">
+<span class="sig-name descname"><span class="pre">start_ros</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.HeightGraphic.start_ros" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.ImageExporter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">host.gui.gui_pages.flight.flight_widget.</span></span><span class="sig-name descname"><span class="pre">ImageExporter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resources_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ImageExporter" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class to handle exporting images to a specified directory structure.
+.. attribute:: resources_path</p>
+<blockquote>
+<div><p>The base path where resources are stored.</p>
+<dl class="field-list simple">
+<dt class="field-odd">type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.ImageExporter.dataset">
+<span class="sig-name descname"><span class="pre">dataset</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ImageExporter.dataset" title="Link to this definition"></a></dt>
+<dd><p>The name of the dataset to which images belong.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.ImageExporter.class_name">
+<span class="sig-name descname"><span class="pre">class_name</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ImageExporter.class_name" title="Link to this definition"></a></dt>
+<dd><p>The name of the class within the dataset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.ImageExporter.img_num">
+<span class="sig-name descname"><span class="pre">img_num</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ImageExporter.img_num" title="Link to this definition"></a></dt>
+<dd><p>The current image number to be exported.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.ImageExporter.gap">
+<span class="sig-name descname"><span class="pre">gap</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ImageExporter.gap" title="Link to this definition"></a></dt>
+<dd><p>The gap between image exports.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.ImageExporter.ready_to_dump">
+<span class="sig-name descname"><span class="pre">ready_to_dump</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ImageExporter.ready_to_dump" title="Link to this definition"></a></dt>
+<dd><p>A flag indicating whether the exporter is ready to dump images.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.ImageExporter.image_dump_path">
+<span class="sig-name descname"><span class="pre">image_dump_path</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ImageExporter.image_dump_path" title="Link to this definition"></a></dt>
+<dd><p>The path where images will be dumped.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.ImageExporter.export_image">
+<span class="sig-name descname"><span class="pre">export_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ImageExporter.export_image" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.ImageExporter.get_class">
+<span class="sig-name descname"><span class="pre">get_class</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ImageExporter.get_class" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.ImageExporter.get_dataset">
+<span class="sig-name descname"><span class="pre">get_dataset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ImageExporter.get_dataset" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.ImageExporter.get_dump_status">
+<span class="sig-name descname"><span class="pre">get_dump_status</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ImageExporter.get_dump_status" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.ImageExporter.set_dump_status">
+<span class="sig-name descname"><span class="pre">set_dump_status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">status</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">class_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ImageExporter.set_dump_status" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.ImageExporter.update_class">
+<span class="sig-name descname"><span class="pre">update_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ImageExporter.update_class" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.ImageExporter.update_dataset">
+<span class="sig-name descname"><span class="pre">update_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ImageExporter.update_dataset" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.ImageExporter.update_export_dir">
+<span class="sig-name descname"><span class="pre">update_export_dir</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ImageExporter.update_export_dir" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.ParameterWidget">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">host.gui.gui_pages.flight.flight_widget.</span></span><span class="sig-name descname"><span class="pre">ParameterWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g2r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_exporter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resources_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QWidget</span></code></p>
+<p>A widget for configuring and managing flight parameters for a scanning operation.
+This widget allows the user to select a dataset, input scan details such as title, radius, height, and starting height,
+and control the readiness and landing state of the operation. It also provides visual feedback and updates to the user
+through various UI elements.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.ParameterWidget.g2r">
+<span class="sig-name descname"><span class="pre">g2r</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.g2r" title="Link to this definition"></a></dt>
+<dd><p>An object responsible for communication with the flight controller.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.ParameterWidget.image_exporter">
+<span class="sig-name descname"><span class="pre">image_exporter</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.image_exporter" title="Link to this definition"></a></dt>
+<dd><p>An object responsible for exporting images.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.ParameterWidget.resources_path">
+<span class="sig-name descname"><span class="pre">resources_path</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.resources_path" title="Link to this definition"></a></dt>
+<dd><p>The path to the resources directory.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.ParameterWidget.dataset_dropdown">
+<span class="sig-name descname"><span class="pre">dataset_dropdown</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.dataset_dropdown" title="Link to this definition"></a></dt>
+<dd><p>A dropdown menu for selecting datasets.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.ParameterWidget.dataset_name_textbox">
+<span class="sig-name descname"><span class="pre">dataset_name_textbox</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.dataset_name_textbox" title="Link to this definition"></a></dt>
+<dd><p>A textbox for entering a custom dataset name.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.ParameterWidget.scan_name_textbox">
+<span class="sig-name descname"><span class="pre">scan_name_textbox</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.scan_name_textbox" title="Link to this definition"></a></dt>
+<dd><p>A textbox for entering the scan title.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.ParameterWidget.ready_button">
+<span class="sig-name descname"><span class="pre">ready_button</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.ready_button" title="Link to this definition"></a></dt>
+<dd><p>A button to indicate readiness for the scan.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.ParameterWidget.land_button">
+<span class="sig-name descname"><span class="pre">land_button</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.land_button" title="Link to this definition"></a></dt>
+<dd><p>A button to land the flight.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.ParameterWidget.radius_spin_box">
+<span class="sig-name descname"><span class="pre">radius_spin_box</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.radius_spin_box" title="Link to this definition"></a></dt>
+<dd><p>A spin box for setting the scan radius.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.ParameterWidget.height_spin_box">
+<span class="sig-name descname"><span class="pre">height_spin_box</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.height_spin_box" title="Link to this definition"></a></dt>
+<dd><p>A spin box for setting the object height.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.ParameterWidget.start_height_spin_box">
+<span class="sig-name descname"><span class="pre">start_height_spin_box</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.start_height_spin_box" title="Link to this definition"></a></dt>
+<dd><p>A spin box for setting the starting height of the object.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.ParameterWidget.start_description">
+<span class="sig-name descname"><span class="pre">start_description</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.start_description" title="Link to this definition"></a></dt>
+<dd><p>A label displaying the start description of the scan.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.ParameterWidget.scan_title">
+<span class="sig-name descname"><span class="pre">scan_title</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.scan_title" title="Link to this definition"></a></dt>
+<dd><p>The title of the scan.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.ParameterWidget.radius">
+<span class="sig-name descname"><span class="pre">radius</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.radius" title="Link to this definition"></a></dt>
+<dd><p>The radius of the scan.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.ParameterWidget.height">
+<span class="sig-name descname"><span class="pre">height</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.height" title="Link to this definition"></a></dt>
+<dd><p>The height of the object being scanned.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.ParameterWidget.start_height">
+<span class="sig-name descname"><span class="pre">start_height</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.start_height" title="Link to this definition"></a></dt>
+<dd><p>The starting height of the object above the ground.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.ParameterWidget.dataset_selection_changed">
+<span class="sig-name descname"><span class="pre">dataset_selection_changed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.dataset_selection_changed" title="Link to this definition"></a></dt>
+<dd><p>Handles the event when the dataset selection is changed in the dropdown.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>index</strong> (<em>int</em>) – The index of the selected item in the dataset dropdown.</p>
+</dd>
+</dl>
+<p>Behavior:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>If the selected index is the last item in the dropdown, the dropdown is disabled,
+the current index is set to 0, and the dataset name textbox is shown.</p></li>
+<li><p>Otherwise, updates the dataset name based on the currently selected text in the dropdown.</p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.ParameterWidget.get_height">
+<span class="sig-name descname"><span class="pre">get_height</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.get_height" title="Link to this definition"></a></dt>
+<dd><p>Returns the height of the flight widget.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The height of the flight widget.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.ParameterWidget.get_radius">
+<span class="sig-name descname"><span class="pre">get_radius</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.get_radius" title="Link to this definition"></a></dt>
+<dd><p>Returns the radius value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The radius value.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.ParameterWidget.get_scan_title">
+<span class="sig-name descname"><span class="pre">get_scan_title</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.get_scan_title" title="Link to this definition"></a></dt>
+<dd><p>Retrieve the title of the scan.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The title of the scan.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.ParameterWidget.get_start_height">
+<span class="sig-name descname"><span class="pre">get_start_height</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.get_start_height" title="Link to this definition"></a></dt>
+<dd><p>Retrieve the starting height.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The starting height.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.ParameterWidget.init_vals">
+<span class="sig-name descname"><span class="pre">init_vals</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.init_vals" title="Link to this definition"></a></dt>
+<dd><p>Initialize the default values for the flight widget.
+This method sets the initial state of various parameters by publishing
+default values to the corresponding topics.</p>
+<ul class="simple">
+<li><p>Flight radius is set to 0.0.</p></li>
+<li><p>Kill switch is set to False.</p></li>
+<li><p>Object height is set to 0.0.</p></li>
+<li><p>Ready state is set to False.</p></li>
+<li><p>Scan title is set to an empty string.</p></li>
+<li><p>Start height is set to 0.0.</p></li>
+<li><p>Will print flag is set to False.</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.ParameterWidget.land">
+<span class="sig-name descname"><span class="pre">land</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.land" title="Link to this definition"></a></dt>
+<dd><p>Prepares the system for landing by publishing a ‘not ready’ status and
+disabling the image exporter’s dump status.</p>
+<p>This method performs the following actions:</p>
+<ol class="arabic simple">
+<li><p>Publishes a ‘not ready’ status to the g2r topic.</p></li>
+<li><p>Sets the image exporter’s dump status to False.</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.ParameterWidget.print_check">
+<span class="sig-name descname"><span class="pre">print_check</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.print_check" title="Link to this definition"></a></dt>
+<dd><p>Publishes a message indicating whether printing will occur.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>val</strong> (<em>bool</em>) – A boolean value indicating whether printing will occur.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.ParameterWidget.ready">
+<span class="sig-name descname"><span class="pre">ready</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.ready" title="Link to this definition"></a></dt>
+<dd><p>Publishes various flight parameters and sets the system to ready state.</p>
+<p>This method publishes the following parameters to the g2r (ground to rover) communication system:</p>
+<ul class="simple">
+<li><p>Flight radius</p></li>
+<li><p>Object height</p></li>
+<li><p>Start height</p></li>
+<li><p>Scan title</p></li>
+</ul>
+<p>After publishing these parameters, it sets the system to a ready state by publishing a ready signal.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.ParameterWidget.update_dataset_name">
+<span class="sig-name descname"><span class="pre">update_dataset_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.update_dataset_name" title="Link to this definition"></a></dt>
+<dd><p>Updates the dataset name in the GUI and notifies relevant components.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> (<em>str</em>) – The new name of the dataset.</p>
+</dd>
+</dl>
+<p>This method updates the dataset name in the image exporter and publishes
+the new dataset name to the scan dataset publisher.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.ParameterWidget.update_height">
+<span class="sig-name descname"><span class="pre">update_height</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.update_height" title="Link to this definition"></a></dt>
+<dd><p>Updates the height attribute and publishes the new height value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> (<em>float</em>) – The new height value to be set.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.ParameterWidget.update_radius">
+<span class="sig-name descname"><span class="pre">update_radius</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.update_radius" title="Link to this definition"></a></dt>
+<dd><p>Update the flight radius and publish the new value.
+This method updates the radius attribute with the given value,
+publishes the new flight radius to the g2r object, and updates
+the start description accordingly.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> (<em>float</em>) – The new radius value to be set.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.ParameterWidget.update_scan_title">
+<span class="sig-name descname"><span class="pre">update_scan_title</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.update_scan_title" title="Link to this definition"></a></dt>
+<dd><p>Updates the scan title with the given value and performs related updates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> (<em>str</em>) – The new scan title to be set.</p>
+</dd>
+</dl>
+<p>This method updates the scan title, publishes the new title, updates the start description,
+and updates the class of the image exporter with the new title.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.ParameterWidget.update_start_description">
+<span class="sig-name descname"><span class="pre">update_start_description</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.update_start_description" title="Link to this definition"></a></dt>
+<dd><p>Updates the start description text with formatted values for radius, height, and start height.</p>
+<p>The description text is set to:</p>
+<p>“Start scan at {r:.1f}m for an object that is approximately {h:.2f}m tall, starting at {s:.2f}m above the ground.”</p>
+<p>The values are formatted as follows:
+- r: radius (formatted to 1 decimal place)
+- h: height (formatted to 2 decimal places)
+- s: start height (formatted to 2 decimal places)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.ParameterWidget.update_start_height">
+<span class="sig-name descname"><span class="pre">update_start_height</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget.update_start_height" title="Link to this definition"></a></dt>
+<dd><p>Updates the start height value and publishes it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>value</strong> (<em>float</em>) – The new start height value.</p>
+</dd>
+</dl>
+<p>This method sets the start height to the given value, publishes the
+new start height using the g2r object, and updates the start
+description accordingly.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.QVIOWidget">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">host.gui.gui_pages.flight.flight_widget.</span></span><span class="sig-name descname"><span class="pre">QVIOWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_exporter</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.QVIOWidget" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QWidget</span></code></p>
+<p>QVIOWidget is a custom QWidget that displays video frames from a video source.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.QVIOWidget.image_exporter">
+<span class="sig-name descname"><span class="pre">image_exporter</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.QVIOWidget.image_exporter" title="Link to this definition"></a></dt>
+<dd><p>An object responsible for exporting images.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.QVIOWidget.image_label">
+<span class="sig-name descname"><span class="pre">image_label</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.QVIOWidget.image_label" title="Link to this definition"></a></dt>
+<dd><p>A QLabel widget to display the video frames.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.QVIOWidget.left">
+<span class="sig-name descname"><span class="pre">left</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.QVIOWidget.left" title="Link to this definition"></a></dt>
+<dd><p>The left position of the widget.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.QVIOWidget.top">
+<span class="sig-name descname"><span class="pre">top</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.QVIOWidget.top" title="Link to this definition"></a></dt>
+<dd><p>The top position of the widget.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.QVIOWidget.width">
+<span class="sig-name descname"><span class="pre">width</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.QVIOWidget.width" title="Link to this definition"></a></dt>
+<dd><p>The width of the widget.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.QVIOWidget.height">
+<span class="sig-name descname"><span class="pre">height</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.QVIOWidget.height" title="Link to this definition"></a></dt>
+<dd><p>The height of the widget.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.QVIOWidget.cap">
+<span class="sig-name descname"><span class="pre">cap</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.QVIOWidget.cap" title="Link to this definition"></a></dt>
+<dd><p>A cv2.VideoCapture object to capture video frames.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.QVIOWidget.dump_images">
+<span class="sig-name descname"><span class="pre">dump_images</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.QVIOWidget.dump_images" title="Link to this definition"></a></dt>
+<dd><p>A boolean indicating whether to dump images.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.QVIOWidget.img_num">
+<span class="sig-name descname"><span class="pre">img_num</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.QVIOWidget.img_num" title="Link to this definition"></a></dt>
+<dd><p>An integer to keep track of the number of images.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.QVIOWidget.start_image_dump">
+<span class="sig-name descname"><span class="pre">start_image_dump</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.QVIOWidget.start_image_dump" title="Link to this definition"></a></dt>
+<dd><p>Enables the dumping of images by setting the dump_images attribute to True.
+This method is used to start the process of dumping images, which can be
+useful for debugging or logging purposes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.QVIOWidget.stop_image_dump">
+<span class="sig-name descname"><span class="pre">stop_image_dump</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.QVIOWidget.stop_image_dump" title="Link to this definition"></a></dt>
+<dd><p>Stops the image dumping process by setting the dump_images flag to False.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.QVIOWidget.update_frame">
+<span class="sig-name descname"><span class="pre">update_frame</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.QVIOWidget.update_frame" title="Link to this definition"></a></dt>
+<dd><p>Capture a frame from the video stream, process it, and update the GUI with the new frame.</p>
+<p>This method performs the following steps:</p>
+<ol class="arabic simple">
+<li><p>Captures a frame from the video stream.</p></li>
+<li><p>If image export is enabled, exports the captured frame.</p></li>
+<li><p>Converts the frame from BGR to RGB format.</p></li>
+<li><p>Converts the RGB image to a QImage.</p></li>
+<li><p>Converts the QImage to a QPixmap.</p></li>
+<li><p>Scales the QPixmap to fit the widget’s dimensions while maintaining the aspect ratio.</p></li>
+<li><p>Updates the image label with the new QPixmap.</p></li>
+</ol>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.QVIOWidget.update_image_display">
+<span class="sig-name descname"><span class="pre">update_image_display</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.QVIOWidget.update_image_display" title="Link to this definition"></a></dt>
+<dd><p>Updates the image display with the provided image data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>image_data</strong> (<em>QPixmap</em>) – The image data to be displayed on the QLabel.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.main">
+<span class="sig-prename descclassname"><span class="pre">host.gui.gui_pages.flight.flight_widget.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.main" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="tensorflow-widget">
+<span id="module-host.gui.gui_pages.tensor_flow.ml_ui"></span><h2>TensorFlow Widget<a class="headerlink" href="#tensorflow-widget" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.ImageScrollWidget">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">host.gui.gui_pages.tensor_flow.ml_ui.</span></span><span class="sig-name descname"><span class="pre">ImageScrollWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">settings_utility</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent_widget</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.ImageScrollWidget" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QWidget</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.ImageScrollWidget.load_images">
+<span class="sig-name descname"><span class="pre">load_images</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.ImageScrollWidget.load_images" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.LoadingPopup">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">host.gui.gui_pages.tensor_flow.ml_ui.</span></span><span class="sig-name descname"><span class="pre">LoadingPopup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.LoadingPopup" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QWidget</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.LoadingPopup.close_popup">
+<span class="sig-name descname"><span class="pre">close_popup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.LoadingPopup.close_popup" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.LoadingPopup.show_popup">
+<span class="sig-name descname"><span class="pre">show_popup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.LoadingPopup.show_popup" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.LoadingPopup.update_progress">
+<span class="sig-name descname"><span class="pre">update_progress</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.LoadingPopup.update_progress" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.MLUI">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">host.gui.gui_pages.tensor_flow.ml_ui.</span></span><span class="sig-name descname"><span class="pre">MLUI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scroll_container</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.MLUI" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QWidget</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.MLUI.image_select">
+<span class="sig-name descname"><span class="pre">image_select</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.MLUI.image_select" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.MLUI.load_ui">
+<span class="sig-name descname"><span class="pre">load_ui</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.MLUI.load_ui" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.MLUI.load_ui_assets">
+<span class="sig-name descname"><span class="pre">load_ui_assets</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.MLUI.load_ui_assets" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.MLUI.model_exists">
+<span class="sig-name descname"><span class="pre">model_exists</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.MLUI.model_exists" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.MLUI.new_mit">
+<span class="sig-name descname"><span class="pre">new_mit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.MLUI.new_mit" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.MLUI.on_load_ui_assets">
+<span class="sig-name descname"><span class="pre">on_load_ui_assets</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.MLUI.on_load_ui_assets" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.MLUI.present_ui_loader">
+<span class="sig-name descname"><span class="pre">present_ui_loader</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.MLUI.present_ui_loader" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.MLUI.renew">
+<span class="sig-name descname"><span class="pre">renew</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.MLUI.renew" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.MLUI.set_classes_directory">
+<span class="sig-name descname"><span class="pre">set_classes_directory</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.MLUI.set_classes_directory" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.MLUI.set_dataset">
+<span class="sig-name descname"><span class="pre">set_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.MLUI.set_dataset" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.MLUI.set_image_directory">
+<span class="sig-name descname"><span class="pre">set_image_directory</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.MLUI.set_image_directory" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.MLUI.set_model_directory">
+<span class="sig-name descname"><span class="pre">set_model_directory</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.MLUI.set_model_directory" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.MLUI.set_model_name">
+<span class="sig-name descname"><span class="pre">set_model_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.MLUI.set_model_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.MLUI.update_object_scan">
+<span class="sig-name descname"><span class="pre">update_object_scan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scan_directory</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.MLUI.update_object_scan" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.MLUI.with_new">
+<span class="sig-name descname"><span class="pre">with_new</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.MLUI.with_new" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionToolkit">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">host.gui.gui_pages.tensor_flow.ml_ui.</span></span><span class="sig-name descname"><span class="pre">ModelInteractionToolkit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">classes_directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">images_directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_tester</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prediction_signal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_directory</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionToolkit" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionToolkit.assign_model_tester">
+<span class="sig-name descname"><span class="pre">assign_model_tester</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_tester</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionToolkit.assign_model_tester" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionToolkit.get_best_match">
+<span class="sig-name descname"><span class="pre">get_best_match</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionToolkit.get_best_match" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionToolkit.model_exists">
+<span class="sig-name descname"><span class="pre">model_exists</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionToolkit.model_exists" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionWidget">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">host.gui.gui_pages.tensor_flow.ml_ui.</span></span><span class="sig-name descname"><span class="pre">ModelInteractionWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_generator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_tester</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">classes_directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">class_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_button</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionWidget" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QWidget</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionWidget.load_model_popup">
+<span class="sig-name descname"><span class="pre">load_model_popup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionWidget.load_model_popup" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionWidget.on_selector_changed">
+<span class="sig-name descname"><span class="pre">on_selector_changed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionWidget.on_selector_changed" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionWidget.present_prediction_loader">
+<span class="sig-name descname"><span class="pre">present_prediction_loader</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionWidget.present_prediction_loader" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionWidget.set_mit">
+<span class="sig-name descname"><span class="pre">set_mit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mit</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionWidget.set_mit" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionWidget.set_next_button">
+<span class="sig-name descname"><span class="pre">set_next_button</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">next_button</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionWidget.set_next_button" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionWidget.set_prediction">
+<span class="sig-name descname"><span class="pre">set_prediction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prediction</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionWidget.set_prediction" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionWidget.show_model_prediction">
+<span class="sig-name descname"><span class="pre">show_model_prediction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prediction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">certainty</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_exists</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionWidget.show_model_prediction" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionWidget.show_training_complete_popup">
+<span class="sig-name descname"><span class="pre">show_training_complete_popup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionWidget.show_training_complete_popup" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionWidget.show_training_popup">
+<span class="sig-name descname"><span class="pre">show_training_popup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionWidget.show_training_popup" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionWidget.train_model">
+<span class="sig-name descname"><span class="pre">train_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predicted_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionWidget.train_model" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.ScanOutputWidget">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">host.gui.gui_pages.tensor_flow.ml_ui.</span></span><span class="sig-name descname"><span class="pre">ScanOutputWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">images_file_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.ScanOutputWidget" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QWidget</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.SplashWidget">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">host.gui.gui_pages.tensor_flow.ml_ui.</span></span><span class="sig-name descname"><span class="pre">SplashWidget</span></span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.SplashWidget" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QWidget</span></code></p>
+</dd></dl>
+
+</section>
+<p id="module-host.mesher">mesher.py: ROS node meshing output point cloud.
+UDRI DTC AEROPRINT</p>
+<section id="mesher">
+<h2>Mesher<a class="headerlink" href="#mesher" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="host.mesher.Mesher">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">host.mesher.</span></span><span class="sig-name descname"><span class="pre">Mesher</span></span><a class="headerlink" href="#host.mesher.Mesher" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Node</span></code></p>
+<p>Mesher class responsible for processing point cloud data into a mesh and exporting it.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="host.mesher.Mesher.dump_directory_callback">
+<span class="sig-name descname"><span class="pre">dump_directory_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.mesher.Mesher.dump_directory_callback" title="Link to this definition"></a></dt>
+<dd><p>Callback function to handle directory dump messages.
+This function sets the directory and point cloud file location based on the incoming message data.
+:param msg: The message containing the directory path data.
+:type msg: Message</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.mesher.Mesher.export_complete_callback">
+<span class="sig-name descname"><span class="pre">export_complete_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.mesher.Mesher.export_complete_callback" title="Link to this definition"></a></dt>
+<dd><p>Callback function that is triggered when the export process is complete.
+:param msg: The message object containing the export status.
+:type msg: Message</p>
+<dl class="simple">
+<dt>Logs:</dt><dd><ul class="simple">
+<li><p>“Export complete callback: &lt;msg.data&gt;” to indicate the callback has been triggered.</p></li>
+<li><p>“Meshing…” if the export was successful.</p></li>
+</ul>
+</dd>
+<dt>Actions:</dt><dd><ul class="simple">
+<li><p>Calls the save() method if the export was successful.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.mesher.Mesher.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.mesher.Mesher.process" title="Link to this definition"></a></dt>
+<dd><p>Processes a point cloud file to generate a smoothed and filtered 3D mesh.
+Steps:</p>
+<ol class="arabic simple">
+<li><p>Reads the point cloud from the specified file location.</p></li>
+<li><p>Estimates normals for the point cloud.</p></li>
+<li><p>Creates a triangle mesh from the point cloud using alpha shapes.</p></li>
+<li><p>Smooths the mesh using Laplacian smoothing.</p></li>
+<li><p>Clusters connected triangles and removes small clusters.</p></li>
+<li><p>Computes vertex normals for the final mesh.</p></li>
+<li><p>Exports the final mesh to an STL file.</p></li>
+</ol>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.mesher.Mesher.self.pc_file_location">
+<span class="sig-prename descclassname"><span class="pre">self.</span></span><span class="sig-name descname"><span class="pre">pc_file_location</span></span><a class="headerlink" href="#host.mesher.Mesher.self.pc_file_location" title="Link to this definition"></a></dt>
+<dd><p>The file location of the point cloud.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="host.mesher.Mesher.self.directory">
+<span class="sig-prename descclassname"><span class="pre">self.</span></span><span class="sig-name descname"><span class="pre">directory</span></span><a class="headerlink" href="#host.mesher.Mesher.self.directory" title="Link to this definition"></a></dt>
+<dd><p>The directory where the output STL file will be saved.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Returns:
+None</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="host.mesher.Mesher.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#host.mesher.Mesher.save" title="Link to this definition"></a></dt>
+<dd><p>Processes the mesh and saves the output to a file.
+This method processes the mesh, constructs the output file path,
+logs the output path, publishes the file directory, and logs the
+completion of the mesh processing.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="host.mesher.main">
+<span class="sig-prename descclassname"><span class="pre">host.mesher.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.mesher.main" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="AeroPrint documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="starling.html" class="btn btn-neutral float-right" title="Starling Package documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Digital Transformation Center.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,604 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Starling Package documentation &mdash; AeroPrint 1.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=292eb321"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Host Package documentation" href="host.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            AeroPrint
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Code Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="host.html">Host Package documentation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Starling Package documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#starling.circle_flight.OffboardStarlingNode"><code class="docutils literal notranslate"><span class="pre">OffboardStarlingNode</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#starling.circle_flight.OffboardStarlingNode.arm"><code class="docutils literal notranslate"><span class="pre">OffboardStarlingNode.arm()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#starling.circle_flight.OffboardStarlingNode.clear_trajectory"><code class="docutils literal notranslate"><span class="pre">OffboardStarlingNode.clear_trajectory()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#starling.circle_flight.OffboardStarlingNode.create_path"><code class="docutils literal notranslate"><span class="pre">OffboardStarlingNode.create_path()</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#starling.circle_flight.OffboardStarlingNode.circle_altitudes"><code class="docutils literal notranslate"><span class="pre">OffboardStarlingNode.circle_altitudes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#starling.circle_flight.OffboardStarlingNode.num_circles"><code class="docutils literal notranslate"><span class="pre">OffboardStarlingNode.num_circles</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#starling.circle_flight.OffboardStarlingNode.min_height"><code class="docutils literal notranslate"><span class="pre">OffboardStarlingNode.min_height</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#starling.circle_flight.OffboardStarlingNode.max_height"><code class="docutils literal notranslate"><span class="pre">OffboardStarlingNode.max_height</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#starling.circle_flight.OffboardStarlingNode.start_altitude"><code class="docutils literal notranslate"><span class="pre">OffboardStarlingNode.start_altitude</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#starling.circle_flight.OffboardStarlingNode.end_altitude"><code class="docutils literal notranslate"><span class="pre">OffboardStarlingNode.end_altitude</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#starling.circle_flight.OffboardStarlingNode.disarm"><code class="docutils literal notranslate"><span class="pre">OffboardStarlingNode.disarm()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#starling.circle_flight.OffboardStarlingNode.engage_offboard_mode"><code class="docutils literal notranslate"><span class="pre">OffboardStarlingNode.engage_offboard_mode()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#starling.circle_flight.OffboardStarlingNode.init_circle"><code class="docutils literal notranslate"><span class="pre">OffboardStarlingNode.init_circle()</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#starling.circle_flight.OffboardStarlingNode.self.path"><code class="docutils literal notranslate"><span class="pre">OffboardStarlingNode.self.path</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#starling.circle_flight.OffboardStarlingNode.land"><code class="docutils literal notranslate"><span class="pre">OffboardStarlingNode.land()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#starling.circle_flight.OffboardStarlingNode.object_height_callback"><code class="docutils literal notranslate"><span class="pre">OffboardStarlingNode.object_height_callback()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#starling.circle_flight.OffboardStarlingNode.offboard_move_callback"><code class="docutils literal notranslate"><span class="pre">OffboardStarlingNode.offboard_move_callback()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#starling.circle_flight.OffboardStarlingNode.publish_offboard_control_heartbeat_signal"><code class="docutils literal notranslate"><span class="pre">OffboardStarlingNode.publish_offboard_control_heartbeat_signal()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#starling.circle_flight.OffboardStarlingNode.publish_takeoff_setpoint"><code class="docutils literal notranslate"><span class="pre">OffboardStarlingNode.publish_takeoff_setpoint()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#starling.circle_flight.OffboardStarlingNode.publish_vehicle_command"><code class="docutils literal notranslate"><span class="pre">OffboardStarlingNode.publish_vehicle_command()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#starling.circle_flight.OffboardStarlingNode.radius_callback"><code class="docutils literal notranslate"><span class="pre">OffboardStarlingNode.radius_callback()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#starling.circle_flight.OffboardStarlingNode.ready_callback"><code class="docutils literal notranslate"><span class="pre">OffboardStarlingNode.ready_callback()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#starling.circle_flight.OffboardStarlingNode.reset"><code class="docutils literal notranslate"><span class="pre">OffboardStarlingNode.reset()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#starling.circle_flight.OffboardStarlingNode.start_height_callback"><code class="docutils literal notranslate"><span class="pre">OffboardStarlingNode.start_height_callback()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#starling.circle_flight.OffboardStarlingNode.timer_callback"><code class="docutils literal notranslate"><span class="pre">OffboardStarlingNode.timer_callback()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#starling.circle_flight.OffboardStarlingNode.vehicle_local_position_callback"><code class="docutils literal notranslate"><span class="pre">OffboardStarlingNode.vehicle_local_position_callback()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#starling.circle_flight.OffboardStarlingNode.vehicle_status_callback"><code class="docutils literal notranslate"><span class="pre">OffboardStarlingNode.vehicle_status_callback()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#starling.circle_flight.VOXLQVIOController"><code class="docutils literal notranslate"><span class="pre">VOXLQVIOController</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#starling.circle_flight.VOXLQVIOController.reset"><code class="docutils literal notranslate"><span class="pre">VOXLQVIOController.reset()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#starling.circle_flight.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#starling.custom_pc_publisher.PCNode"><code class="docutils literal notranslate"><span class="pre">PCNode</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#starling.custom_pc_publisher.PCNode.callback"><code class="docutils literal notranslate"><span class="pre">PCNode.callback()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#starling.custom_pc_publisher.PoseNode"><code class="docutils literal notranslate"><span class="pre">PoseNode</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#starling.custom_pc_publisher.PoseNode.sub"><code class="docutils literal notranslate"><span class="pre">PoseNode.sub</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#starling.custom_pc_publisher.PoseNode.lookup"><code class="docutils literal notranslate"><span class="pre">PoseNode.lookup</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#starling.custom_pc_publisher.PoseNode.pose"><code class="docutils literal notranslate"><span class="pre">PoseNode.pose</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#starling.custom_pc_publisher.PoseNode.callback"><code class="docutils literal notranslate"><span class="pre">PoseNode.callback()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#starling.custom_pc_publisher.PoseNode.find"><code class="docutils literal notranslate"><span class="pre">PoseNode.find()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#starling.custom_pc_publisher.PoseNode.get_pose"><code class="docutils literal notranslate"><span class="pre">PoseNode.get_pose()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#starling.custom_pc_publisher.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">AeroPrint</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Starling Package documentation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/starling.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="starling-package-documentation">
+<h1>Starling Package documentation<a class="headerlink" href="#starling-package-documentation" title="Link to this heading"></a></h1>
+<p id="module-starling.circle_flight">circle_flight.py: ROS node to perform flight based on scan parameters.
+UDRI DTC AEROPRINT</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="starling.circle_flight.OffboardStarlingNode">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">starling.circle_flight.</span></span><span class="sig-name descname"><span class="pre">OffboardStarlingNode</span></span><a class="headerlink" href="#starling.circle_flight.OffboardStarlingNode" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Node</span></code></p>
+<p>Node for controlling a vehicle in offboard mode.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="starling.circle_flight.OffboardStarlingNode.arm">
+<span class="sig-name descname"><span class="pre">arm</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#starling.circle_flight.OffboardStarlingNode.arm" title="Link to this definition"></a></dt>
+<dd><p>Send an arm command to the vehicle.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="starling.circle_flight.OffboardStarlingNode.clear_trajectory">
+<span class="sig-name descname"><span class="pre">clear_trajectory</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#starling.circle_flight.OffboardStarlingNode.clear_trajectory" title="Link to this definition"></a></dt>
+<dd><p>Clear the trajectory.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="starling.circle_flight.OffboardStarlingNode.create_path">
+<span class="sig-name descname"><span class="pre">create_path</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#starling.circle_flight.OffboardStarlingNode.create_path" title="Link to this definition"></a></dt>
+<dd><p>Creates a flight path consisting of multiple circular levels at different altitudes.
+This method calculates a series of altitudes for circular flight paths, starting from a maximum height
+and descending to a minimum height. The number of circular levels is determined by <cite>num_circles</cite>.
+The altitudes are stored in the <cite>circle_altitudes</cite> list and are used to initialize circular flight paths.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="starling.circle_flight.OffboardStarlingNode.circle_altitudes">
+<span class="sig-name descname"><span class="pre">circle_altitudes</span></span><a class="headerlink" href="#starling.circle_flight.OffboardStarlingNode.circle_altitudes" title="Link to this definition"></a></dt>
+<dd><p>A list to store the altitudes for each circular level.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="starling.circle_flight.OffboardStarlingNode.num_circles">
+<span class="sig-name descname"><span class="pre">num_circles</span></span><a class="headerlink" href="#starling.circle_flight.OffboardStarlingNode.num_circles" title="Link to this definition"></a></dt>
+<dd><p>The number of circular levels to create.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="starling.circle_flight.OffboardStarlingNode.min_height">
+<span class="sig-name descname"><span class="pre">min_height</span></span><a class="headerlink" href="#starling.circle_flight.OffboardStarlingNode.min_height" title="Link to this definition"></a></dt>
+<dd><p>The minimum altitude for the flight path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="starling.circle_flight.OffboardStarlingNode.max_height">
+<span class="sig-name descname"><span class="pre">max_height</span></span><a class="headerlink" href="#starling.circle_flight.OffboardStarlingNode.max_height" title="Link to this definition"></a></dt>
+<dd><p>The maximum altitude for the flight path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="starling.circle_flight.OffboardStarlingNode.start_altitude">
+<span class="sig-name descname"><span class="pre">start_altitude</span></span><a class="headerlink" href="#starling.circle_flight.OffboardStarlingNode.start_altitude" title="Link to this definition"></a></dt>
+<dd><p>The starting altitude for the flight path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="starling.circle_flight.OffboardStarlingNode.end_altitude">
+<span class="sig-name descname"><span class="pre">end_altitude</span></span><a class="headerlink" href="#starling.circle_flight.OffboardStarlingNode.end_altitude" title="Link to this definition"></a></dt>
+<dd><p>The ending altitude for the flight path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Logs:</p>
+<blockquote>
+<div><p>Logs the starting altitude and the list of calculated circle altitudes.</p>
+</div></blockquote>
+<p>Calls:</p>
+<blockquote>
+<div><p>self.init_circle(altitude): Initializes a circular flight path at the given altitude.</p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="starling.circle_flight.OffboardStarlingNode.disarm">
+<span class="sig-name descname"><span class="pre">disarm</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#starling.circle_flight.OffboardStarlingNode.disarm" title="Link to this definition"></a></dt>
+<dd><p>Send a disarm command to the vehicle.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="starling.circle_flight.OffboardStarlingNode.engage_offboard_mode">
+<span class="sig-name descname"><span class="pre">engage_offboard_mode</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#starling.circle_flight.OffboardStarlingNode.engage_offboard_mode" title="Link to this definition"></a></dt>
+<dd><p>Switch to offboard mode.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="starling.circle_flight.OffboardStarlingNode.init_circle">
+<span class="sig-name descname"><span class="pre">init_circle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">altitude</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#starling.circle_flight.OffboardStarlingNode.init_circle" title="Link to this definition"></a></dt>
+<dd><p>Initializes a circular flight path at a given altitude.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>altitude</strong> (<em>float</em>) – The altitude at which the circular flight path should be initialized.</p>
+</dd>
+</dl>
+<p>This method calculates the trajectory setpoints for a circular flight path based on the
+specified altitude, radius, rate, and cycle duration. It computes the position, velocity,
+acceleration, and yaw for each step in the circular path and appends the resulting
+TrajectorySetpoint messages to the path list. Additionally, it calculates the yawspeed
+for smooth transitions between yaw angles.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="starling.circle_flight.OffboardStarlingNode.self.path">
+<span class="sig-prename descclassname"><span class="pre">self.</span></span><span class="sig-name descname"><span class="pre">path</span></span><a class="headerlink" href="#starling.circle_flight.OffboardStarlingNode.self.path" title="Link to this definition"></a></dt>
+<dd><p>A list of TrajectorySetpoint messages representing the circular flight path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="starling.circle_flight.OffboardStarlingNode.land">
+<span class="sig-name descname"><span class="pre">land</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#starling.circle_flight.OffboardStarlingNode.land" title="Link to this definition"></a></dt>
+<dd><p>Switch to land mode.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="starling.circle_flight.OffboardStarlingNode.object_height_callback">
+<span class="sig-name descname"><span class="pre">object_height_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#starling.circle_flight.OffboardStarlingNode.object_height_callback" title="Link to this definition"></a></dt>
+<dd><p>Callback function to update the object’s height.</p>
+<p>This function is triggered when a new message is received. It updates the
+object’s height attribute with the data from the message and logs the update.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>msg</strong> – The message containing the new height data. It is expected to have
+a ‘data’ attribute that holds the height value.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="starling.circle_flight.OffboardStarlingNode.offboard_move_callback">
+<span class="sig-name descname"><span class="pre">offboard_move_callback</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#starling.circle_flight.OffboardStarlingNode.offboard_move_callback" title="Link to this definition"></a></dt>
+<dd><p>Callback function to handle offboard movement.
+This function is called periodically to publish the next setpoint in the
+offboard path. It also handles the end of the scan by publishing a
+scan end message and initiating a landing sequence after a certain
+number of iterations.</p>
+<p>Behavior:</p>
+<ul class="simple">
+<li><p>Publishes the next trajectory setpoint if the counter is within the path length.</p></li>
+<li><p>If the counter exceeds the path length and the scan has not ended, it logs the end of the scan,
+publishes a scan end message, and sets the scan ended flag.</p></li>
+<li><p>Publishes a takeoff setpoint with the end altitude.</p></li>
+<li><p>Initiates landing if the counter exceeds the path length by 100.</p></li>
+</ul>
+<p>Attributes:</p>
+<ul class="simple">
+<li><p>self.offboard_arr_counter (int): Counter to track the current position in the path.</p></li>
+<li><p>self.path (list): List of trajectory setpoints.</p></li>
+<li><p>self.scan_ended (bool): Flag to indicate if the scan has ended.</p></li>
+<li><p>self.end_altitude (float): Altitude to use for the takeoff setpoint at the end of the scan.</p></li>
+<li><p>self.trajectory_setpoint_publisher (Publisher): Publisher for trajectory setpoints.</p></li>
+<li><p>self.scan_end_pub (Publisher): Publisher for scan end messages.</p></li>
+<li><p>self.get_logger (function): Function to get the logger instance.</p></li>
+<li><p>self.publish_takeoff_setpoint (function): Function to publish the takeoff setpoint.</p></li>
+<li><p>self.land (function): Function to initiate landing.</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="starling.circle_flight.OffboardStarlingNode.publish_offboard_control_heartbeat_signal">
+<span class="sig-name descname"><span class="pre">publish_offboard_control_heartbeat_signal</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#starling.circle_flight.OffboardStarlingNode.publish_offboard_control_heartbeat_signal" title="Link to this definition"></a></dt>
+<dd><p>Publish the offboard control mode.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="starling.circle_flight.OffboardStarlingNode.publish_takeoff_setpoint">
+<span class="sig-name descname"><span class="pre">publish_takeoff_setpoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#starling.circle_flight.OffboardStarlingNode.publish_takeoff_setpoint" title="Link to this definition"></a></dt>
+<dd><p>Publish the trajectory setpoint.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="starling.circle_flight.OffboardStarlingNode.publish_vehicle_command">
+<span class="sig-name descname"><span class="pre">publish_vehicle_command</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#starling.circle_flight.OffboardStarlingNode.publish_vehicle_command" title="Link to this definition"></a></dt>
+<dd><p>Publish a vehicle command.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="starling.circle_flight.OffboardStarlingNode.radius_callback">
+<span class="sig-name descname"><span class="pre">radius_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#starling.circle_flight.OffboardStarlingNode.radius_callback" title="Link to this definition"></a></dt>
+<dd><p>Callback function to update the radius based on the received message.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>msg</strong> (<em>Message</em>) – The message containing the new radius value.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="starling.circle_flight.OffboardStarlingNode.ready_callback">
+<span class="sig-name descname"><span class="pre">ready_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#starling.circle_flight.OffboardStarlingNode.ready_callback" title="Link to this definition"></a></dt>
+<dd><p>Callback function that is triggered when a ready message is received.
+This function handles the initialization and reset of various components
+based on the received message. If the message indicates readiness, it
+resets the system, logs the event, creates a flight path, and starts a
+timer for periodic callbacks. If the message does not indicate readiness,
+it resets the system and initiates landing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>msg</strong> (<em>std_msgs.msg.Bool</em>) – A message indicating whether the system is ready.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="starling.circle_flight.OffboardStarlingNode.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#starling.circle_flight.OffboardStarlingNode.reset" title="Link to this definition"></a></dt>
+<dd><p>Resets the flight control node to its initial state.</p>
+<p>This method performs the following actions:</p>
+<ul class="simple">
+<li><p>Attempts to cancel the current timer. Logs a message if it fails.</p></li>
+<li><p>Attempts to cancel the figure-8 timer. Logs a message if it fails.</p></li>
+<li><p>Sets the scan_ended flag to False.</p></li>
+<li><p>Clears the flight path.</p></li>
+<li><p>Resets the offboard setpoint counter.</p></li>
+<li><p>Sets the hit_figure_8 flag to False.</p></li>
+<li><p>Sets the taken_off flag to False.</p></li>
+<li><p>Sets the armed flag to False.</p></li>
+<li><p>Resets the offboard arrival counter.</p></li>
+<li><p>Logs a message indicating that the flight control node has been reset.</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="starling.circle_flight.OffboardStarlingNode.start_height_callback">
+<span class="sig-name descname"><span class="pre">start_height_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#starling.circle_flight.OffboardStarlingNode.start_height_callback" title="Link to this definition"></a></dt>
+<dd><p>Callback function to update the start height.</p>
+<p>This function is triggered when a new message is received. It updates the
+start height with the data from the message and logs the updated height.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>msg</strong> – The message containing the new start height data. It is expected
+to have a ‘data’ attribute that holds the height value.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="starling.circle_flight.OffboardStarlingNode.timer_callback">
+<span class="sig-name descname"><span class="pre">timer_callback</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#starling.circle_flight.OffboardStarlingNode.timer_callback" title="Link to this definition"></a></dt>
+<dd><p>Timer callback function that handles offboard control and flight operations.
+This function is periodically called to:</p>
+<ul class="simple">
+<li><p>Publish offboard control heartbeat signals.</p></li>
+<li><p>Engage offboard mode and arm the vehicle after a certain number of setpoints.</p></li>
+<li><p>Increment the offboard setpoint counter.</p></li>
+<li><p>Publish takeoff setpoints for the vehicle to reach the start altitude.</p></li>
+<li><p>Initiate a scan operation and start a figure-8 flight pattern if conditions are met.</p></li>
+</ul>
+<p>The function performs the following steps:</p>
+<ol class="arabic simple">
+<li><p>Publishes offboard control heartbeat signals.</p></li>
+<li><p>Engages offboard mode and arms the vehicle when the offboard setpoint counter reaches 10.</p></li>
+<li><p>Increments the offboard setpoint counter if it is less than 11.</p></li>
+<li><p>Publishes takeoff setpoints until 10 seconds have passed since the start time.</p></li>
+<li><p>Initiates a scan operation and starts a figure-8 flight pattern if the vehicle is ready and the figure-8 pattern has not been started.</p></li>
+</ol>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="starling.circle_flight.OffboardStarlingNode.vehicle_local_position_callback">
+<span class="sig-name descname"><span class="pre">vehicle_local_position_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vehicle_local_position</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#starling.circle_flight.OffboardStarlingNode.vehicle_local_position_callback" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="starling.circle_flight.OffboardStarlingNode.vehicle_status_callback">
+<span class="sig-name descname"><span class="pre">vehicle_status_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vehicle_status</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#starling.circle_flight.OffboardStarlingNode.vehicle_status_callback" title="Link to this definition"></a></dt>
+<dd><p>Callback function for vehicle_status topic subscriber.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="starling.circle_flight.VOXLQVIOController">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">starling.circle_flight.</span></span><span class="sig-name descname"><span class="pre">VOXLQVIOController</span></span><a class="headerlink" href="#starling.circle_flight.VOXLQVIOController" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Controller class for handling VOXL QVIO (Visual-Inertial Odometry) operations.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="starling.circle_flight.VOXLQVIOController.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#starling.circle_flight.VOXLQVIOController.reset" title="Link to this definition"></a></dt>
+<dd><p>Sends a reset command to the VOXL QVIO system.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="starling.circle_flight.main">
+<span class="sig-prename descclassname"><span class="pre">starling.circle_flight.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#starling.circle_flight.main" title="Link to this definition"></a></dt>
+<dd><p>Main function to initialize the ROS node and start the flight control node.</p>
+</dd></dl>
+
+<p id="module-starling.custom_pc_publisher">custom_pc_publisher.py: ROS node for publishing PointCloud2, transformed for drone pose.
+UDRI DTC AEROPRINT</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="starling.custom_pc_publisher.PCNode">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">starling.custom_pc_publisher.</span></span><span class="sig-name descname"><span class="pre">PCNode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pose_node</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#starling.custom_pc_publisher.PCNode" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Node</span></code></p>
+<p>Node for publishing transformed point cloud data.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="starling.custom_pc_publisher.PCNode.callback">
+<span class="sig-name descname"><span class="pre">callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#starling.custom_pc_publisher.PCNode.callback" title="Link to this definition"></a></dt>
+<dd><p>Callback function to process incoming point cloud data and publish transformed data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (<em>sensor_msgs.msg.PointCloud2</em>) – The incoming point cloud data.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Exception</strong> – If any error occurs during processing, it logs the exception message.</p>
+</dd>
+</dl>
+<p>The function performs the following steps:</p>
+<ol class="arabic simple">
+<li><p>Extracts the timestamp from the incoming data and finds the corresponding pose.</p></li>
+<li><p>Calculates the time difference between the pose and point cloud data.</p></li>
+<li><p>Checks if the current time minus the last published time is greater than the publishing rate and if the time difference is within the allowed maximum.</p></li>
+<li><p>If conditions are met, it processes the point cloud data:</p></li>
+</ol>
+<blockquote>
+<div><ul class="simple">
+<li><p>Converts the PointCloud2 data to a numpy array and then to an Open3D point cloud.</p></li>
+<li><p>Rotates and translates the point cloud based on the pose’s position and orientation.</p></li>
+<li><p>Converts the transformed point cloud back to PointCloud2 format.</p></li>
+<li><p>Publishes the transformed point cloud data.</p></li>
+<li><p>Updates the last published time.</p></li>
+</ul>
+</div></blockquote>
+<ol class="arabic simple" start="5">
+<li><p>If conditions are not met, it logs a message indicating a bad scan.</p></li>
+</ol>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="starling.custom_pc_publisher.PoseNode">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">starling.custom_pc_publisher.</span></span><span class="sig-name descname"><span class="pre">PoseNode</span></span><a class="headerlink" href="#starling.custom_pc_publisher.PoseNode" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Node</span></code></p>
+<p>Node for acquiring and managing pose data from VOXL MPA.</p>
+<p>This class subscribes to a specific topic to receive pose data in the form of PoseStamped messages.
+It maintains a dictionary of received poses keyed by their timestamp for quick lookup and retrieval.</p>
+<p>As Starling pose data and ToF data are recieved by ROS, we need to ensure the pose is as close to the
+pose in the particular ToF frame. So we keep a dictionary of recent ToF frames and use the one that
+most closely matches the pose timestamp.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="starling.custom_pc_publisher.PoseNode.sub">
+<span class="sig-name descname"><span class="pre">sub</span></span><a class="headerlink" href="#starling.custom_pc_publisher.PoseNode.sub" title="Link to this definition"></a></dt>
+<dd><p>The subscription to the pose topic.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Subscription</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="starling.custom_pc_publisher.PoseNode.lookup">
+<span class="sig-name descname"><span class="pre">lookup</span></span><a class="headerlink" href="#starling.custom_pc_publisher.PoseNode.lookup" title="Link to this definition"></a></dt>
+<dd><p>A dictionary to store pose messages keyed by their timestamp.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="starling.custom_pc_publisher.PoseNode.pose">
+<span class="sig-name descname"><span class="pre">pose</span></span><a class="headerlink" href="#starling.custom_pc_publisher.PoseNode.pose" title="Link to this definition"></a></dt>
+<dd><p>The most recently received pose message.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>PoseStamped</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="starling.custom_pc_publisher.PoseNode.callback">
+<span class="sig-name descname"><span class="pre">callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#starling.custom_pc_publisher.PoseNode.callback" title="Link to this definition"></a></dt>
+<dd><p>Add pose to dictionary.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="starling.custom_pc_publisher.PoseNode.find">
+<span class="sig-name descname"><span class="pre">find</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#starling.custom_pc_publisher.PoseNode.find" title="Link to this definition"></a></dt>
+<dd><p>Find a pose with a key closest to a target</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="starling.custom_pc_publisher.PoseNode.get_pose">
+<span class="sig-name descname"><span class="pre">get_pose</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#starling.custom_pc_publisher.PoseNode.get_pose" title="Link to this definition"></a></dt>
+<dd><p>Get a pose</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="starling.custom_pc_publisher.main">
+<span class="sig-prename descclassname"><span class="pre">starling.custom_pc_publisher.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#starling.custom_pc_publisher.main" title="Link to this definition"></a></dt>
+<dd><p>Start both nodes in separate threads</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="host.html" class="btn btn-neutral float-left" title="Host Package documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Digital Transformation Center.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
