@@ -5,6 +5,8 @@
 
 AeroPrint documentation
 =======================
+For development documentation, please see the `AeroPrint GitHub <https://github.com/Digital-Transformation-Center/aeroprint/wiki>`_.
+
 Introduction
 -------------
 AeroPrint is a student-led research project designed to explore real-world application of the `digital thread <https://en.wikipedia.org/wiki/Digital_thread>`_. AeroPrint employs a small `UAS <https://www.faa.gov/uas>`_ to perform automated 3D digital scanning of objects. Using a `ToF (Time of Flight) sensor <https://en.wikipedia.org/wiki/Time-of-flight_camera>`_, the AeroPrint drone performs a systematic scan of a given object by flying an automatically generated flight plan.
