@@ -104,7 +104,7 @@ class OffboardFigure8Node(Node):
         self.voxl_reset.reset()
         self.rate = 20
         self.radius = 0.0                               #from 0.9 to 0.0
-        self.cycle_s = 8
+        self.cycle_s = 20                               #controls speed
         
         self.steps = self.cycle_s * self.rate
         self.path = []
@@ -188,7 +188,7 @@ class OffboardFigure8Node(Node):
 
         self.ready = msg.data
 
-    def init_circle(self, altitude, num_stops=4, pause_duration=3.0):               #number of stops per circle , pause duration
+    def init_circle(self, altitude, num_stops=6, pause_duration=3.0):               #number of stops per circle , pause duration
         """Initialize circle trajectory with stops at specified intervals."""
         dt = 1.0 / self.rate
         dadt = (2.0 * math.pi) / self.cycle_s
