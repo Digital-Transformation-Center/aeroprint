@@ -260,7 +260,7 @@ class OffboardFigure8Node(Node):
         
         if self.start_time + 10 > time.time():
             # Takeoff to the starting point on the circle's edge
-            self.publish_takeoff_setpoint(self.radius, 0.0, -self.start_altitude)               #Radius
+            self.publish_takeoff_setpoint(r * math.cos(a), 0.0, -self.start_altitude)               #Radius   self.publish_takeoff_setpoint(self.radius, 0.0, -self.start_altitude)    
         else:
             if not self.hit_figure_8 and self.ready:
                 self.get_logger().info("Starting Scan Now.")
