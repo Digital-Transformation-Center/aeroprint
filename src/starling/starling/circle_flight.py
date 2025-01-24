@@ -109,7 +109,7 @@ class OffboardFigure8Node(Node):
         # Flight / path parameters
         self.rate = 20
         self.radius = 0.0
-        self.cycle_s = 30  # one circle time (seconds)
+        self.cycle_s = 20  # one circle time (seconds)
         self.steps = self.cycle_s * self.rate
         self.path = []
         self.vehicle_local_position = VehicleLocalPosition()
@@ -133,7 +133,7 @@ class OffboardFigure8Node(Node):
         """
         self.path = []  # Reset path
         # Decide top and bottom altitudes based on object height, etc.
-        num_circles = 2
+        num_circles = 3
         min_height = self.start_height + 0.20
         max_height = self.start_height + self.object_height + 0.20
         self.start_altitude = max_height
@@ -154,7 +154,7 @@ class OffboardFigure8Node(Node):
             # Because PX4 uses Z negative down, we pass -altitude
             self.init_circle(-altitude)
 
-    def init_circle(self, altitude, num_stops=4, pause_in_time=1.0, pause_center_time=1.0, pause_out_time=1.0):
+    def init_circle(self, altitude, num_stops=4, pause_in_time=2.0, pause_center_time=5.0, pause_out_time=2.0):
         """
         Initialize circle trajectory with 'stops' at intervals around the circle.
         Instead of a pure pause, we do a radial in-and-out maneuver (closer to center, then back).
