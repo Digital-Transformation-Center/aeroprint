@@ -200,8 +200,11 @@ class OffboardFigure8Node(Node):
             ]
 
             # Force the yaw to face the center => a + pi
-            msg.yaw = a + math.pi
-            msg.yawspeed = 0.0  # We'll keep zero or can compute derivative if you want
+
+
+            msg.yaw = math.atan2(msg.acceleration[1], msg.acceleration[0])
+            #msg.yaw = a + math.pi
+            #msg.yawspeed = 0.0  # We'll keep zero or can compute derivative if you want
 
             circle_points.append(msg)
 
