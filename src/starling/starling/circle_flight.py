@@ -154,7 +154,7 @@ class OffboardFigure8Node(Node):
             # Because PX4 uses Z negative down, we pass -altitude
             self.init_circle(-altitude)
 
-    def init_circle(self, altitude, num_stops=4, pause_in_time=2.0, pause_center_time=5.0, pause_out_time=2.0):
+    def init_circle(self, altitude, num_stops=8, pause_in_time=4.0, pause_center_time=5.0, pause_out_time=4.0):
         """
         Initialize circle trajectory with 'stops' at intervals around the circle.
         Instead of a pure pause, we do a radial in-and-out maneuver (closer to center, then back).
