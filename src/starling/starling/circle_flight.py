@@ -200,9 +200,24 @@ class OffboardFigure8Node(Node):
             ]
 
             # Force the yaw to face the center => a + pi
+                    # Calculate yawspeed for smooth rotation
+        #for i in range(self.steps):                                    #Original
+        #    next_yaw = self.path[(i + 1) % self.steps].yaw             #Original
+        for i in range(len(self.path) - 1):
+            next_yaw = self.path[i + 1].yaw
+            curr = self.path[i].yaw
+            if next_yaw - curr < -math.pi:
+                next_yaw += 2.0 * math.pi
+            if next_yaw - curr > math.pi:
+                next_yaw -= 2.0 * math.pi
+
+            self.path[i].yawspeed = (next_yaw - curr) / dt
+
+        # Set yawspeed for the last point
+        self.path[-1].yawspeed = 0.0
 
 
-            msg.yaw = math.atan2(msg.acceleration[1], msg.acceleration[0])
+            #msg.yaw = math.atan2(msg.acceleration[1], msg.acceleration[0])
             #msg.yaw = a + math.pi
             #msg.yawspeed = 0.0  # We'll keep zero or can compute derivative if you want
 
