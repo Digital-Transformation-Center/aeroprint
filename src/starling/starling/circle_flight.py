@@ -100,7 +100,7 @@ class OffboardFigure8Node(Node):
         self.voxl_reset.reset()
         self.rate = 20
         self.radius = 0.0                               #from 0.9 to 0.0
-        self.cycle_s = 80                                # Lower INT = Faster flight speed 10 is quick
+        self.cycle_s = 30                                # Lower INT = Faster flight speed 10 is quick
         
         self.steps = self.cycle_s * self.rate
         self.path = []
@@ -201,7 +201,7 @@ class OffboardFigure8Node(Node):
             #a = (i * (2.0 * math.pi) / self.steps) - math.pi / 2                #newer path
             a = (-math.pi) + i * (2.0 * math.pi / self.steps)                   #Original circular path
             #msg.position = [r + r * math.cos(a), r * math.sin(a), altitude]    #Original circular path
-            msg.position = [r * math.cos(a), r * math.sin(a), altitude]         #New path
+            msg.position = [r + r * math.cos(a), r * math.sin(a), altitude]         #New path
             msg.velocity = [
                 dadt * -r * math.sin(a),
                 dadt * r * math.cos(a),
@@ -260,7 +260,7 @@ class OffboardFigure8Node(Node):
         
         if self.start_time + 10 > time.time():
             # Takeoff to the starting point on the circle's edge
-            self.publish_takeoff_setpoint(r * math.cos(a), 0.0, -self.start_altitude)               #Radius   self.publish_takeoff_setpoint(self.radius, 0.0, -self.start_altitude)    
+            self.publish_takeoff_setpoint(0.0, 0.0, -self.start_altitude)               #Radius   self.publish_takeoff_setpoint(self.radius, 0.0, -self.start_altitude)    
         else:
             if not self.hit_figure_8 and self.ready:
                 self.get_logger().info("Starting Scan Now.")
