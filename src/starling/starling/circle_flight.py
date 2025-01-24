@@ -55,6 +55,8 @@ class OffboardFigure8Node(Node):
         self.vehicle_command_publisher = self.create_publisher(
             VehicleCommand, "/fmu/in/vehicle_command", qos_profile
         )
+
+        # Vehicle status subscriber
         self.vehicle_status_subscriber = self.create_subscription(
             VehicleStatus,
             "/fmu/out/vehicle_status",
@@ -156,6 +158,12 @@ class OffboardFigure8Node(Node):
         """
         Initialize circle trajectory with 'stops' at intervals around the circle.
         Instead of a pure pause, we do a radial in-and-out maneuver (closer to center, then back).
+        
+        NOTE: We are centering the circle at (r, 0). The drone’s position along the circle is:
+            x = r + r*cos(a)
+            y = r*sin(a)
+        So the center is at (r, 0). To face that center, we compute yaw as:
+            yaw = atan2(0 - y, r - x)
         """
         dt = 1.0 / self.rate
         dadt = (2.0 * math.pi) / self.cycle_s  # derivative of angle wrt time
@@ -172,11 +180,10 @@ class OffboardFigure8Node(Node):
             a = -math.pi + i * (2.0 * math.pi / self.steps)
 
             # Position on the circle
-            msg.position = [
-                r + r * math.cos(a),  # X
-                r * math.sin(a),      # Y
-                altitude              # Z
-            ]
+            x = r + r * math.cos(a)
+            y = r * math.sin(a)
+            msg.position = [x, y, altitude]
+
             # Approx velocity (for potential feedforward)
             msg.velocity = [
                 dadt * -r * math.sin(a),
@@ -189,28 +196,11 @@ class OffboardFigure8Node(Node):
                 dadt * -r * math.sin(a),
                 0.0,
             ]
-            # Yaw
-            msg.yaw = math.atan2(msg.velocity[1], msg.velocity[0])
-            msg.yawspeed = 0.0  # will fix up next
+            # Yaw to face the circle center at (r, 0)
+            msg.yaw = math.atan2(0.0 - y, r - x)
+            msg.yawspeed = 0.0  # We'll set it to 0.0 or ignore for now
 
             circle_points.append(msg)
-
-        # Refine yawspeed for a smooth rotation
-        for i in range(len(circle_points) - 1):
-            curr = circle_points[i]
-            nxt = circle_points[i + 1]
-            # Adjust next yaw if there's a 2*pi crossing
-            diff = nxt.yaw - curr.yaw
-            if diff < -math.pi:
-                nxt.yaw += 2.0 * math.pi
-            if diff > math.pi:
-                nxt.yaw -= 2.0 * math.pi
-
-            # approximate yawspeed
-            circle_points[i].yawspeed = (nxt.yaw - curr.yaw) / dt
-
-        # last point yawspeed = 0
-        circle_points[-1].yawspeed = 0.0
 
         # Now insert the radial in-and-out sequences at each "stop"
         for i in range(self.steps):
@@ -221,10 +211,14 @@ class OffboardFigure8Node(Node):
             if i != 0 and (i % stop_interval) == 0:
                 # We will keep the same angle a for the in-out motion
                 # and just move radially from r -> r_in -> r
-                # We can pick r_in however you want:
-                r_in = 0.5 * r  # Half the circle radius, for example
+                # We can pick r_in: half the circle radius for example
+                r_in = 0.5 * r
                 angle_a = -math.pi + i * (2.0 * math.pi / self.steps)
-                current_yaw = circle_points[i].yaw
+
+                # Coordinates for the angle
+                circle_x = r + r * math.cos(angle_a)
+                circle_y = r * math.sin(angle_a)
+                current_yaw = math.atan2(0.0 - circle_y, r - circle_x)
 
                 # Move inward
                 steps_in = int(pause_in_time * self.rate)
@@ -233,29 +227,27 @@ class OffboardFigure8Node(Node):
                     # linear interpolation from r to r_in
                     s = r - frac * (r - r_in)
                     msg_in = TrajectorySetpoint()
-                    msg_in.position = [
-                        r + s * math.cos(angle_a),
-                        s * math.sin(angle_a),
-                        altitude
-                    ]
+                    x_in = r + s * math.cos(angle_a)
+                    y_in = s * math.sin(angle_a)
+                    msg_in.position = [x_in, y_in, altitude]
                     msg_in.velocity = [0.0, 0.0, 0.0]
                     msg_in.acceleration = [0.0, 0.0, 0.0]
-                    msg_in.yaw = current_yaw
+                    # Keep facing center
+                    msg_in.yaw = math.atan2(0.0 - y_in, r - x_in)
                     msg_in.yawspeed = 0.0
                     self.path.append(msg_in)
 
                 # Pause briefly at the inner radius
                 steps_pause = int(pause_center_time * self.rate)
+                x_in = r + r_in * math.cos(angle_a)
+                y_in = r_in * math.sin(angle_a)
+                pause_yaw = math.atan2(0.0 - y_in, r - x_in)
                 for _ in range(steps_pause):
                     msg_pause = TrajectorySetpoint()
-                    msg_pause.position = [
-                        r + r_in * math.cos(angle_a),
-                        r_in * math.sin(angle_a),
-                        altitude
-                    ]
+                    msg_pause.position = [x_in, y_in, altitude]
                     msg_pause.velocity = [0.0, 0.0, 0.0]
                     msg_pause.acceleration = [0.0, 0.0, 0.0]
-                    msg_pause.yaw = current_yaw
+                    msg_pause.yaw = pause_yaw
                     msg_pause.yawspeed = 0.0
                     self.path.append(msg_pause)
 
@@ -266,17 +258,15 @@ class OffboardFigure8Node(Node):
                     # linear interpolation from r_in to r
                     s = r_in + frac * (r - r_in)
                     msg_out = TrajectorySetpoint()
-                    msg_out.position = [
-                        r + s * math.cos(angle_a),
-                        s * math.sin(angle_a),
-                        altitude
-                    ]
+                    x_out = r + s * math.cos(angle_a)
+                    y_out = s * math.sin(angle_a)
+                    msg_out.position = [x_out, y_out, altitude]
                     msg_out.velocity = [0.0, 0.0, 0.0]
                     msg_out.acceleration = [0.0, 0.0, 0.0]
-                    msg_out.yaw = current_yaw
+                    # Keep facing center
+                    msg_out.yaw = math.atan2(0.0 - y_out, r - x_out)
                     msg_out.yawspeed = 0.0
                     self.path.append(msg_out)
-
 
     def start_height_callback(self, msg):
         self.start_height = msg.data
@@ -294,7 +284,8 @@ class OffboardFigure8Node(Node):
         # Reset relevant state
         self.voxl_reset.reset()
         self.scan_ended = False
-        b_false = Bool(); b_false.data = False
+        b_false = Bool()
+        b_false.data = False
         self.scan_start_pub.publish(b_false)
         self.scan_end_pub.publish(b_false)
 
@@ -359,7 +350,8 @@ class OffboardFigure8Node(Node):
             # Once path is done, signal end and hold the final position for a bit before land
             if not self.scan_ended:
                 self.get_logger().info("End of Scan.")
-                b = Bool(); b.data = True
+                b = Bool()
+                b.data = True
                 self.scan_end_pub.publish(b)
                 self.scan_ended = True
             self.publish_takeoff_setpoint(0.0, 0.0, -self.end_altitude)
@@ -369,10 +361,6 @@ class OffboardFigure8Node(Node):
             self.land()
 
         self.offboard_arr_counter += 1
-
-    def vehicle_local_position_callback(self, vehicle_local_position):
-        """Callback function for vehicle_local_position topic subscriber."""
-        self.vehicle_local_position = vehicle_local_position
 
     def vehicle_status_callback(self, vehicle_status):
         """Callback function for vehicle_status topic subscriber."""
