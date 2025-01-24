@@ -321,7 +321,7 @@ class OffboardFigure8Node(Node):
                 b = Bool(); b.data  = True
                 self.scan_end_pub.publish(b)
                 self.scan_ended = True
-            self.publish_takeoff_setpoint(self.radius, 0.0, -self.end_altitude)             #Radius
+            self.publish_takeoff_setpoint(0.0, 0.0, -self.end_altitude)             #Radius
 
         if self.offboard_arr_counter == len(self.path) + 100:
             self.figure8_timer.cancel()
