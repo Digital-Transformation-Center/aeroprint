@@ -152,19 +152,10 @@ class OffboardFigure8Node(Node):
             # Because PX4 uses Z negative down, we pass -altitude
             self.init_circle(-altitude)
 
-    def init_circle(self, 
-                    altitude, 
-                    num_stops=4, 
-                    pause_in_time=1.0, 
-                    pause_center_time=1.0, 
-                    pause_out_time=1.0):
+    def init_circle(self, altitude, num_stops=4, pause_in_time=1.0, pause_center_time=1.0, pause_out_time=1.0):
         """
         Initialize circle trajectory with 'stops' at intervals around the circle.
-        Instead of a pure pause, we do a radial in-and-out maneuver (closer to center).
-        
-        Now, we will have the drone face the center of the circle by setting:
-        msg.yaw = a + math.pi
-        (since the circle is centered around (r,0) ).
+        Instead of a pure pause, we do a radial in-and-out maneuver (closer to center, then back).
         """
         dt = 1.0 / self.rate
         dadt = (2.0 * math.pi) / self.cycle_s  # derivative of angle wrt time
@@ -176,52 +167,50 @@ class OffboardFigure8Node(Node):
         # Build the main circle path
         circle_points = []
         for i in range(self.steps):
+            msg = TrajectorySetpoint()
             # angle around circle
             a = -math.pi + i * (2.0 * math.pi / self.steps)
 
-            # Position on the circle (centered at (r, 0))
-            x = r + r * math.cos(a)
-            y = r * math.sin(a)
-
-            msg = TrajectorySetpoint()
-            msg.position = [x, y, altitude]
-
-            # We'll keep velocity/acceleration purely for feedforward if desired,
-            # but the main difference is that we force yaw to face center.
+            # Position on the circle
+            msg.position = [
+                r + r * math.cos(a),  # X
+                r * math.sin(a),      # Y
+                altitude              # Z
+            ]
+            # Approx velocity (for potential feedforward)
             msg.velocity = [
                 dadt * -r * math.sin(a),
                 dadt * r * math.cos(a),
                 0.0,
             ]
+            # Approx acceleration
             msg.acceleration = [
                 dadt * -r * math.cos(a),
                 dadt * -r * math.sin(a),
                 0.0,
             ]
-
-            # Force the yaw to face the center => a + pi
-                    # Calculate yawspeed for smooth rotation
-        #for i in range(self.steps):                                    #Original
-        #    next_yaw = self.path[(i + 1) % self.steps].yaw             #Original
-        for i in range(len(self.path) - 1):
-            next_yaw = self.path[i + 1].yaw
-            curr = self.path[i].yaw
-            if next_yaw - curr < -math.pi:
-                next_yaw += 2.0 * math.pi
-            if next_yaw - curr > math.pi:
-                next_yaw -= 2.0 * math.pi
-
-            self.path[i].yawspeed = (next_yaw - curr) / dt
-
-        # Set yawspeed for the last point
-        self.path[-1].yawspeed = 0.0
-
-
-            #msg.yaw = math.atan2(msg.acceleration[1], msg.acceleration[0])
-            #msg.yaw = a + math.pi
-            #msg.yawspeed = 0.0  # We'll keep zero or can compute derivative if you want
+            # Yaw
+            msg.yaw = math.atan2(msg.velocity[1], msg.velocity[0])
+            msg.yawspeed = 0.0  # will fix up next
 
             circle_points.append(msg)
+
+        # Refine yawspeed for a smooth rotation
+        for i in range(len(circle_points) - 1):
+            curr = circle_points[i]
+            nxt = circle_points[i + 1]
+            # Adjust next yaw if there's a 2*pi crossing
+            diff = nxt.yaw - curr.yaw
+            if diff < -math.pi:
+                nxt.yaw += 2.0 * math.pi
+            if diff > math.pi:
+                nxt.yaw -= 2.0 * math.pi
+
+            # approximate yawspeed
+            circle_points[i].yawspeed = (nxt.yaw - curr.yaw) / dt
+
+        # last point yawspeed = 0
+        circle_points[-1].yawspeed = 0.0
 
         # Now insert the radial in-and-out sequences at each "stop"
         for i in range(self.steps):
@@ -230,62 +219,64 @@ class OffboardFigure8Node(Node):
 
             # Check if we should do the in-out motion at this step
             if i != 0 and (i % stop_interval) == 0:
-                # We'll keep the same angle `a` as circle_points[i]
-                # so we know the direction from the center
-                cp = circle_points[i]
+                # We will keep the same angle a for the in-out motion
+                # and just move radially from r -> r_in -> r
+                # We can pick r_in however you want:
+                r_in = 0.5 * r  # Half the circle radius, for example
                 angle_a = -math.pi + i * (2.0 * math.pi / self.steps)
-                
-                # We'll define an inner radius (half, for example)
-                r_in = 0.5 * r  
-                current_yaw = cp.yaw  # same angle to keep facing center
+                current_yaw = circle_points[i].yaw
 
-                # 1) Move inward
+                # Move inward
                 steps_in = int(pause_in_time * self.rate)
                 for step_j in range(steps_in):
                     frac = float(step_j) / float(max(steps_in - 1, 1))
                     # linear interpolation from r to r_in
                     s = r - frac * (r - r_in)
-                    x_in = r + s * math.cos(angle_a)
-                    y_in = s * math.sin(angle_a)
-
                     msg_in = TrajectorySetpoint()
-                    msg_in.position = [x_in, y_in, cp.position[2]]
+                    msg_in.position = [
+                        r + s * math.cos(angle_a),
+                        s * math.sin(angle_a),
+                        altitude
+                    ]
                     msg_in.velocity = [0.0, 0.0, 0.0]
                     msg_in.acceleration = [0.0, 0.0, 0.0]
-                    # Keep yaw facing the center
                     msg_in.yaw = current_yaw
                     msg_in.yawspeed = 0.0
                     self.path.append(msg_in)
 
-                # 2) Pause briefly at the inner radius
+                # Pause briefly at the inner radius
                 steps_pause = int(pause_center_time * self.rate)
-                x_pause = r + r_in * math.cos(angle_a)
-                y_pause = r_in * math.sin(angle_a)
                 for _ in range(steps_pause):
                     msg_pause = TrajectorySetpoint()
-                    msg_pause.position = [x_pause, y_pause, cp.position[2]]
+                    msg_pause.position = [
+                        r + r_in * math.cos(angle_a),
+                        r_in * math.sin(angle_a),
+                        altitude
+                    ]
                     msg_pause.velocity = [0.0, 0.0, 0.0]
                     msg_pause.acceleration = [0.0, 0.0, 0.0]
                     msg_pause.yaw = current_yaw
                     msg_pause.yawspeed = 0.0
                     self.path.append(msg_pause)
 
-                # 3) Move outward
+                # Move outward
                 steps_out = int(pause_out_time * self.rate)
                 for step_j in range(steps_out):
                     frac = float(step_j) / float(max(steps_out - 1, 1))
                     # linear interpolation from r_in to r
                     s = r_in + frac * (r - r_in)
-                    x_out = r + s * math.cos(angle_a)
-                    y_out = s * math.sin(angle_a)
-
                     msg_out = TrajectorySetpoint()
-                    msg_out.position = [x_out, y_out, cp.position[2]]
+                    msg_out.position = [
+                        r + s * math.cos(angle_a),
+                        s * math.sin(angle_a),
+                        altitude
+                    ]
                     msg_out.velocity = [0.0, 0.0, 0.0]
                     msg_out.acceleration = [0.0, 0.0, 0.0]
                     msg_out.yaw = current_yaw
                     msg_out.yawspeed = 0.0
                     self.path.append(msg_out)
+
 
     def start_height_callback(self, msg):
         self.start_height = msg.data
@@ -373,7 +364,6 @@ class OffboardFigure8Node(Node):
                 self.scan_ended = True
             self.publish_takeoff_setpoint(0.0, 0.0, -self.end_altitude)
 
-        # After 100 more ticks, land the drone
         if self.offboard_arr_counter == (len(self.path) + 100):
             self.figure8_timer.cancel()
             self.land()
