@@ -71,6 +71,31 @@ class OffboardFigure8Node(Node):
             self.ready_callback,
             qos_profile_system_default
         )
+
+
+
+
+                # Subscriber for number of circles
+        self.num_circles_sub = self.create_subscription(
+            Int32,
+            "/host/gui/out/num_circles",
+            self.num_circles_callback,
+            qos_profile_system_default
+        )
+        #self.radius_sub = self.create_subscription(
+        #    Float32,
+        #    "/host/gui/out/radius",
+        #    self.radius_callback,
+        #    qos_profile_system_default
+
+
+
+
+
+
+
+
+
         self.radius_sub = self.create_subscription(
             Float32,
             "/host/gui/out/radius",
@@ -119,12 +144,24 @@ class OffboardFigure8Node(Node):
         self.offboard_setpoint_counter = 0
         self.start_time = time.time()
         self.offboard_arr_counter = 0
+        # Initialize variable
+        self.num_circles = 3  # Default number of circles
+
+
 
         # Default altitudes
         self.start_altitude = 0.6
         self.end_altitude = 1.1
         self.start_height = 0.0
         self.object_height = 0.0
+
+
+
+
+
+      def num_circles_callback(self, msg):
+        self.num_circles = msg.data
+        self.get_logger().info(f"Updating number of circles to {self.num_circles}")
 
     def create_path(self):
         """
@@ -138,6 +175,44 @@ class OffboardFigure8Node(Node):
         max_height = self.start_height + self.object_height + 0.20
         self.start_altitude = max_height
         self.end_altitude = min_height
+
+
+
+
+
+            # Use user-defined number of circles
+    num_circles = self.num_circles
+
+    min_height = self.start_height + 0.20
+    max_height = self.start_height + self.object_height + 0.20
+    self.start_altitude = max_height
+    self.end_altitude = min_height
+
+    # Compute altitudes for the circles
+    circle_altitudes = []
+    for lev in range(num_circles):
+        if lev == 0:
+            circle_altitudes.append(max_height)
+        elif lev == num_circles - 1:
+            circle_altitudes.append(min_height)
+        else:
+            # Intermediate altitudes
+            inter_lev = max_height - lev * ((max_height - min_height) / (num_circles - 1))
+            circle_altitudes.append(inter_lev)
+
+    # Create the flight path for each altitude
+    for altitude in circle_altitudes:
+        self.init_circle(-altitude)
+
+
+
+
+
+
+
+
+
+
 
         circle_altitudes = []
         for lev in range(num_circles):
@@ -279,6 +354,22 @@ class OffboardFigure8Node(Node):
     def radius_callback(self, msg):
         self.radius = msg.data
         self.get_logger().info("Updating radius to " + str(msg.data))
+
+
+
+
+
+
+
+    def radius_callback(self, msg):
+        self.radius = msg.data
+        self.get_logger().info("Updating radius to " + str(msg.data))
+
+
+
+
+
+
 
     def ready_callback(self, msg):
         # Reset relevant state

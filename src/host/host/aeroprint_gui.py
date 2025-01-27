@@ -103,6 +103,34 @@ class ParameterWidget(QWidget):
         self.radius_spin_box = QDoubleSpinBox(self)
         self.radius_spin_box.setDecimals(1)  # Scan radius
         self.radius_spin_box.setRange(0.0, 3.0)  # Set the allowed value range        
+
+
+
+
+        # Number of circles spin box
+        self.num_circles_spin_box = QSpinBox(self)
+        self.num_circles_spin_box.setRange(1, 5)  # Min: 1, Max: 5 circles
+        #self.num_circles_spin_box.setValue(3)  # Default: 3 circles
+        self.num_circles_spin_box.valueChanged.connect(self.update_num_circles)
+
+        # Add the widget to the layout
+        layout = QVBoxLayout()
+        layout.addWidget(QLabel("Number of Circles:"))
+        layout.addWidget(self.num_circles_spin_box)
+
+
+
+        #self.radius_spin_box = QDoubleSpinBox(self)
+        #self.radius_spin_box.setDecimals(1)  # Scan radius
+        #self.radius_spin_box.setRange(0.0, 3.0)  # Set the allowed value range    
+
+
+
+
+
+
+
+
         self.height_spin_box = QDoubleSpinBox(self)
         self.height_spin_box.setDecimals(2)  # Scan radius
         self.height_spin_box.setRange(0.0, 5.0)  # Set the allowed value range
@@ -111,7 +139,22 @@ class ParameterWidget(QWidget):
         self.start_height_spin_box.setRange(0.0, 5.0)  # Set the allowed value range
         self.print_checkbox = QCheckBox("Send to printer when done", self)
         self.scan_title = ""
-        self.radius = 0.0                                                           #### changed from 0.0 -> 0.0
+        self.radius = 0.0    
+        
+        
+        
+        
+        
+        
+        self.radius = 0.0    
+        
+        
+        
+        
+        
+        
+        
+                                                               #### changed from 0.0 -> 0.0
         self.height = 0.0
         self.start_height = 0.0
         self.start_description = QLabel('')
@@ -131,6 +174,20 @@ class ParameterWidget(QWidget):
         layout.addWidget(self.scan_name_textbox)
         layout.addWidget(QLabel('Scan Radius (From Center in Meters): '))
         layout.addWidget(self.radius_spin_box)
+
+
+
+
+
+        layout.addWidget(QLabel('Scan Radius (From Center in Meters): '))
+        layout.addWidget(self.radius_spin_box)
+
+
+
+
+
+
+
         # layout.addWidget(self.label)
         layout.addWidget(QLabel('Object Height (Approx. in Meters): '))
         layout.addWidget(self.height_spin_box)
@@ -145,6 +202,18 @@ class ParameterWidget(QWidget):
 
     def init_vals(self):
         self.g2r.publish_flight_radius(0.0)                         #changed from 0.0 -> 0.4
+
+
+
+
+
+        self.g2r.publish_flight_radius(0.0)  
+
+
+
+
+
+
         self.g2r.publish_kill(False)
         self.g2r.publish_object_height(0.0)
         self.g2r.publish_ready(False)
@@ -163,6 +232,30 @@ class ParameterWidget(QWidget):
         self.radius = value
         self.g2r.publish_flight_radius(value)
         self.update_start_description()
+
+
+
+
+    def update_num_circles(self, value):
+        # Publish the number of circles to ROS
+        self.g2r.publish_num_circles(value)
+
+
+
+    #def update_radius(self, value):
+    #    self.radius = value
+    #    self.g2r.publish_flight_radius(value)
+    #    self.update_start_description()
+
+
+
+
+
+
+
+
+
+
 
     def update_height(self, value):
         self.height = value
@@ -193,6 +286,21 @@ class ParameterWidget(QWidget):
     def get_radius(self):
         return self.radius
     
+
+
+
+
+
+    #def get_radius(self):
+    #    return self.radius
+    
+
+
+
+
+
+
+
     def get_height(self):
         return self.height
 
@@ -231,6 +339,32 @@ class GUItoROS(Node):
             "/host/gui/out/radius",
             qos_profile_system_default
         )
+
+
+
+
+         # New publisher for number of circles
+        self.num_circles_pub = self.create_publisher(
+            Int32,
+            "/host/gui/out/num_circles",
+            qos_profile_system_default
+        )
+        #self.flight_radius_pub = self.create_publisher(
+        #    Float32, 
+        #    "/host/gui/out/radius",
+        #    qos_profile_system_default
+        #)
+
+
+
+
+
+
+
+
+
+
+
         self.object_height_pub = self.create_publisher(
             Float32, 
             "/host/gui/out/object_height", 
@@ -300,6 +434,29 @@ class GUItoROS(Node):
     def publish_start_height(self, height):
         self.start_height_pub.publish(self.create_float32(height))
         self.info("Publishing start height: " + str(height))
+
+
+
+
+    def publish_num_circles(self, num_circles):
+        msg = Int32()
+        msg.data = num_circles
+        self.num_circles_pub.publish(msg)
+        self.get_logger().info(f"Publishing number of circles: {num_circles}")
+
+
+    #def publish_flight_radius(self, rad):
+    #    self.flight_radius_pub.publish(self.create_float32(rad))
+    #    self.info("Publishing flight radius: " + str(rad))
+
+
+
+
+
+
+
+
+
 
     def publish_scan_title(self, title):
         self.scan_title_pub.publish(self.create_string(title))
