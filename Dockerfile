@@ -1,30 +1,33 @@
-# Use the official Ubuntu 20.04 base image
-FROM ubuntu:20.04
-ENV DEBIAN_FRONTEND=nonintercative
-# Update package lists and install any necessary packages
+# Use the official ROS2 Humble base image
+FROM ros:foxy
+
+# Install necessary packages
 RUN apt-get update && apt-get install -y \
-    # Add your desired packages here (e.g., curl, vim, etc.)
-    curl \
-    vim \
+    python3-colcon-common-extensions \
+    python3-rosdep \
+    python3-vcstool \
+    build-essential \
     git \
-    locales \
-    software-properties-common && \
-    locale-gen en_US en_US.UTF-8 && \
-    update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 && \
-    export LANG=en_US.UTF-8 && \
-    add-apt-repository universe && \
-    apt-get update && apt-get install curl -y && \
-    curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg && \
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | tee /etc/apt/sources.list.d/ros2.list > /dev/null && \
-    apt-get update && apt-get upgrade -y && \
-    apt-get install -y \
-    ros-foxy-desktop \
-    python3-argcomplete && \
-    echo "source /opt/ros/foxy/setup.bash" >> ~/.bashrc
+    ros-foxy-demo-nodes-py \
+    && rm -rf /var/lib/apt/lists/*
 
-# Set environment variables if needed
-# ENV MY_ENV_VAR=value
-EXPOSE 7400-7411
+# Copy pre-built px4_msgs package into the container
+# COPY px4_msgs_install/ /px4_msgs/install/
 
-# Start a shell when the container runs
-CMD ["bash"]
+# Copy the workspace into the container
+COPY ./ /workspace/
+
+# Set the working directory to the workspace
+WORKDIR /workspace
+
+# Build the workspace
+# RUN /bin/bash -c "source /opt/ros/foxy/setup.bash && colcon build"
+
+RUN echo "source /opt/ros/foxy/setup.bash" >> /root/.bashrc
+
+# Run your application
+
+
+# Set the entrypoint to the bash shell
+# CMD ["/bin/bash", "-c", "source /opt/ros/foxy/setup.bash"]
+CMD ["/bin/bash"]
