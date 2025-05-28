@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Helix Path Visualizer</title>
+    <style>
+        body { 
+            font-family: sans-serif; background: #222; color: #eee; 
+            display: flex; flex-direction: column; align-items: center;
+        }
+        #controls { margin-bottom: 1em; }
+        label { margin-right: 1em; }
+        canvas { display: block; margin: 0 auto; background: #111; }
+        #container {
+            border-radius: 24px;
+            max-width: 800px;
+            box-shadow: 0 0px 16px rgba(125, 125, 125, 0.301);
+            border: #111;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <h2>Helix Path Visualizer</h2>
+    <div id="controls">
+        <label>
+            Radius:
+            <input type="range" id="radius" value="2" min="0.2" step="0.2" max="3" oninput="document.getElementById('radiusValue').textContent = this.value; updateHelix();">
+            <span id="radiusValue">2</span>
+        </label>
+        <label>
+            Height:
+            <input type="range" id="pitch" value="2" min="0.1" step="0.1" max="3" oninput="document.getElementById('pitchValue').textContent = this.value; updateHelix();">
+            <span id="pitchValue">2</span>
+        </label>
+        <label>
+            Passes:
+            <input type="range" id="turns" value="2" min="1" step="1" max="10" oninput="document.getElementById('turnsValue').textContent = this.value; updateHelix();">
+            <span id="turnsValue">2</span>
+        </label>
+        <br>
+        <!-- <label>
+            Starting Height:
+            <input type="number" id="startHeight" value="0" min="-10" max="100" step="0.1" oninput="updateHelix();">
+        </label> -->
+    </div>
+    <div style="display: flex; flex-direction: row; align-items: flex-start;">
+        <!-- Vertical slider for Starting Height -->
+        <div style="display: flex; flex-direction: column; align-items: center; margin-right: 1em;">
+            <input
+                type="range"
+                id="startHeightSlider"
+                min="0"
+                max="5"
+                step="0.1"
+                value="0"
+                style="writing-mode: bt-lr; -webkit-appearance: slider-vertical; width: 32px; height: 500px; margin-bottom: 0.5em;"
+            >
+            <input
+                type="number"
+                id="startHeight"
+                value="0"
+                min="-10"
+                max="100"
+                step="0.1"
+                style="width: 60px; margin-top: 0.5em;"
+            >
+            <!-- <label for="startHeight" style="margin-top: 0.2em;">Start Height</label> -->
+        </div>
+        <div id="container" class="visualizer"></div>
+    </div>
+    <script type="module">
+        import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.176.0/build/three.module.js';
+        let scene, camera, renderer, helixLine, controls, axesGroup;
+        let startMarker, endMarker, startLabel, endLabel;
+        let placeHereMarker, placeHereLabel;
+
+        function createTextSprite(text, color = "#fff") {
+            // Use a high-res canvas and better font rendering for crispness
+            const scale = 0.5; // for high DPI
+            const baseWidth = 256, baseHeight = 96;
+            const canvas = document.createElement('canvas');
+            canvas.width = baseWidth * scale;
+            canvas.height = baseHeight * scale;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Font settings
+            ctx.font = `bold ${64 * scale}px Arial, Helvetica, sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            // Shadow for contrast
+            ctx.shadowColor = "#222";
+            ctx.shadowBlur = 16 * scale;
+
+            // Draw text
+            ctx.fillStyle = color;
+            ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+
+            // Optional: outline for more contrast
+            ctx.shadowBlur = 0;
+            ctx.lineWidth = 0 * scale;
+            ctx.strokeStyle = "#222";
+            ctx.strokeText(text, canvas.width / 2, canvas.height / 2);
+
+            // Create texture and sprite
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.needsUpdate = true;
+            texture.minFilter = THREE.LinearFilter;
+            texture.generateMipmaps = false;
+            const spriteMaterial = new THREE.SpriteMaterial({ map: texture, transparent: true });
+            const sprite = new THREE.Sprite(spriteMaterial);
+
+            // Set scale for world units (adjust as needed)
+            sprite.scale.set(3, 1, 1);
+            return sprite;
+        }
+
+        let pulseIndex = 0;
+        let pulseDirection = -1;
+        let pulseLine;
+        let droneMarker, droneLabel;
+
+        function createHelixGeometry(radius, pitch, turns, points, baseY = 0) {
+            const geometry = new THREE.BufferGeometry();
+            const positions = [];
+            const totalAngle = turns * 2 * Math.PI;
+            for (let i = 0; i <= points; i++) {
+                const t = i / points;
+                const angle = t * totalAngle;
+                const x = radius * Math.cos(angle);
+                const z = radius * Math.sin(angle);
+                const y = baseY + pitch * turns * t;
+                positions.push(x, y, z);
+            }
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+            return geometry;
+        }
+
+        function createAxesMarkers(length = 5, step = 1) {
+            const group = new THREE.Group();
+            // X axis: red, Y axis: green, Z axis: blue (Z is up)
+            const axes = [
+                { dir: [1,0,0], color: 0xffffff, label: 'X' },
+                { dir: [0,1,0], color: 0x00a4ff, label: 'Z' },
+                { dir: [0,0,1], color: 0xffffff, label: 'Y' }
+            ];
+            axes.forEach(axis => {
+                // Axis line
+                const mat = new THREE.LineBasicMaterial({ color: axis.color });
+                const geo = new THREE.BufferGeometry().setFromPoints([
+                    new THREE.Vector3(0,0,0),
+                    new THREE.Vector3(axis.dir[0]*length, axis.dir[1]*length, axis.dir[2]*length)
+                ]);
+                group.add(new THREE.Line(geo, mat));
+                // Markers
+                for (let i = 1; i <= length; i += step) {
+                    const markerGeo = new THREE.SphereGeometry(0.07, 8, 8);
+                    const markerMat = new THREE.MeshBasicMaterial({ color: axis.color });
+                    const marker = new THREE.Mesh(markerGeo, markerMat);
+                    marker.position.set(axis.dir[0]*i, axis.dir[1]*i, axis.dir[2]*i);
+                    group.add(marker);
+                }
+            });
+            return group;
+        }
+
+        function addInputListeners() {
+            // Update on any input change
+            const ids = ["radius", "pitch", "turns"];
+            ids.forEach(id => {
+                document.getElementById(id).addEventListener("input", updateHelix);
+            });
+            // Sync slider and number input for startHeight
+            const slider = document.getElementById("startHeightSlider");
+            const number = document.getElementById("startHeight");
+            slider.addEventListener("input", () => {
+                number.value = slider.value;
+                updateHelix();
+            });
+            number.addEventListener("input", () => {
+                slider.value = number.value;
+                updateHelix();
+            });
+        }
+
+        function init() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x000000); // black background
+
+            // Set fixed aspect ratio and size for the renderer
+            const width = Math.min(window.innerWidth * 0.9, 800);
+            const height = 500;
+            camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 100);
+            camera.position.set(6, 6, 6);
+            camera.lookAt(0, 2, 0);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(width, height);
+            renderer.setClearColor(0x888888);
+            // Center the canvas in the container
+            renderer.domElement.style.display = "block";
+            renderer.domElement.style.margin = "0 auto";
+            renderer.domElement.style.position = "relative";
+            renderer.domElement.style.left = "50%";
+            renderer.domElement.style.transform = "translateX(-50%)";
+            document.getElementById('container').appendChild(renderer.domElement);
+
+            // Light
+            const light = new THREE.PointLight(0xffffff, 1);
+            light.position.set(10, 10, 10);
+            scene.add(light);
+
+            // Axes with markers
+            axesGroup = createAxesMarkers(5, 1);
+            scene.add(axesGroup);
+
+            // Initial helix
+            updateHelix();
+
+            // Simple orbit controls
+            let isDragging = false, prevX, prevY, theta = Math.PI/4, phi = Math.PI/6;
+            renderer.domElement.addEventListener('mousedown', e => {
+                isDragging = true; prevX = e.clientX; prevY = e.clientY;
+            });
+            window.addEventListener('mousemove', e => {
+                if (!isDragging) return;
+                theta -= (e.clientX - prevX) * 0.01;
+                phi -= (e.clientY - prevY) * 0.01;
+                phi = Math.max(-Math.PI/2 + 0.1, Math.min(Math.PI/2 - 0.1, phi));
+                const r = 10;
+                // Z is up, so use y for up/down
+                camera.position.x = r * Math.sin(theta) * Math.cos(phi);
+                camera.position.y = r * Math.sin(phi) + 2;
+                camera.position.z = r * Math.cos(theta) * Math.cos(phi);
+                camera.lookAt(0, 4, 0);
+                prevX = e.clientX; prevY = e.clientY;
+            });
+            window.addEventListener('mouseup', () => { isDragging = false; });
+
+            addInputListeners();
+            animate();
+        }
+
+        function updateHelix() {
+            const radius = parseFloat(document.getElementById('radius').value);
+            const pitch = parseFloat(document.getElementById('pitch').value) / parseInt(document.getElementById('turns').value);
+            const turns = parseInt(document.getElementById('turns').value);
+            const points = 300;
+            const startHeight = parseFloat(document.getElementById('startHeight').value);
+
+            if (helixLine) scene.remove(helixLine);
+            if (pulseLine) scene.remove(pulseLine);
+            if (placeHereMarker) scene.remove(placeHereMarker);
+            if (placeHereLabel) scene.remove(placeHereLabel);
+            if (droneMarker) scene.remove(droneMarker);
+            if (droneLabel) scene.remove(droneLabel);
+
+            // Helix starts at object height (startHeight)
+            const geometry = createHelixGeometry(radius, pitch, turns, points, startHeight);
+            const material = new THREE.LineBasicMaterial({ color: 0xff2222 });
+            helixLine = new THREE.Line(geometry, material);
+            scene.add(helixLine);
+
+            // Place Here marker and label (unchanged)
+            placeHereMarker = new THREE.Mesh(
+                new THREE.SphereGeometry(0.11, 16, 16),
+                new THREE.MeshBasicMaterial({ color: 0x53cc3d })
+            );
+            placeHereMarker.position.set(0, startHeight, 0);
+            scene.add(placeHereMarker);
+
+            placeHereLabel = createTextSprite("Object", "#53cc3d");
+            placeHereLabel.position.set(0, startHeight + 0.5, 0);
+            scene.add(placeHereLabel);
+
+            // Drone marker and label (on x axis at radius, at same height as start)
+            droneMarker = new THREE.Mesh(
+                new THREE.SphereGeometry(0.1, 16, 16),
+                new THREE.MeshBasicMaterial({ color: 0xff8e1c })
+            );
+            droneMarker.position.set(radius, 0, 0);
+            scene.add(droneMarker);
+
+            droneLabel = createTextSprite("Drone", "#ff8e1c");
+            droneLabel.position.set(radius, 0.5, 0);
+            scene.add(droneLabel);
+
+            // Pulse line setup
+            pulseIndex = 0;
+            if (pulseLine) scene.remove(pulseLine);
+            const pulseGeo = new THREE.BufferGeometry();
+            // Initially, pulse is at the start
+            const positions = geometry.getAttribute('position');
+            const pulsePositions = [];
+            for (let i = 0; i <= pulseIndex; i++) {
+                pulsePositions.push(positions.getX(i), positions.getY(i), positions.getZ(i));
+            }
+            pulseGeo.setAttribute('position', new THREE.Float32BufferAttribute(pulsePositions, 3));
+            const pulseMat = new THREE.LineBasicMaterial({ color: 0x2266ff, linewidth: 5 });
+            pulseLine = new THREE.Line(pulseGeo, pulseMat);
+            scene.add(pulseLine);
+
+            // Store for animation
+            pulseLine._helixPositions = positions;
+            pulseLine._helixPoints = points;
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            // Animate pulse along the helix
+            if (pulseLine && pulseLine._helixPositions) {
+                const points = pulseLine._helixPoints;
+                // Move pulseIndex forward/backward
+                pulseIndex += pulseDirection * 0.5;
+                if (pulseIndex >= points) {
+                    pulseIndex = points;
+                    pulseDirection = 1;
+                } else if (pulseIndex <= 0) {
+                    pulseIndex = points - 1;
+                    pulseDirection = -1;
+                }
+                // Update pulse geometry
+                const pulsePositions = [];
+                const startIdx = Math.max(0, Math.floor(pulseIndex) - 3);
+                const endIdx = Math.floor(pulseIndex);
+                for (let i = startIdx; i <= endIdx; i++) {
+                    pulsePositions.push(
+                        pulseLine._helixPositions.getX(i),
+                        pulseLine._helixPositions.getY(i),
+                        pulseLine._helixPositions.getZ(i)
+                    );
+                }
+                pulseLine.geometry.setAttribute(
+                    'position',
+                    new THREE.Float32BufferAttribute(pulsePositions, 3)
+                );
+                pulseLine.geometry.setDrawRange(0, pulseIndex + 1);
+                pulseLine.geometry.attributes.position.needsUpdate = true;
+            }
+            renderer.render(scene, camera);
+        }
+
+        window.addEventListener('resize', () => {
+            const width = Math.min(window.innerWidth * 0.9, 800);
+            const height = 500;
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+            renderer.setSize(width, height);
+        });
+
+        init();
+    </script>
+</body>
+</html>
