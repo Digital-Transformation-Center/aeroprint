@@ -22,7 +22,7 @@ setup(
     maintainer_email="ryankuederle@icloud.com",
     description="TODO: Package description",
     license="TODO: License declaration",
-    tests_require=["pytest"],
+    # tests_require=["pytest"],
     entry_points={
         "console_scripts": [
             "test_node = host.test_node:main",
