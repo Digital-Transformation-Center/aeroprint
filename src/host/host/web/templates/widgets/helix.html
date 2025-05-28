@@ -26,7 +26,7 @@
     <div id="controls">
         <label>
             Radius:
-            <input type="range" id="radius" value="2" min="0.2" step="0.2" max="3" oninput="document.getElementById('radiusValue').textContent = this.value; updateHelix();">
+            <input type="range" id="radius" value="2" min="0.2" step="0.2" max="3" oninput="document.getElementById('radiusValue').textContent = this.value;">
             <span id="radiusValue">2</span>
         </label>
         <label>
@@ -72,6 +72,9 @@
     </div>
     <script type="module">
         import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.176.0/build/three.module.js';
+        // --- Socket.io client setup ---
+        import { io } from 'https://cdn.jsdelivr.net/npm/socket.io-client@4.7.5/dist/socket.io.esm.min.js';
+        window.socket = io();
         let scene, camera, renderer, helixLine, controls, axesGroup;
         let startMarker, endMarker, startLabel, endLabel;
         let placeHereMarker, placeHereLabel;
@@ -173,6 +176,13 @@
             ids.forEach(id => {
                 document.getElementById(id).addEventListener("input", updateHelix);
             });
+            ids.forEach(id => {
+                document.getElementById(id).addEventListener("input", () => {
+                    if (window.socket && window.socket.emit) {
+                        window.socket.emit(id + "_changed", document.getElementById(id).value);
+                    }
+                });
+            });
             // Sync slider and number input for startHeight
             const slider = document.getElementById("startHeightSlider");
             const number = document.getElementById("startHeight");
@@ -194,13 +204,30 @@
             const width = Math.min(window.innerWidth * 0.9, 800);
             const height = 500;
             camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 100);
+            // Camera distance (r) is now a variable for zooming
+            let cameraDistance = 10;
+            let theta = Math.PI/4, phi = Math.PI/6;
+
+            function updateCameraPosition() {
+                camera.position.x = cameraDistance * Math.sin(theta) * Math.cos(phi);
+                camera.position.y = cameraDistance * Math.sin(phi) + 2;
+                camera.position.z = cameraDistance * Math.cos(theta) * Math.cos(phi);
+                camera.lookAt(0, 1, 0);
+
+                // --- Scale labels based on camera distance ---
+                // The base scale is 3 (see createTextSprite), so scale relative to distance
+                const baseScale = 3;
+                const scale = baseScale * (cameraDistance / 10);
+                if (placeHereLabel) placeHereLabel.scale.set(scale, scale / 3, 1);
+                if (droneLabel) droneLabel.scale.set(scale, scale / 3, 1);
+            }
+
             camera.position.set(6, 6, 6);
             camera.lookAt(0, 2, 0);
 
             renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(width, height);
             renderer.setClearColor(0x888888);
-            // Center the canvas in the container
             renderer.domElement.style.display = "block";
             renderer.domElement.style.margin = "0 auto";
             renderer.domElement.style.position = "relative";
@@ -221,7 +248,7 @@
             updateHelix();
 
             // Simple orbit controls
-            let isDragging = false, prevX, prevY, theta = Math.PI/4, phi = Math.PI/6;
+            let isDragging = false, prevX, prevY;
             renderer.domElement.addEventListener('mousedown', e => {
                 isDragging = true; prevX = e.clientX; prevY = e.clientY;
             });
@@ -230,15 +257,22 @@
                 theta -= (e.clientX - prevX) * 0.01;
                 phi -= (e.clientY - prevY) * 0.01;
                 phi = Math.max(-Math.PI/2 + 0.1, Math.min(Math.PI/2 - 0.1, phi));
-                const r = 10;
-                // Z is up, so use y for up/down
-                camera.position.x = r * Math.sin(theta) * Math.cos(phi);
-                camera.position.y = r * Math.sin(phi) + 2;
-                camera.position.z = r * Math.cos(theta) * Math.cos(phi);
-                camera.lookAt(0, 1, 0);
+                updateCameraPosition();
                 prevX = e.clientX; prevY = e.clientY;
             });
             window.addEventListener('mouseup', () => { isDragging = false; });
+
+            // --- Scroll to zoom ---
+            renderer.domElement.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                // Adjust zoom speed as needed
+                cameraDistance += e.deltaY * 0.01;
+                cameraDistance = Math.max(3, Math.min(30, cameraDistance));
+                updateCameraPosition();
+            }, { passive: false });
+
+            // Set initial camera position
+            updateCameraPosition();
 
             addInputListeners();
             animate();
