@@ -409,18 +409,19 @@ class OffboardHelicalFlightNode(Node):
         - self.land (function): Function to initiate landing.
         """
 
-        if self.offboard_arr_counter < self.helix.get_num_steps():
-            self.trajectory_setpoint_publisher.publish(
-                next_state = self.helix.get_state(self.offboard_arr_counter)
-                msg = TrajectorySetpoint()
-                msg.position = [next_state.x, next_state.y, next_state.z]
-                msg.velocity = [next_state.vx, next_state.vy, next_state.vz]
-                msg.acceleration = [next_state.ax, next_state.ay, next_state.az]
-                msg.yaw = next_state.yaw
-                msg.yaw_rate = next_state.yaw_rate
-                msg.timestamp = int(self.get_clock().now().nanoseconds / 1000)
-                self.trajectory_setpoint_publisher.publish(msg)
-            )
+        # if self.offboard_arr_counter < self.helix.get_num_steps():
+        #     self.trajectory_setpoint_publisher.publish(
+        #         next_state = self.helix.get_state(self.offboard_arr_counter),
+        #         msg = TrajectorySetpoint()
+        #     )
+        #     msg.position = [next_state.x, next_state.y, next_state.z]
+        #     msg.velocity = [next_state.vx, next_state.vy, next_state.vz]
+        #     msg.acceleration = [next_state.ax, next_state.ay, next_state.az]
+        #     msg.yaw = next_state.yaw
+        #     msg.yaw_rate = next_state.yaw_rate
+        #     msg.timestamp = int(self.get_clock().now().nanoseconds / 1000)
+        #     self.trajectory_setpoint_publisher.publish(msg)
+        # )
 
         if self.offboard_arr_counter >= len(self.path):
             if not self.scan_ended:
