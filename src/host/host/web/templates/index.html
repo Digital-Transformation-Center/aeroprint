@@ -26,10 +26,316 @@
             margin: 0;
             padding: 0;
         }
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0; top: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background: #181818;
+            border-radius: 24px;
+            box-shadow: 0 0px 32px rgba(0,0,0,0.5);
+            padding: 0;
+            position: relative;
+            max-width: 90vw;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .modal-content iframe {
+            margin: 0;
+            width: 80vw;
+            max-width: 820px;
+            height: 70vh;
+            border-radius: 24px 24px 24px 24px;
+            box-shadow: none;
+            scale: 1;
+        }
+        .close-btn {
+            position: absolute;
+            top: 12px;
+            right: 18px;
+            background: #333;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            font-size: 1.5em;
+            cursor: pointer;
+            z-index: 10;
+            transition: background 0.2s;
+        }
+        .close-btn:hover {
+            background: #555;
+        }
+        .inquiry-btn {
+            position: absolute;
+            top: 12px;
+            left: 18px;
+            background: #333;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            font-size: 1.5em;
+            cursor: pointer;
+            z-index: 10;
+            transition: background 0.2s;
+        }
+        .center-btn {
+            display: flex;
+            justify-content: center;
+            margin-top: 2em;
+        }
+        .flight-setup-btn {
+            background: #1976d2;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 1em 2em;
+            font-size: 1.2em;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(25, 118, 210, 0.15);
+            transition: background 0.2s;
+        }
+        .flight-setup-btn:hover {
+            background: #1565c0;
+        }
+        .notification {
+            display: none;
+            position: fixed;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #323232;
+            color: #fff;
+            padding: 18px 32px;
+            border-radius: 12px;
+            box-shadow: 0 2px 16px #0008;
+            font-size: 1.2em;
+            z-index: 2000;
+            min-width: 200px;
+            text-align: center;
+        }
+        .heartbeat-indicator {
+            position: fixed;
+            bottom: 18px;
+            right: 32px;
+            z-index: 3000;
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+            font-size: 1.1em;
+            font-weight: bold;
+            background: #232323;
+            padding: 8px 18px;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px #0005;
+            color: #fff;
+            min-width: 120px;
+            user-select: none;
+    }
+
+    .flight-controller {
+        position: fixed;
+        bottom: 18px;
+        left: 32px;
+        z-index: 3000;
+        display: flex;
+        align-items: center;
+        gap: 0.5em;
+        font-size: 1.1em;
+        font-weight: bold;
+        /* background: #232323; */
+        padding: 0;
+        border-radius: 16px;
+        /* box-shadow: 0 2px 8px #0005; */
+        color: #fff;
+        min-width: 120px;
+        user-select: none;
+    }
+    .shutdown-btn {
+        margin-left: 18px;
+        background: #e53935;
+        color: #fff;
+        border: none;
+        border-radius: 16px;
+        padding: 8px 18px;
+        font-size: 1.1em;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0 2px 8px #0005;
+        transition: background 0.2s;
+    }
+    .shutdown-btn:hover {
+        background: #b71c1c;
+        }
+        .heartbeat-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #888;
+            display: inline-block;
+            margin-right: 6px;
+            border: 2px solid #222;
+            transition: background 0.3s;
+        }
+        .heartbeat-dot.connected {
+            background: #2ecc40;
+        }
+        .heartbeat-dot.disconnected {
+            background: #e53935;
+        }
+        #draggable {
+      width: 150px;
+      height: 100px;
+      background-color: #4caf50;
+      color: white;
+      text-align: center;
+      line-height: 100px;
+      position: absolute; /* Important for moving */
+      cursor: move;
+      top: 100px;
+      left: 100px;
+      user-select: none;  /* Prevents accidental text selection */
+    }
+        
     </style>
     <title>Document</title>
 </head>
 <body>
-    <iframe src="/widgets/helix" title="Helix Path Visualizer" scrolling="no" aria-placeholder="Helix Path Visualizer"></iframe>
+
+    <div id="draggable">Drag Me</div>
+    <div class="center-btn">
+        <button class="flight-setup-btn" id="openModalBtn">Flight Setup</button>
+    </div>
+    <div class="heartbeat-indicator" id="heartbeatIndicator">
+        <span class="heartbeat-dot disconnected" id="heartbeatDot"></span>
+        <span id="heartbeatText">Disconnected</span>
+        <button class="shutdown-btn" id="shutdownBtn">Shutdown</button>
+    </div>
+    <div class="flight-controller" id="flightController">
+        <label>
+            <input type="range" id="turns" value="2" min="1" step="1" max="10" data-thumb-text="'→'">
+        </label>
+    </div>
+    <!-- Modal Popup -->
+    <div class="modal" id="flightModal">
+        <div class="modal-content">
+            <button class="inquiry-btn" id="modalInquiryBtn" title="Info">?</button>
+            <button class="close-btn" id="closeModalBtn" title="Close">&times;</button>
+            <iframe src="/widgets/flight_config" title="Helix Path Visualizer" scrolling="no" aria-placeholder="Helix Path Visualizer"></iframe>
+        </div>
+    </div>
+    <!-- Notification box -->
+    <div id="notification" class="notification"></div>
+    <script type="module">
+        // Shutdown button logic
+        const shutdownBtn = document.getElementById('shutdownBtn');
+        shutdownBtn.onclick = () => {
+            window.socket.emit('shutdown_test_node');
+        };
+        const openBtn = document.getElementById('openModalBtn');
+        const closeBtn = document.getElementById('closeModalBtn');
+        const modalInfoBtn = document.getElementById('modalInquiryBtn');
+        modalInfoBtn.onclick = () => {
+            alert('Use this visualizer to configure the flight path and object parameters.\n' +
+                  'The blue cylinder is the area in which objects will be digitized. \n' +
+                  'The red line is the flight path of the drone.\n\n' +
+                  '1. Adjust the radius, height, and number of passes using the sliders.\n' +
+                  '2. The vertical slider sets the starting height of the flight path.\n' +
+                  '3. Click "Save" to apply your settings.\n\n' +
+                  'For more information, refer to the documentation.');
+        };
+        const modal = document.getElementById('flightModal');
+        const notif_bg_default = '#323232';
+        openBtn.onclick = () => { modal.classList.add('active'); };
+        closeBtn.onclick = () => { modal.classList.remove('active'); };
+        window.onclick = (e) => {
+            if (e.target === modal) modal.classList.remove('active');
+        };
+        window.onkeydown = (e) => {
+            if (e.key === "Escape") modal.classList.remove('active');
+        };
+
+        import { io } from 'https://cdn.jsdelivr.net/npm/socket.io-client@4.7.5/dist/socket.io.esm.min.js';
+        window.socket = io();
+        // Heartbeat indicator logic
+        const heartbeatDot = document.getElementById('heartbeatDot');
+        const heartbeatText = document.getElementById('heartbeatText');
+        let heartbeatTimeout = null;
+        function setHeartbeatStatus(connected) {
+            if (connected) {
+                heartbeatDot.classList.remove('disconnected');
+                heartbeatDot.classList.add('connected');
+                heartbeatText.textContent = 'Connected';
+            } else {
+                heartbeatDot.classList.remove('connected');
+                heartbeatDot.classList.add('disconnected');
+                heartbeatText.textContent = 'Disconnected';
+            }
+        }
+        window.socket.on('heartbeat', data => {
+            setHeartbeatStatus(data && data.ok);
+            if (heartbeatTimeout) clearTimeout(heartbeatTimeout);
+            // If no heartbeat in 3s, set to disconnected
+            heartbeatTimeout = setTimeout(() => setHeartbeatStatus(false), 3000);
+        });
+        // --- Notification listener ---
+        window.socket.on('notification', data => {
+            const notif = document.getElementById('notification');
+            notif.textContent = data && data.message ? data.message : String(data);
+            let stat = data.warning;
+            if (stat == 'good') {
+                notif.style.backgroundColor = '#2ecc40';
+            } else if (stat == 'bad') {
+                notif.style.backgroundColor = '#e53935';
+            } else {
+                notif.style.backgroundColor = notif_bg_default;
+            }
+            notif.style.display = 'block';
+            notif.style.opacity = '1';
+            // Hide after 3 seconds
+            setTimeout(() => {
+                notif.style.transition = 'opacity 0.5s';
+                notif.style.opacity = '0';
+                setTimeout(() => { notif.style.display = 'none'; notif.style.transition = ''; }, 500);
+            }, 3000);
+        });
+    </script>
+
+    <script>
+    const dragEl = document.getElementById('draggable');
+
+    let offsetX = 0, offsetY = 0, isDragging = false;
+
+    dragEl.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        offsetX = e.clientX - dragEl.offsetLeft;
+        offsetY = e.clientY - dragEl.offsetTop;
+        dragEl.style.zIndex = 1000;  // bring to front
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        dragEl.style.left = (e.clientX - offsetX) + 'px';
+        dragEl.style.top = (e.clientY - offsetY) + 'px';
+    });
+
+    document.addEventListener('mouseup', () => {
+        isDragging = false;
+    });
+    </script>
 </body>
 </html>

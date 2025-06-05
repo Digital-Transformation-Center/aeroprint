@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bouncing Slider</title>
+  <style>
+    body {
+      margin: 40px;
+      font-family: sans-serif;
+    }
+
+    .slider-container {
+      width: 400px;
+      height: 60px;
+      background: #ddd;
+      border-radius: 30px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .slider-knob {
+      min-width: 60px;
+      height: 60px;
+      background: #4caf50;
+    border-radius: 30px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      cursor: grab;
+      user-select: none;
+      transition: left 0.3s ease; /* for bounce-back animation */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.3s ease; /* for bounce-back animation */
+    }
+
+
+    .slider-knob.dragging {
+      transition: none; /* disable animation while dragging */
+      cursor: grabbing;
+    }
+
+    #text_container {
+      color: white;
+      font-size: 14px;
+      text-align: center;
+      pointer-events: none; /* prevent interaction with the text */
+      margin: 12px;
+    }
+
+    .slider-knob-end {
+      background-color: #f44336; /* Red color for the end of the slider */
+    }
+  </style>
+</head>
+<body>
+
+<div class="slider-container">
+  <div id="knob" class="slider-knob"></div>
+</div>
+
+<script>
+  const knob = document.getElementById('knob');
+  const container = document.querySelector('.slider-container');
+
+  let isDragging = false;
+  let startX = 0;
+  let startLeft = 0;
+  let hold = false;
+  const maxRight = container.offsetWidth - knob.offsetWidth;
+
+  knob.addEventListener('mousedown', (e) => {
+    isDragging = true;
+    startX = e.clientX;
+    startLeft = knob.offsetLeft;
+    knob.classList.add('dragging');
+  });
+
+knob.addEventListener('mouseenter', () => {
+    let text_container = document.createElement('span');
+    text_container.id = 'text_container';
+    text_container.textContent = 'Drag me!';
+    text_container.style.opacity = '0';
+    text_container.style.transition = 'opacity 0.3s ease';
+    knob.appendChild(text_container);
+    // Force reflow to ensure the transition applies
+    void text_container.offsetWidth;
+    text_container.style.opacity = '1';
+});
+
+    knob.addEventListener('mouseleave', () => {
+        knob.removeChild(document.getElementById('text_container'));
+    });
+
+  document.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+
+    const dx = e.clientX - startX;
+    let newLeft = startLeft + dx;
+
+    // Clamp between 0 and maxRight
+    
+    newLeft = Math.max(0, Math.min(maxRight, newLeft));
+    if (newLeft >= maxRight) {
+        hold = true; // Set hold to true when at the end
+        knob.classList.add('slider-knob-end');
+        text_container = document.getElementById('text_container');
+        if (text_container) {
+            text_container.textContent = 'Hold to reset';
+        } else {
+            text_container = document.createElement('span');
+            text_container.id = 'text_container';
+            text_container.textContent = 'Hold to reset';
+            text_container.style.opacity = '1';
+            knob.appendChild(text_container);
+        }
+    } else {
+        hold = false; // Reset hold when not at the end
+        knob.classList.remove('slider-knob-end');
+    }
+    knob.style.left = newLeft + 'px';
+  });
+
+  document.addEventListener('mouseup', () => {
+    if (!isDragging) return;
+    if (!hold) {
+        reset_knob();
+    }
+    isDragging = false;
+  });
+
+  function reset_knob() {
+    isDragging = false;
+    knob.style.left = '0px';
+    knob.classList.remove('slider-knob-end');
+    knob.classList.remove('dragging');
+  }
+
+  
+</script>
+
+</body>
+</html>

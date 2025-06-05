@@ -30,6 +30,10 @@ setup(
         #     os.path.join("share", package_name, "web", "static"),
         #     glob(os.path.join("host", "web", "static", "*")),
         # ),
+        (
+            os.path.join("share", package_name, "web", "static", "flight_config"),
+            glob(os.path.join("host", "web", "static", "flight_config", "*")),
+        ),
     ],
     install_requires=["setuptools"],
     zip_safe=True,
@@ -40,7 +44,7 @@ setup(
     # tests_require=["pytest"],
     entry_points={
         "console_scripts": [
-            "test_node = host.test_node:main",
+            # "test_node = host.test_node:main",
             "test_sub = host.test_sub:main",
             "pc_processor = host.pc_processor:main",
             "gui = host.aeroprint_gui:main",
@@ -48,10 +52,15 @@ setup(
             "pc-post-processor = host.pc_post_processor:main", 
             "mesher = host.mesher:main",
             "legacy_gui = host.legacy_aeroprint_gui:main",
-            "flask_server_node = host.web.flask_server_node:main",
+            "flask-server-node = host.web.flask_server_node:main",
+            "test-node = host.web.test_node:main",
         ],
     },
     package_data={
-        'host': ['host/web/templates/*.html', 'host/web/static/*.css'],
+        'host': [
+        'web/templates/*.html',
+        'web/templates/widgets/*.html',
+        'web/static/flight_config/*',
+]
     }
 )

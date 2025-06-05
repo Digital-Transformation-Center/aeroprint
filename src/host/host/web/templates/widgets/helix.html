@@ -9,7 +9,10 @@
             display: flex; flex-direction: column; align-items: center;
             justify-content: center; height: 100vh; margin: 0; padding: 0;
         }
-        #controls { margin-bottom: 1em; }
+        #controls { 
+            margin-bottom: 1em; 
+            padding: 1em;
+        }
         label { margin-right: 1em; }
         canvas { display: block; margin: 0 auto; background: #111; }
         #container {
@@ -70,6 +73,11 @@
         </div>
         <div id="container" class="visualizer"></div>
     </div>
+    <div id="save-button-container" style="position: absolute; bottom: 10px; right: 10px;">
+        <button id="save-button" style="padding: 10px 20px; font-size: 16px;">Save</button>
+    </div>
+    <!-- Notification box -->
+    <div id="notification" style="display:none;position:fixed;top:30px;left:50%;transform:translateX(-50%);background:#323232;color:#fff;padding:18px 32px;border-radius:12px;box-shadow:0 2px 16px #0008;font-size:1.2em;z-index:2000;min-width:200px;text-align:center;"></div>
     <script type="module">
         import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.176.0/build/three.module.js';
         // --- Socket.io client setup ---
@@ -194,6 +202,15 @@
                 slider.value = number.value;
                 updateHelix();
             });
+
+            // Add listener for the Save button
+            document.getElementById("save-button").addEventListener("click", () => {
+                if (window.socket && window.socket.emit) {
+                    // Emit the current helix parameters
+                    const params = getHelixParameters();
+                    window.socket.emit('save_helix', params);
+                }
+            });
         }
 
         function init() {
@@ -278,11 +295,20 @@
             animate();
         }
 
+        function getHelixParameters() {
+            return {
+                radius: parseFloat(document.getElementById('radius').value),
+                pitch: parseFloat(document.getElementById('pitch').value),
+                turns: parseInt(document.getElementById('turns').value),
+                startHeight: parseFloat(document.getElementById('startHeight').value)
+            };
+        }
+
         function updateHelix() {
             const radius = parseFloat(document.getElementById('radius').value);
             const pitch = parseFloat(document.getElementById('pitch').value) / parseInt(document.getElementById('turns').value);
             const turns = parseInt(document.getElementById('turns').value);
-            const points = 300;
+            const points = 300; // Number of segments
             const startHeight = parseFloat(document.getElementById('startHeight').value);
 
             if (helixLine) scene.remove(helixLine);

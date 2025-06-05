@@ -1,0 +1,61 @@
+body { 
+    font-family: sans-serif; background: #222; color: #eee; 
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; height: 100vh; margin: 0; padding: 0;
+}
+#controls { 
+    margin-bottom: 1em; 
+    padding: 1em;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1em;
+}
+label { margin-right: 1em; }
+canvas { display: block; margin: 0 auto; background: #111; }
+#container {
+    max-width: 800px;
+    height: 500px;
+    overflow: hidden;            
+}
+input[type="number"] {
+    transform: translateX(40%);
+}
+.save-button {
+    background: #1976d2;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 0.5em 1em;
+    font-size: 1.2em;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(25, 118, 210, 0.15);
+    transition: background 0.2s;
+}
+.save-button:hover {
+    background: #1565c0;
+}
+.decimal-input {
+    border: 2px solid #1976d2;
+    /* color: #fff; */
+    border-radius: 8px;
+    padding: 0.5em 1em;
+    font-size: 1em;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(25, 118, 210, 0.15);
+    transition: background 0.2s;
+    z-index: 1;
+}
+.decimal-input:hover {
+    border-color: #1565c0;
+}
+label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0.5em 0.5em;
+    border: 2px solid #1976d2;
+    border-radius: 8px;
+}

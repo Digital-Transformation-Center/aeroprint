@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flight Path & Object Config</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='flight_config/style.css') }}">
+</head>
+<body>
+    <!-- Controls and layout -->
+    <div id="controls">
+        <label>
+            Radius:
+            <input type="range" id="radius" value="2" min="0.2" step="0.2" max="3">
+            <span id="radiusValue">2</span>
+        </label>
+        <label>
+            Height:
+            <input type="range" id="height" value="2" min="0.1" step="0.1" max="5">
+            <span id="heightValue">2</span>
+        </label>
+        <label>
+            Passes:
+            <input type="range" id="turns" value="2" min="1" step="1" max="10">
+            <span id="turnsValue">2</span>
+        </label>
+        <br>
+    </div>
+    <div style="display: flex; flex-direction: row; align-items: flex-start;">
+        <!-- Vertical slider for Starting Height -->
+        <div style="display: flex; flex-direction: column; align-items: center; margin-right: 1em;">
+            <input
+                type="range"
+                id="startHeightSlider"
+                min="0"
+                max="5"
+                step="0.1"
+                value="0"
+                style="writing-mode: bt-lr; -webkit-appearance: slider-vertical; width: 32px; height: 400px; margin-bottom: 0.5em;"
+            >
+            <input
+                class="decimal-input"
+                type="number"
+                id="startHeight"
+                value="0"
+                min="0"
+                max="5"
+                step="0.01"
+            >
+        </div>
+        <div id="container" class="visualizer"></div>
+    </div>
+    <div id="save-button-container" style="position: absolute; bottom: 10px; right: 10px;">
+        <button id="save-button" class="save-button">Save</button>
+    </div>
+    <div id="notification" style="display:none;position:fixed;top:30px;left:50%;transform:translateX(-50%);background:#323232;color:#fff;padding:18px 32px;border-radius:12px;box-shadow:0 2px 16px #0008;font-size:1.2em;z-index:2000;min-width:200px;text-align:center;"></div>
+    <script type="module" src="{{ url_for('static', filename='flight_config/main.js') }}"></script>
+</body>
+</html>
