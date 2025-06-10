@@ -247,6 +247,9 @@
     .slider-knob.active {
       background: #f44336;
     }
+    .slider-knob.warn {
+      background: #9c841a;
+    }
     .slider-knob .knob-text {
       display: flex;
       align-items: center;
@@ -284,6 +287,10 @@
     .slider-knob.active:hover .knob-text,
     .slider-knob.active:focus .knob-text {
       transform: translateX(22px);
+    }
+    .slider-knob.warn:hover .knob-text,
+    .slider-knob.warn:focus .knob-text {
+      transform: translateX(0);
     }
     .slider-label {
       position: absolute;
@@ -409,6 +416,7 @@
         
     const slider = document.getElementById('flightSlider');
     const knob = document.getElementById('sliderKnob');
+    knob.classList.add('warn');
     const knobText = knob.querySelector('.knob-text');
     const arrow = document.getElementById('sliderArrow');
 
@@ -417,6 +425,7 @@
             <path d="M5 12h14M13 6l6 6-6 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         `;
+    // arrow.innerHTML = '';
     const knobWidth = 96;
     const sliderWidth = 320;
     const minLeft = 4;
@@ -425,15 +434,19 @@
     let startX = 0;
     let knobStartLeft = 0;
     let startCondition = false; // false = not started, true = started
+    let knob_status = 1;
 
     // import { io } from 'https://cdn.jsdelivr.net/npm/socket.io-client@4.7.5/dist/socket.io.esm.min.js';
     // window.socket = io();
 
+
     function setKnobState() {
-      if (!startCondition) {
+      set_knob_appearance();
+      if (!startCondition && knob_status == 0) {
         land_flight();
-        knob.querySelector('.knob-text').textContent = 'Start';
-        knob.classList.remove('active');
+        // let content = knob_status == 0 ? 'Start' : 'Not Ready';
+        // knob.querySelector('.knob-text').textContent = content;
+        // knob.classList.remove('active');
         // Right arrow SVG
         arrow.innerHTML = `
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -442,7 +455,7 @@
         `;
         arrow.style.left = '';
         arrow.style.right = '12px';
-      } else {
+      } else if (knob_status == 0) {
         start_flight();
         knob.querySelector('.knob-text').textContent = 'Flying';
         knob.classList.add('active');
@@ -454,6 +467,28 @@
         `;
         arrow.style.right = '';
         arrow.style.left = '12px';
+      }
+    }
+
+    function set_knob_appearance() {
+      if (startCondition) {
+        knob.classList.add('active');
+        knob.querySelector('.knob-text').textContent = 'Flying';
+        knob.classList.remove('warn');
+        knob.classList.add('active');
+        arrow.style.left = '12px';
+        arrow.style.right = '';
+      } else {
+        knob.classList.remove('active');
+        if (knob_status == 0) {
+          knob.querySelector('.knob-text').textContent = 'Start';
+          knob.classList.remove('warn');
+        } else {
+          knob.querySelector('.knob-text').textContent = 'Warn';
+          knob.classList.add('warn');
+        }
+        arrow.style.left = '';
+        arrow.style.right = '12px';
       }
     }
 
@@ -511,7 +546,12 @@
       if (!dragging) return;
       dragging = false;
       const left = parseInt(knob.style.left, 10) || minLeft;
-      if (!startCondition) {
+      if (knob_status == 1) {
+          startCondition = false;
+          setKnobState();
+          setKnobPosition(minLeft);
+      }
+      else if (!startCondition) {
         if (left > maxLeft - 10) {
           // Dragged all the way right: activate start
           startCondition = true;
@@ -527,7 +567,7 @@
           startCondition = false;
           setKnobState();
           setKnobPosition(minLeft);
-        } else {
+        } else{
           // Not far enough: bounce back right
           setKnobPosition(maxLeft);
         }
@@ -543,12 +583,20 @@
 
     // On hover, show correct arrow
     knob.addEventListener('mouseenter', () => {
+      if (knob_status == 1) {
+        arrow.style.opacity = '0';
+      } else {
+        arrow.style.opacity = '1';
+      }
+      
         if (knob.classList.contains('active')) {
-            knob.querySelector('.knob-text').textContent = 'Land';
+            // knob.querySelector('.knob-text').textContent = 'Land';
+            set_knob_appearance();
         } else {
-            knob.querySelector('.knob-text').textContent = 'Start';
+            // knob.querySelector('.knob-text').textContent = 'Start';
+
+            set_knob_appearance();
         }
-      arrow.style.opacity = '1';
     });
     knob.addEventListener('mouseleave', () => {
         if (knob.classList.contains('active')) {
@@ -556,6 +604,35 @@
         }
       arrow.style.opacity = '0';
     });
+
+    window.socket.on('flight_status', data => {
+      if (data) {
+        if (data.status === 'idle') {
+          console.log('Flight idle received');
+          knob_status = 1; // Set to idle state
+          reset_knob();
+        } else if (data.status === 'param_receive') {
+          console.log('Flight parameters received by server');
+          knob_status = 0; // Set to safe state
+          reset_knob();
+        }
+      }
+    });
+
+    function reset_knob() {
+      knob.querySelector('.knob-text').textContent = 'Start';
+      knob.classList.remove('active');
+      // Right arrow SVG
+      arrow.innerHTML = `
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M5 12h14M13 6l6 6-6 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      `;
+      arrow.style.left = '';
+      arrow.style.right = '12px';
+      startCondition = false;
+      setKnobPosition(minLeft);
+   }
 
     // Initialize
     setKnobState();

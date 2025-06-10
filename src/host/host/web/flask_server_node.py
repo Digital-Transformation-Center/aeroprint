@@ -84,7 +84,7 @@ class FlaskWebApp:
             self.emit_notification("Failed to Load Flight Parameters", warning='bad')
 
     def emit_status(self, status):
-        self.socketio.emit('server_status', {'status': status})
+        self.socketio.emit('flight_status', {'status': status})
 
     def emit_notification(self, message, warning='good'):
         self.socketio.emit('notification', {'message': message, 'warning': warning})
@@ -108,6 +108,10 @@ class FlaskServerNode(Node):
 
         self.start_flight_publisher = self.create_publisher(
             std_msgs.msg.Bool, 'start_flight', 10
+        )
+
+        self.status_subscriber = self.create_subscription(
+            std_msgs.msg.Int8, '/state', self.drone_status_callback, 10
         )
 
         self.flask_status_callback = None
@@ -180,11 +184,22 @@ class FlaskServerNode(Node):
 
 
     def drone_status_callback(self, msg):
-        if self.flask_status_callback:
-            self.flask_status_callback(msg.data)
-            self.get_logger().info("Calling flask callback.")
-        else:
-            self.get_logger().info("Status callback not attached.")
+        self.get_logger().info(f"Drone status received: {msg.data}")
+        status = msg.data
+        if status == 0:
+            self.get_logger().info("Drone is idle.")
+            if hasattr(self, 'flask_web_app'):
+                self.flask_web_app.emit_status('idle')
+        elif status == 1:
+            self.get_logger().info("Drone received flight parameters.")
+            if hasattr(self, 'flask_web_app'):
+                self.flask_web_app.emit_status('param_receive')
+
+        # if self.flask_status_callback:
+        #     self.flask_status_callback(msg.data)
+        #     self.get_logger().info("Calling flask callback.")
+        # else:
+        #     self.get_logger().info("Status callback not attached.")
 
     def attach_status_callback(self, fn):
         self.flask_status_callback = fn

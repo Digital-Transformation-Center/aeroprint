@@ -11,6 +11,8 @@ class Helix(Path):
         self.helix_param_p = helix_num_passes
         self.helix_param_g = helix_height / helix_num_passes
         self.helix_param_sh = helix_start_height
+        if self.helix_param_sh < 0.1:
+            self.helix_param_sh = 0.1  # Ensure starting height is not too low
         self.helix_param_rate = helix_rate
 
         self.helix_starting_position = Position(0, 0, self.helix_param_sh + self.helix_param_h)  # Starting position of the helix

@@ -13,7 +13,7 @@ from rclpy.node import Node
 from rclpy.duration import Duration
 from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy
 from math import pi
-from std_msgs.msg import Bool, Float32MultiArray
+from std_msgs.msg import Bool, Float32MultiArray, Int8
 from starling.flightdefs.helix import Helix
 
 from px4_msgs.msg import (
@@ -58,6 +58,10 @@ class HeartbeatNode(Node):
         # Create publisher for TrajectorySetpoint
         self.trajectory_setpoint_publisher = self.create_publisher(
             TrajectorySetpoint, "/fmu/in/trajectory_setpoint", qos_profile
+        )
+
+        self.state_publisher = self.create_publisher(
+            Int8, "/state", 10
         )
 
         self.start_flight_subscriber = self.create_subscription(
@@ -164,6 +168,9 @@ class HeartbeatNode(Node):
         self.steps = self.path.get_num_steps()
         self.hit_figure_8 = False
         self.offboard_arr_counter = 0
+        msg = Int8()
+        msg.data = 1  # Indicating parameters received
+        self.state_publisher.publish(msg)
 
     def start_flight(self, msg: Bool) -> None:
         """Callback function to start the flight sequence."""
@@ -267,6 +274,9 @@ class HeartbeatNode(Node):
             self.figure8_timer.cancel()
             self._land_vehicle()
             self.current_system_state = "DISARMED_IDLE"
+            msg = Int8()
+            msg.data = 0  # Indicating disarmed state
+            self.state_publisher.publish(msg)
             self.get_logger().info("Vehicle land command sent.")
             self.get_logger().info("Arm/disarm sequence complete. Stopping active control commands.")
             # self.destroy_node()
