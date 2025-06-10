@@ -4,7 +4,7 @@ from rclpy.node import Node
 from threading import Thread
 from flask import Flask, render_template
 import std_msgs.msg
-from std_msgs.msg import String
+from std_msgs.msg import String, Float32MultiArray
 import json
 
 from flask_socketio import SocketIO
@@ -57,7 +57,7 @@ class FlaskWebApp:
         @self.socketio.on('shutdown_test_node')
         def handle_shutdown_test_node():
             self.node.shutdown_test_node()
-            self.emit_notification('Shutdown signal sent to test_node.', warning='bad')
+            self.emit_notification('Shutdown signal sent to Test Node.', warning='bad')
 
         @self.socketio.on('save_flight_config')
         def handle_save_flight_config(data):
@@ -65,6 +65,16 @@ class FlaskWebApp:
             print(f"save_flight_config event received with data: {data}")
             self.node.get_logger().info(f'Saving flight config data: {data}')
             self.emit_status('flight_config_saved')
+
+        @self.socketio.on('start_flight')
+        def handle_start_flight():
+            self.node.start_flight()
+            self.emit_notification('Stand clear. Flight starting.', warning='good')
+
+        @self.socketio.on('land_flight')
+        def handle_land_flight():
+            self.node.get_logger().info('Landing flight.')
+            self.node.request_land_flight()
 
     def status_callback(self, data):
         self.emit_notification('ROS Callback functions.')
@@ -93,8 +103,13 @@ class FlaskServerNode(Node):
             std_msgs.msg.Int8, 'drone_status', self.drone_status_callback, 10
         )
         self.param_publisher = self.create_publisher(
-            std_msgs.msg.String, 'helix_params', 10 
+            Float32MultiArray, 'helix_params', 10 
         )
+
+        self.start_flight_publisher = self.create_publisher(
+            std_msgs.msg.Bool, 'start_flight', 10
+        )
+
         self.flask_status_callback = None
 
         # Heartbeat subscriber
@@ -146,8 +161,21 @@ class FlaskServerNode(Node):
         self.radius_publisher.publish(msg)
 
     def publish_params(self, data):
-        msg = String()
-        msg.data = json.dumps(data)
+        self.get_logger().info("Web Node received parameters.")
+        radius = data['radius']
+        height = data['height']
+        turns = data['turns']
+        start_height = data['startHeight']
+        self.get_logger().info(f"Received radius: {radius}")
+
+        print(f"Radius: {data['radius']}")
+        # radius: flight_path_radius,
+        # height: flight_path_height,
+        # turns: flight_path_turns,
+        # startHeight: flight_path_start_height,
+        msg = Float32MultiArray()
+        msg.data = [float(radius), float(height), float(turns), float(start_height)]
+
         self.param_publisher.publish(msg)
 
 
@@ -160,6 +188,19 @@ class FlaskServerNode(Node):
 
     def attach_status_callback(self, fn):
         self.flask_status_callback = fn
+
+    def start_flight(self):
+        msg = std_msgs.msg.Bool()
+        msg.data = True
+        self.start_flight_publisher.publish(msg)
+        self.get_logger().info('Flight started.')
+
+    def request_land_flight(self):
+        msg = std_msgs.msg.Bool()
+        msg.data = False
+        self.start_flight_publisher.publish(msg)
+        self.get_logger().info('Landing flight requested.')
+
 
 def run_flask(flask_app):
     flask_app.run()

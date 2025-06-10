@@ -39,6 +39,9 @@ WORKDIR /home/$USERNAME
 COPY --chown=aeroprint_user:aeroprint_user entrypoint.sh /home/$USERNAME/entrypoint.sh
 RUN chmod +x /home/$USERNAME/entrypoint.sh
 
+# RUN echo "source /opt/ros/$ROS_DISTRO/setup.bash" >> /home/$USERNAME/.bashrc && \
+#     echo "source /opt/px4_msgs/setup.bash" >> /home/$USERNAME/.bashrc
+
 # COPY --chown=$USERNAME:$USERNAME ./px4_msgs/px4_msgs_install/ ./install/
 # COPY --chown=$USERNAME:$USERNAME ./px4_msgs/px4_msgs_build/ ./build/
 
