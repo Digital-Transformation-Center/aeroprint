@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
-TODO: info
+flightnode.py: Framework for PX4 offboard control, including arm, wait, and disarm sequence.
+UDRI DTC AEROPRINT
 """
 __author__ = "Ryan Kuederle"
 __email__ = "ryan.kuederle@udri.udayton.edu"
@@ -10,11 +11,12 @@ __status__ = "Development"
 import rclpy
 from rclpy.node import Node
 from rclpy.duration import Duration
-from std_srvs.srv import Trigger
 from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy
 from math import pi
-from flight_controller.flightdefs.path import Path
-# from flight_controller.helix import Helix
+from std_msgs.msg import Bool, Int8
+from starling.flightdefs.helix import Helix
+from starling.flightdefs.path import Path
+import starling.flightdefs.flight_status_codes as flight_status_codes
 
 from px4_msgs.msg import (
     OffboardControlMode,
@@ -24,16 +26,20 @@ from px4_msgs.msg import (
     TrajectorySetpoint,
 )
 
-import math # Required for math.radians if used for yaw, though 0.0 is fine.
+import math # Required for math.radians.
 
 
 class FlightNode(Node):
     """Node for PX4 offboard control, including arm, wait, and disarm sequence."""
 
-    def __init__(self, node_name="flight_node") -> None:
-        super().__init__(node_name)
+    def __init__(self, name="flight_node") -> None:
+        super().__init__(name)
+
         self.get_logger().info("Flight Node Alive!")
 
+        # Configure QoS profile for publishing
+        # For control messages, RELIABLE might be preferred, but BEST_EFFORT is used
+        # in the reference helical_flight_node.py for PX4 publishers.
         qos_profile = QoSProfile(
             reliability=ReliabilityPolicy.BEST_EFFORT,
             durability=DurabilityPolicy.TRANSIENT_LOCAL,  # To allow late subscribers to get the last message
@@ -56,6 +62,11 @@ class FlightNode(Node):
             TrajectorySetpoint, "/fmu/in/trajectory_setpoint", qos_profile
         )
 
+
+        self.state_publisher = self.create_publisher(
+            Int8, "/fcu/out/status", 10
+        )
+
         self.vehicle_odometry_subscriber = self.create_subscription(
             VehicleOdometry,
             "/fmu/out/vehicle_odometry",
@@ -65,22 +76,18 @@ class FlightNode(Node):
 
         # Timer for the main control loop (e.g., every 0.1 seconds = 10Hz)
         # PX4 typically requires OffboardControlMode messages at >2Hz.
-        # self.control_timer_period = 0.1  # seconds
-        # self.control_timer = self.create_timer(
-        #     self.control_timer_period, self._control_loop_callback
-        # )
-        self.control_timer = None
+        self.control_timer_period = 0.1  # seconds
 
         # State variables for the arm/disarm sequence
-        self.current_system_state = "DISARMED_IDLE"  # States: INIT, OFFBOARD_ENGAGING, ARMED, DISARMED_IDLE
+        self.current_system_state = "INIT"  # States: INIT, OFFBOARD_ENGAGING, ARMED, DISARMED_IDLE
         self.offboard_mode_set_time = None
         self.armed_time = None
         self.initial_heartbeat_count = 0
+        # Delay start to allow the vehicle to stabilize
         self.init_heartbeat_hold_time = 5.0  # seconds
-        self.init_takeoff_hold_time = 15.0
+        self.init_takeoff_hold_time = 10.0
 
-        self.hold_yaw = 0  # radians
-
+        # Homing variables
         self.home_position = [0.0, 0.0, 0.0]
         self.home_yaw = 0.0  # radians
         self.current_vehicle_position = [0.0, 0.0, 0.0]
@@ -88,46 +95,48 @@ class FlightNode(Node):
         self.current_vehicle_position_timestamp = None
         self.did_update_home_position = False
         self.home_position_update_time = None
+        self.hold_yaw = 0.0  # radians, yaw to hold during takeoff and landing
 
-        self.flight_duration = 10000.0  # seconds
         self.flight_start_time = None
 
         self.rate = 20  # Hz, rate of the helix path
-        
-        self.hit_path = False
-        self.offboard_arr_counter = 0
 
-        self.start_flight_service = self.create_service(
-            Trigger,
-            "/start_flight",
-            self.start_flight_callback,
-            qos_profile=qos_profile
-        )
+    def init_heartbeat(self, period: float = 0.5):
+        self.heartbeat_manager = ServerHeartBeatManager(node = self, acceptable_loss = period)
 
-        self.get_logger().info(
-            f"Control loop running."
-        )
-
-    def start_flight_callback(self, request: Trigger.Request, response: Trigger.Response) -> Trigger.Response:
-        if self.current_system_state == "INIT":
-            self.get_logger().info("Received start_flight command. Beginning flight sequence.")
-            # PX4 typically requires OffboardControlMode messages at >2Hz.
-            self.control_timer_period = 0.1  # seconds
-            self.control_timer = self.create_timer(self.control_timer_period, self._control_loop_callback)
-            response.success = True
-        else:
-            response.success = False
-            response.message = f"Flight sequence already started or in state: {self.current_system_state}"
-        return response
-    
-    def set_path(self, path: Path):
-        self.path = path
+    def update_path(self, new_path: Path):
+        """Update the system path with a new path object"""
+        self.path = new_path
         self.start_position = self.path.get_starting_position(invert_axis='z')
         self.end_position = self.path.get_ending_position(invert_axis='z')
         self.steps = self.path.get_num_steps()
+        self.hit_flight = False
         self.offboard_arr_counter = 0
-        self.current_system_state = "INIT"
+        self.publish_status(flight_status_codes.FLIGHT_PATH_LOADED)
 
+    def publish_status(self, status_code: int) -> None:
+        """Publish the current flight status code."""
+        msg = Int8()
+        msg.data = status_code
+        self.state_publisher.publish(msg)
+
+    def start_flight(self, msg: Bool) -> None:
+        """Callback function to start the flight sequence."""
+        self.hit_flight = False
+        if msg.data:
+            if hasattr(self, "control_timer") and self.control_timer is not None:
+                self.control_timer.cancel()
+            self.get_logger().info("Start flight command received.")
+            self.current_system_state = "INIT"
+            if self.current_system_state == "INIT":
+                self.initial_heartbeat_count = 0
+                self.control_timer = self.create_timer(
+                self.control_timer_period, self._control_loop_callback
+        ) 
+        else:
+            self.get_logger().info("Entering landing sequence.")
+            self.current_system_state = "LANDING"
+                
     def offboard_move_callback(self):
         if self.offboard_arr_counter < self.steps:
             state = self.path.get_state(self.offboard_arr_counter)
@@ -146,10 +155,11 @@ class FlightNode(Node):
                 self.hold_yaw, velocity=[0.0, 0.0, 0.0], acceleration=[0.0, 0.0, 0.0], yawspeed=0.0
             )
 
-        if self.offboard_arr_counter == self.steps + 100:
+        # We will hold position so the drone can settle, then land
+        if self.offboard_arr_counter == self.steps + 50:
+            self.figure8_timer.cancel()
             self.current_system_state = "LANDING"
-            self.get_logger().info("Path completed, landing now.")
-            self.path_timer.cancel()
+            self.get_logger().info("Figure path completed, landing now.")
 
         self.offboard_arr_counter += 1
 
@@ -185,6 +195,7 @@ class FlightNode(Node):
             else:
                 try:
                     self._publish_trajectory_setpoint([self.start_position.x, self.start_position.y, self.start_position.z], self.hold_yaw)
+                    self.publish_status(flight_status_codes.FLIGHT_ARMED)
                 except AssertionError as e:
                     self.get_logger().error(f"Error publishing trajectory setpoint: {e}")
                     self.current_system_state = "DISARMED_IDLE"
@@ -194,27 +205,42 @@ class FlightNode(Node):
                     return
 
         elif self.current_system_state == "FLIGHT_ENGAGED":
-            # This state is not used in the current sequence, but could be used for flight control.
-            # For example, to maintain position or send other commands.
-            if self.get_clock().now() - self.flight_start_time < Duration(seconds=self.flight_duration):
-                if not self.hit_path:
-                    self.get_logger().info("Flying path now.")
-                    self.path_timer = self.create_timer(
-                        1 / self.rate, self.offboard_move_callback
-                    )
-                    self.hit_path = True                
+            # Only create the timer if it doesn't already exist
+            if not self.hit_flight:
+                self.publish_status(flight_status_codes.FLIGHT_ENGAGED)
+                self.figure8_timer = self.create_timer(
+                    1 / self.rate, self.offboard_move_callback
+                )
+                self.hit_flight = True
+                    
 
         elif self.current_system_state == "LANDING":
+            if self.hit_flight:
+                self.publish_status(flight_status_codes.FLIGHT_LANDING)
+                self.figure8_timer.cancel()
+                self.hit_flight = False
+                self.land_counter = 0
+            
             self._land_vehicle()
-            self.current_system_state = "DISARMED_IDLE"
-            self.get_logger().info("Vehicle land command sent.")
-            self.get_logger().info("Arm/disarm sequence complete. Stopping active control commands.")
-            self.path_timer.cancel() if self.path_timer else None
+
+            if self.land_counter > 50:  # Wait for 5 seconds at 10Hz
+                self.current_system_state = "DISARMED_IDLE"
+
+            self.land_counter += 1
+            # msg = Int8()
+            # msg.data = 0  # Indicating disarmed state
+            # self.state_publisher.publish(msg)
+            # self.get_logger().info("Vehicle land command sent.")
+            # # self.destroy_node()
+
 
         elif self.current_system_state == "DISARMED_IDLE":
+            self.publish_status(flight_status_codes.FLIGHT_DISARMED)
+            if hasattr(self, "control_timer") and self.control_timer is not None:
+                self.control_timer.cancel()
+                self.hit_flight = False
             # The control_timer should have been cancelled.
             # If not, something is wrong or it was restarted.
-            pass
 
     def _publish_offboard_control_heartbeat(self) -> None:
         """Publish the offboard control mode signal (heartbeat)."""
@@ -229,38 +255,41 @@ class FlightNode(Node):
         self.offboard_control_mode_publisher.publish(msg)
 
     def _publish_trajectory_setpoint(self, position: list, yaw: float, velocity: list = None, acceleration: list = None, yawspeed: float = None) -> None:
-        """Publish the trajectory setpoint, rotating velocity/acceleration to home yaw frame."""
+        """Publish the trajectory setpoint, adjusting position, acceleration, and yaw based on home position and yaw."""
         msg = TrajectorySetpoint()
-        # Adjust position relative to home position
-        # self.get_logger().info(f"Publishing TrajectorySetpoint at position: {position}, yaw: {yaw}")
-        position = [p + h for p, h in zip(position, self.home_position)]
-        # self.get_logger().info(f"Publishing TrajectorySetpoint at position: {position}, yaw: {yaw}")
-        
-        msg.yaw = float(yaw) + self.home_yaw  # Adjust yaw relative to home yaw
 
+        # Helper to rotate a vector by a given yaw (radians)
         def rotate_vector(vec, yaw):
-            # Only rotate x/y, leave z unchanged
             if vec is None:
                 return None
             if len(vec) != 3:
                 raise ValueError("Vector must be length 3")
-            cos_yaw = math.cos(self.home_yaw)
-            sin_yaw = math.sin(self.home_yaw)
+            cos_yaw = math.cos(yaw)
+            sin_yaw = math.sin(yaw)
             x, y, z = vec
             x_r = x * cos_yaw - y * sin_yaw
             y_r = x * sin_yaw + y * cos_yaw
             return [float(x_r), float(y_r), float(z)]
-        
-        msg.position = rotate_vector([float(p) for p in position], self.home_yaw)  # Ensure float values
 
-        if velocity is not None:
-            rotated_velocity = rotate_vector(velocity, self.home_yaw)
-            msg.velocity = rotated_velocity
+        # Adjust position: rotate by home_yaw, then translate by home_position
+        rotated_position = rotate_vector([float(p) for p in position], self.home_yaw)
+        msg.position = [rotated_position[i] + float(self.home_position[i]) for i in range(3)]
+
+        # Adjust acceleration: rotate by home_yaw
         if acceleration is not None:
-            rotated_acceleration = rotate_vector(acceleration, self.home_yaw)
-            msg.acceleration = rotated_acceleration
+            msg.acceleration = rotate_vector(acceleration, self.home_yaw)
+
+        # Adjust velocity: rotate by home_yaw
+        if velocity is not None:
+            msg.velocity = rotate_vector(velocity, self.home_yaw)
+
+        # Adjust yaw: add home_yaw
+        msg.yaw = float(yaw) + self.home_yaw
+
+        # Adjust yawspeed: no change needed (already in body frame)
         if yawspeed is not None:
             msg.yawspeed = float(yawspeed)
+
         msg.timestamp = int(self.get_clock().now().nanoseconds / 1000)
         self.trajectory_setpoint_publisher.publish(msg)
 
@@ -272,17 +301,12 @@ class FlightNode(Node):
 
     def vehicle_odometry_callback(self, msg: VehicleOdometry) -> None:
         """Callback function for vehicle_odometry topic subscriber."""
-        # self.get_logger().info("Received Vehicle Odometry data.")
         self.current_vehicle_position = msg.position
         w, x, y, z = msg.q
         self.current_vehicle_yaw = self.get_yaw_from_quaternion(w, x, y, z)
         self.current_vehicle_position_timestamp = self.get_clock().now()
-        # self.get_logger().debug("Received Vehicle Odometry data.")
         self.did_update_vehicle_position = True
-
-        # self.get_logger().info(f"Vehicle Position Z: {vehicle_position_z:.2f}m")
         
-
     def _publish_vehicle_command(self, command: int, **params) -> None:
         """Publish a vehicle command."""
         msg = VehicleCommand()
@@ -330,13 +354,17 @@ class FlightNode(Node):
 
     def _update_home_position(self) -> None:
         if self.current_vehicle_position_timestamp is None:
-            self.get_logger().warn("Current vehicle position not available, cannot update home position.")
+            self.get_logger().info("Current vehicle position not available, cannot update home position.")
             return
         elif self.get_clock().now() - self.current_vehicle_position_timestamp < Duration(seconds=0.1):
             self.home_position = self.current_vehicle_position.copy()
             self.home_yaw = self.current_vehicle_yaw
             self.get_logger().info(f"Home position updated: {self.home_position}")
+            self.get_logger().info(f"Home yaw updated: {self.home_yaw} radians")
             return
+        else:
+            self.get_logger().warn("Current vehicle position is too old, not updating home position.")
+            self._update_home_position()
         
     def destroy_node(self):
         self.get_logger().info("Shutting down Heartbeat Node.")
@@ -348,20 +376,79 @@ class FlightNode(Node):
         cosy_cosp = 1.0 - 2.0 * (y * y + z * z)
         yaw = math.atan2(siny_cosp, cosy_cosp)
         return yaw
+    
+# A heart beat manager for the server
+class ServerHeartBeatManager():
+    def __init__(self, node: Node, acceptable_loss: float) -> None:
+        self.node = node
+        self.acceptable_loss = acceptable_loss  # seconds
+        self.heartbeat_publisher = self.node.create_publisher(
+            Int8, '/fcu/out/heartbeat', 10
+        )
+        self.heartbeat_subscriber = self.node.create_subscription(
+            Int8, '/fcu/in/heartbeat', self.heartbeat_callback, 10
+        )
+        self.last_heartbeat_sent = 0
+        self.last_heartbeat_received = self.node.get_clock().now().nanoseconds / 1e9
+        self.heartbeat_value = 0
+        self.dead_called = False
+
+        # Publish heartbeat at 2x the acceptable_loss frequency
+        self.heartbeat_period = acceptable_loss / 2.0
+        self.heartbeat_timer = self.node.create_timer(
+            self.heartbeat_period, self.send_heartbeat
+        )
+        # Timer to check for missed heartbeats (check at same rate as heartbeat)
+        self.check_timer = self.node.create_timer(
+            self.heartbeat_period, self.check_heartbeat
+        )
+
+    def send_heartbeat(self):
+        msg = Int8()
+        self.heartbeat_value = (self.heartbeat_value + 1) % 128  # cycle value for robustness
+        msg.data = self.heartbeat_value
+        self.heartbeat_publisher.publish(msg)
+        self.last_heartbeat_sent = self.node.get_clock().now().nanoseconds / 1e9
+        # Optionally, reset dead_called if a new heartbeat is sent
+        self.dead_called = False
+
+    def heartbeat_callback(self, msg):
+        # Only accept if matches last sent value
+        if msg.data == self.heartbeat_value:
+            self.last_heartbeat_received = self.node.get_clock().now().nanoseconds / 1e9
+            self.dead_called = False
+        else:
+            self.node.get_logger().error("Heartbeat out of sync.")
+
+    def check_heartbeat(self):
+        now = self.node.get_clock().now().nanoseconds / 1e9
+        if (now - self.last_heartbeat_received) > self.acceptable_loss:
+            if not self.dead_called:
+                self.dead()
+                self.dead_called = True
+
+    def set_dead_callback(self, callback):
+        self.dead_callback = callback
+
+    def dead(self):
+        self.node.get_logger().warn("Heartbeat lost! Calling dead() handler.")
+        if hasattr(self, "dead_callback"):
+            self.dead_callback()
+        pass
 
 
 def main(args=None) -> None:
     """
-    Main function to initialize and run the HeartbeatNode.
+    Main function to initialize and run the FlightNode
     """
     rclpy.init(args=args)
-    heartbeat_node = HeartbeatNode()
+    flight_node = FlightNode()
     try:
-        rclpy.spin(heartbeat_node)
+        rclpy.spin(flight_node)
     except KeyboardInterrupt:
-        heartbeat_node.get_logger().info("Keyboard interrupt received, shutting down...")
+        flight_node.get_logger().info("Keyboard interrupt received, shutting down...")
     finally:
-        heartbeat_node.destroy_node()
+        flight_node.destroy_node()
         if rclpy.ok():
             rclpy.shutdown()
 

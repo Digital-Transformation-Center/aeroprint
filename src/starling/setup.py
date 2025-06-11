@@ -30,6 +30,7 @@ setup(
             "circle-flight = starling.circle_flight:main",
             "custom-pc-pub = starling.custom_pc_publisher:main",
             "helical-flight = starling.helical_flight_node:main",
+            "new-helix = starling.modular_helix_node:main"
         ],
     },
 )

@@ -9,6 +9,8 @@ import json
 
 from flask_socketio import SocketIO
 
+from starling.flightdefs.flight_status_codes import *
+
 class FlaskWebApp:
     def __init__(self, node):
         # Setup template/static dirs
@@ -36,6 +38,7 @@ class FlaskWebApp:
 
         self.setup_routes()
         self.setup_socketio_handlers()
+        self.units = 'meters'
 
     def emit_heartbeat(self, ok):
         self.socketio.emit('heartbeat', {'ok': ok})
@@ -43,15 +46,17 @@ class FlaskWebApp:
     def setup_routes(self):
         @self.app.route('/')
         def home():
-            return render_template('index.html')
+            # Pass units to the template
+            return render_template('index.html', units=self.units)
 
-        @self.app.route('/widgets/helix')
-        def helix_widget():
-            return render_template('widgets/helix.html')
+        # @self.app.route('/widgets/helix')
+        # def helix_widget():
+        #     return render_template('widgets/helix.html')
 
         @self.app.route('/widgets/flight_config')
         def flight_config_widget():
             return render_template('widgets/flight_config.html')
+        
 
     def setup_socketio_handlers(self):
         @self.socketio.on('shutdown_test_node')
@@ -76,6 +81,12 @@ class FlaskWebApp:
             self.node.get_logger().info('Landing flight.')
             self.node.request_land_flight()
 
+        @self.socketio.on('set_units')
+        def handle_set_units(data):
+            self.units = data.get('units', 'meters')
+            self.emit_notification(f"Units set to {self.units}.", warning='warn')
+            self.socketio.emit('units_changed', {'units': self.units})
+
     def status_callback(self, data):
         self.emit_notification('ROS Callback functions.')
         if data == 3:
@@ -98,10 +109,7 @@ class FlaskServerNode(Node):
         self.get_logger().info('FlaskServerNode initialized.')
         self.radius_publisher = self.create_publisher(
             std_msgs.msg.Float32, 'radius', 10)
-        
-        self.drone_status_subscriber = self.create_subscription(
-            std_msgs.msg.Int8, 'drone_status', self.drone_status_callback, 10
-        )
+
         self.param_publisher = self.create_publisher(
             Float32MultiArray, 'helix_params', 10 
         )
@@ -111,7 +119,7 @@ class FlaskServerNode(Node):
         )
 
         self.status_subscriber = self.create_subscription(
-            std_msgs.msg.Int8, '/state', self.drone_status_callback, 10
+            std_msgs.msg.Int8, '/fcu/out/status', self.flight_status_callback, 10
         )
 
         self.flask_status_callback = None
@@ -119,8 +127,12 @@ class FlaskServerNode(Node):
         # Heartbeat subscriber
         self.heartbeat_ok = False
         self.create_subscription(
-            std_msgs.msg.Int8, 'heartbeat', self.heartbeat_callback, 10
+            std_msgs.msg.Int8, '/fcu/out/heartbeat', self.heartbeat_callback, 10
         )
+        self.heartbeat_publisher = self.create_publisher(
+            std_msgs.msg.Int8, '/fcu/in/heartbeat', 10
+        )
+
         import threading
         self._heartbeat_timeout = 0.5  # seconds
         self._heartbeat_lock = threading.Lock()
@@ -139,6 +151,7 @@ class FlaskServerNode(Node):
         self.shutdown_publisher.publish(msg)
 
     def heartbeat_callback(self, msg):
+        self.heartbeat_publisher.publish(msg)
         with self._heartbeat_lock:
             self.heartbeat_ok = True
             import time
@@ -183,23 +196,34 @@ class FlaskServerNode(Node):
         self.param_publisher.publish(msg)
 
 
-    def drone_status_callback(self, msg):
-        self.get_logger().info(f"Drone status received: {msg.data}")
+    def flight_status_callback(self, msg):
+        self.get_logger().info(f"Flight status received: {msg.data}")
         status = msg.data
-        if status == 0:
-            self.get_logger().info("Drone is idle.")
+        if status == FLIGHT_DISARMED:
+            self.get_logger().info("Flight is idle.")
             if hasattr(self, 'flask_web_app'):
                 self.flask_web_app.emit_status('idle')
-        elif status == 1:
-            self.get_logger().info("Drone received flight parameters.")
+        elif status == FLIGHT_PATH_LOADED:
+            self.get_logger().info("Flight received parameters.")
             if hasattr(self, 'flask_web_app'):
                 self.flask_web_app.emit_status('param_receive')
+        elif status == FLIGHT_ENGAGED:
+            self.get_logger().info("Flight engaged.")
+            if hasattr(self, 'flask_web_app'):
+                self.flask_web_app.emit_status('flight_engaged')
+        elif status == FLIGHT_ARMED:
+            self.get_logger().info("Flight armed.")
+            if hasattr(self, 'flask_web_app'):
+                self.flask_web_app.emit_status('flight_armed')
+        elif status == FLIGHT_LANDING:
+            self.get_logger().info("Flight landing.")
+            if hasattr(self, 'flask_web_app'):
+                self.flask_web_app.emit_status('flight_landing')
+        elif status == FLIGHT_ERROR:
+            self.get_logger().error("Flight error occurred.")
+            if hasattr(self, 'flask_web_app'):
+                self.flask_web_app.emit_status('flight_error')
 
-        # if self.flask_status_callback:
-        #     self.flask_status_callback(msg.data)
-        #     self.get_logger().info("Calling flask callback.")
-        # else:
-        #     self.get_logger().info("Status callback not attached.")
 
     def attach_status_callback(self, fn):
         self.flask_status_callback = fn

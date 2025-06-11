@@ -3,643 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        iframe {
-            width: 100%;
-            max-width: 820px;
-            height: 700px;
-            border: none;
-            display: block;
-            margin: 2em auto;
-            border-radius: 24px;
-            box-shadow: 0 0px 16px rgba(125, 125, 125, 0.301);
-            background: #222;
-            overflow: hidden;
-            scale: 0.8;
-        }
-        html, body {
-            overflow: hidden;
-            height: 100%;
-            width: 100%;
-        }
-        body {
-            margin: 0;
-            padding: 0;
-        }
-        /* Modal styles */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0; top: 0;
-            width: 100vw; height: 100vh;
-            background: rgba(0,0,0,0.5);
-            justify-content: center;
-            align-items: center;
-        }
-        .modal.active {
-            display: flex;
-        }
-        .modal-content {
-            background: #181818;
-            border-radius: 24px;
-            box-shadow: 0 0px 32px rgba(0,0,0,0.5);
-            padding: 0;
-            position: relative;
-            max-width: 90vw;
-            max-height: 90vh;
-            display: flex;
-            flex-direction: column;
-        }
-        .modal-content iframe {
-            margin: 0;
-            width: 80vw;
-            max-width: 820px;
-            height: 70vh;
-            border-radius: 24px 24px 24px 24px;
-            box-shadow: none;
-            scale: 1;
-        }
-        .close-btn {
-            position: absolute;
-            top: 12px;
-            right: 18px;
-            background: #333;
-            color: #fff;
-            border: none;
-            border-radius: 50%;
-            width: 32px;
-            height: 32px;
-            font-size: 1.5em;
-            cursor: pointer;
-            z-index: 10;
-            transition: background 0.2s;
-        }
-        .close-btn:hover {
-            background: #555;
-        }
-        .inquiry-btn {
-            position: absolute;
-            top: 12px;
-            left: 18px;
-            background: #333;
-            color: #fff;
-            border: none;
-            border-radius: 50%;
-            width: 32px;
-            height: 32px;
-            font-size: 1.5em;
-            cursor: pointer;
-            z-index: 10;
-            transition: background 0.2s;
-        }
-        .center-btn {
-            display: flex;
-            justify-content: center;
-            margin-top: 2em;
-        }
-        .flight-setup-btn {
-            background: #1976d2;
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            padding: 1em 2em;
-            font-size: 1.2em;
-            cursor: pointer;
-            box-shadow: 0 2px 8px rgba(25, 118, 210, 0.15);
-            transition: background 0.2s;
-        }
-        .flight-setup-btn:hover {
-            background: #1565c0;
-        }
-        .notification {
-            display: none;
-            position: fixed;
-            top: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #323232;
-            color: #fff;
-            padding: 18px 32px;
-            border-radius: 12px;
-            box-shadow: 0 2px 16px #0008;
-            font-size: 1.2em;
-            z-index: 2000;
-            min-width: 200px;
-            text-align: center;
-        }
-        .heartbeat-indicator {
-            position: fixed;
-            bottom: 18px;
-            right: 32px;
-            z-index: 3000;
-            display: flex;
-            align-items: center;
-            gap: 0.5em;
-            font-size: 1.1em;
-            font-weight: bold;
-            background: #232323;
-            padding: 8px 18px;
-            border-radius: 16px;
-            box-shadow: 0 2px 8px #0005;
-            color: #fff;
-            min-width: 120px;
-            user-select: none;
-    }
-
-    .flight-controller {
-        position: fixed;
-        bottom: 18px;
-        right: 32px;
-        z-index: 3000;
-        display: flex;
-        align-items: center;
-        gap: 0.5em;
-        font-size: 1.1em;
-        font-weight: bold;
-        /* background: #232323; */
-        padding: 0;
-        border-radius: 16px;
-        /* box-shadow: 0 2px 8px #0005; */
-        color: #fff;
-        min-width: 120px;
-        user-select: none;
-    }
-    .shutdown-btn {
-        margin-left: 18px;
-        background: #e53935;
-        color: #fff;
-        border: none;
-        border-radius: 12px;
-        padding: 8px 18px;
-        font-size: 1.1em;
-        font-weight: bold;
-        cursor: pointer;
-        box-shadow: 0 2px 8px #0005;
-        transition: background 0.2s;
-    }
-    .shutdown-btn:hover {
-        background: #b71c1c;
-        }
-        .heartbeat-dot {
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: #888;
-            display: inline-block;
-            margin-right: 6px;
-            border: 2px solid #222;
-            transition: background 0.3s;
-        }
-        .heartbeat-dot.connected {
-            background: #2ecc40;
-        }
-        .heartbeat-dot.disconnected {
-            background: #e53935;
-        }
-        
-    </style>
-      <style>
-    .slider-container {
-      width: 320px;
-      height: 56px;
-      background: red;
-      border-radius: 28px;
-      /* position: relative */
-      position: fixed;
-    bottom: 18px;
-    left: 32px;
-      user-select: none;
-      box-shadow: 0 2px 8px #0002;
-      /* margin: 32px auto; */
-      display: flex;
-      align-items: center;
-    }
-    .slider-track {
-      width: 100%;
-      height: 100%;
-      border-radius: 16px;
-      background: #222;
-      /* position: absolute;
-      top: 0; left: 0; */
-      /* z-index: 1; */
-    }
-    .slider-knob {
-      width: 96px;
-      height: 48px;
-      background: #4caf50;
-      color: #fff;
-      border-radius: 12px;
-      position: absolute;
-      top: 4px;
-      left: 4px;
-      z-index: 2;
-      display: flex;
-      align-items: stretch;
-      justify-content: center;
-      font-size: 1.3em;
-      font-weight: bold;
-      cursor: pointer;
-      transition: left 0.2s cubic-bezier(.4,2,.6,1), background 0.2s;
-      box-shadow: 0 2px 6px #0003;
-      overflow: hidden;
-    }
-    .slider-knob.active {
-      background: #f44336;
-    }
-    .slider-knob.warn {
-      background: #9c841a;
-    }
-    .slider-knob .knob-text {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      transition: transform 0.18s cubic-bezier(.4,2,.6,1);
-      text-align: center;
-      width: 100%;
-      z-index: 1;
-      position: relative;
-    }
-    .slider-knob .arrow {
-      font-size: 1.2em;
-      opacity: 0;
-      transition: opacity 0.15s;
-      z-index: 2;
-      position: absolute;
-      right: 12px;
-      top: 50%;
-      transform: translateY(-40%);
-      pointer-events: none;
-    }
-    .slider-knob.active .arrow {
-      left: 12px;
-      right: auto;
-    }
-    .slider-knob:hover .arrow,
-    .slider-knob:focus .arrow {
-      opacity: 1;
-    }
-    .slider-knob:hover .knob-text,
-    .slider-knob:focus .knob-text {
-      transform: translateX(-22px);
-    }
-    .slider-knob.active:hover .knob-text,
-    .slider-knob.active:focus .knob-text {
-      transform: translateX(22px);
-    }
-    .slider-knob.warn:hover .knob-text,
-    .slider-knob.warn:focus .knob-text {
-      transform: translateX(0);
-    }
-    .slider-label {
-      position: absolute;
-      left: 24px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: #888;
-      font-size: 1em;
-      font-weight: bold;
-      z-index: 0;
-      pointer-events: none;
-    }
-  </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
     <title>Document</title>
 </head>
 <body>
     <div class="center-btn">
         <button class="flight-setup-btn" id="openModalBtn">Flight Setup</button>
     </div>
-    <div class="heartbeat-indicator" id="heartbeatIndicator">
+    <div class="control_bar">
+      <div class="flight-controller" id="flightController">
+        <div class="slider-container" id="flightSlider">
+          <div class="slider-track"></div>
+          <div class="slider-knob" id="sliderKnob">
+            <span class="knob-text">Start</span>
+            <span class="arrow" id="sliderArrow"></span>
+          </div>
+          <span class="slider-label" id="sliderLabel"></span>
+        </div>
+      </div>
+      <div class="heartbeat-indicator" id="heartbeatIndicator">
         <span class="heartbeat-dot disconnected" id="heartbeatDot"></span>
         <span id="heartbeatText">Disconnected</span>
         <button class="shutdown-btn" id="shutdownBtn">Shutdown</button>
+      </div>
     </div>
-    <div class="flight-controller" id="flightController">
-        <div class="slider-container" id="flightSlider">
-            <div class="slider-track"></div>
-            <div class="slider-knob" id="sliderKnob">
-            <span class="knob-text">Start</span>
-            <span class="arrow" id="sliderArrow">&#8594;</span>
-            </div>
-            <span class="slider-label" id="sliderLabel"></span>
-        </div>
-    </div>
+    
     <!-- Modal Popup -->
     <div class="modal" id="flightModal">
+      
         <div class="modal-content">
             <button class="inquiry-btn" id="modalInquiryBtn" title="Info">?</button>
+            <h3 class="config-label">Helical Flight Configurator</h3>
             <button class="close-btn" id="closeModalBtn" title="Close">&times;</button>
             <iframe src="/widgets/flight_config" title="Helix Path Visualizer" scrolling="no" aria-placeholder="Helix Path Visualizer"></iframe>
         </div>
     </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-dialog" class="modal">
+      <div class="modal-content">
+          <div class="settings-content">
+              Settings
+              <div class="settings-item">
+                  Units
+                  <label class="toggle-switch">
+                      <span class="toggle-label" id="unitLabel">Meters</span>
+                      <span class="switch">
+                          <input type="checkbox" id="unitToggle" aria-checked="false" aria-label="Toggle units">
+                          <span class="slider"></span>
+                      </span>
+                  </label>
+              </div>
+          </div>
+      </div>
+    </div>
     <!-- Notification box -->
+    <button id="settingsBtn" title="Settings" aria-label="Settings">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="32" height="32" fill="#222" style="display: block;">
+          <path d="M495.9 166.6c3.2 8.7 .5 18.4-6.4 24.6l-43.3 39.4c1.1 8.3 1.7 16.8 1.7 25.4s-.6 17.1-1.7 25.4l43.3 39.4c6.9 6.2 9.6 15.9 6.4 24.6c-4.4 11.9-9.7 23.3-15.8 34.3l-4.7 8.1c-6.6 11-14 21.4-22.1 31.2c-5.9 7.2-15.7 9.6-24.5 6.8l-55.7-17.7c-13.4 10.3-28.2 18.9-44 25.4l-12.5 57.1c-2 9.1-9 16.3-18.2 17.8c-13.8 2.3-28 3.5-42.5 3.5s-28.7-1.2-42.5-3.5c-9.2-1.5-16.2-8.7-18.2-17.8l-12.5-57.1c-15.8-6.5-30.6-15.1-44-25.4L83.1 425.9c-8.8 2.8-18.6 .3-24.5-6.8c-8.1-9.8-15.5-20.2-22.1-31.2l-4.7-8.1c-6.1-11-11.4-22.4-15.8-34.3c-3.2-8.7-.5-18.4 6.4-24.6l43.3-39.4C64.6 273.1 64 264.6 64 256s.6-17.1 1.7-25.4L22.4 191.2c-6.9-6.2-9.6-15.9-6.4-24.6c4.4-11.9 9.7-23.3 15.8-34.3l4.7-8.1c6.6-11 14-21.4 22.1-31.2c5.9-7.2 15.7-9.6 24.5-6.8l55.7 17.7c13.4-10.3 28.2-18.9 44-25.4l12.5-57.1c2-9.1 9-16.3 18.2-17.8C227.3 1.2 241.5 0 256 0s28.7 1.2 42.5 3.5c9.2 1.5 16.2 8.7 18.2 17.8l12.5 57.1c15.8 6.5 30.6 15.1 44 25.4l55.7-17.7c8.8-2.8 18.6-.3 24.5 6.8c8.1 9.8 15.5 20.2 22.1 31.2l4.7 8.1c6.1 11 11.4 22.4 15.8 34.3zM256 336a80 80 0 1 0 0-160 80 80 0 1 0 0 160z"/>
+      </svg>
+    </button>
+
     <div id="notification" class="notification"></div>
-    <script type="module">
-        // Shutdown button logic
-        const shutdownBtn = document.getElementById('shutdownBtn');
-        shutdownBtn.onclick = () => {
-            window.socket.emit('shutdown_test_node');
-        };
-        const openBtn = document.getElementById('openModalBtn');
-        const closeBtn = document.getElementById('closeModalBtn');
-        const modalInfoBtn = document.getElementById('modalInquiryBtn');
-        modalInfoBtn.onclick = () => {
-            alert('Use this visualizer to configure the flight path and object parameters.\n' +
-                  'The blue cylinder is the area in which objects will be digitized. \n' +
-                  'The red line is the flight path of the drone.\n\n' +
-                  '1. Adjust the radius, height, and number of passes using the sliders.\n' +
-                  '2. The vertical slider sets the starting height of the flight path.\n' +
-                  '3. Click "Save" to apply your settings.\n\n' +
-                  'For more information, refer to the documentation.');
-        };
-        const modal = document.getElementById('flightModal');
-        const notif_bg_default = '#323232';
-        openBtn.onclick = () => { modal.classList.add('active'); };
-        closeBtn.onclick = () => { modal.classList.remove('active'); };
-        window.onclick = (e) => {
-            if (e.target === modal) modal.classList.remove('active');
-        };
-        window.onkeydown = (e) => {
-            if (e.key === "Escape") modal.classList.remove('active');
-        };
-
-        import { io } from 'https://cdn.jsdelivr.net/npm/socket.io-client@4.7.5/dist/socket.io.esm.min.js';
-        window.socket = io();
-        // Heartbeat indicator logic
-        const heartbeatDot = document.getElementById('heartbeatDot');
-        const heartbeatText = document.getElementById('heartbeatText');
-        let heartbeatTimeout = null;
-        function setHeartbeatStatus(connected) {
-            if (connected) {
-                heartbeatDot.classList.remove('disconnected');
-                heartbeatDot.classList.add('connected');
-                heartbeatText.textContent = 'Connected';
-            } else {
-                heartbeatDot.classList.remove('connected');
-                heartbeatDot.classList.add('disconnected');
-                heartbeatText.textContent = 'Disconnected';
-            }
-        }
-        window.socket.on('heartbeat', data => {
-            setHeartbeatStatus(data && data.ok);
-            if (heartbeatTimeout) clearTimeout(heartbeatTimeout);
-            // If no heartbeat in 3s, set to disconnected
-            heartbeatTimeout = setTimeout(() => setHeartbeatStatus(false), 3000);
-        });
-        // --- Notification listener ---
-        window.socket.on('notification', data => {
-            let msg = data && data.message ? data.message : String(data);
-            let stat = data.warning;
-            notify(msg, stat);
-        });
-
-        function notify(message, stat = 'default') {
-            const notif = document.getElementById('notification');
-            notif.textContent = message || 'Notification';
-            if (stat == 'good') {
-                notif.style.backgroundColor = '#2ecc40';
-            } else if (stat == 'bad') {
-                notif.style.backgroundColor = '#e53935';
-            } else {
-                notif.style.backgroundColor = notif_bg_default;
-            }
-            notif.style.display = 'block';
-            notif.style.opacity = '1';
-            // Hide after 3 seconds
-            setTimeout(() => {
-                notif.style.transition = 'opacity 0.5s';
-                notif.style.opacity = '0';
-                setTimeout(() => { notif.style.display = 'none'; notif.style.transition = ''; }, 500);
-            }, 3000);
-        }
-        
-    const slider = document.getElementById('flightSlider');
-    const knob = document.getElementById('sliderKnob');
-    knob.classList.add('warn');
-    const knobText = knob.querySelector('.knob-text');
-    const arrow = document.getElementById('sliderArrow');
-
-    arrow.innerHTML = `
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M5 12h14M13 6l6 6-6 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        `;
-    // arrow.innerHTML = '';
-    const knobWidth = 96;
-    const sliderWidth = 320;
-    const minLeft = 4;
-    const maxLeft = sliderWidth - knobWidth - 4;
-    let dragging = false;
-    let startX = 0;
-    let knobStartLeft = 0;
-    let startCondition = false; // false = not started, true = started
-    let knob_status = 1;
-
-    // import { io } from 'https://cdn.jsdelivr.net/npm/socket.io-client@4.7.5/dist/socket.io.esm.min.js';
-    // window.socket = io();
-
-
-    function setKnobState() {
-      set_knob_appearance();
-      if (!startCondition && knob_status == 0) {
-        land_flight();
-        // let content = knob_status == 0 ? 'Start' : 'Not Ready';
-        // knob.querySelector('.knob-text').textContent = content;
-        // knob.classList.remove('active');
-        // Right arrow SVG
-        arrow.innerHTML = `
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M5 12h14M13 6l6 6-6 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        `;
-        arrow.style.left = '';
-        arrow.style.right = '12px';
-      } else if (knob_status == 0) {
-        start_flight();
-        knob.querySelector('.knob-text').textContent = 'Flying';
-        knob.classList.add('active');
-        // Left arrow SVG
-        arrow.innerHTML = `
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M19 12H5M11 6l-6 6 6 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        `;
-        arrow.style.right = '';
-        arrow.style.left = '12px';
-      }
-    }
-
-    function set_knob_appearance() {
-      if (startCondition) {
-        knob.classList.add('active');
-        knob.querySelector('.knob-text').textContent = 'Flying';
-        knob.classList.remove('warn');
-        knob.classList.add('active');
-        arrow.style.left = '12px';
-        arrow.style.right = '';
-      } else {
-        knob.classList.remove('active');
-        if (knob_status == 0) {
-          knob.querySelector('.knob-text').textContent = 'Start';
-          knob.classList.remove('warn');
-        } else {
-          knob.querySelector('.knob-text').textContent = 'Warn';
-          knob.classList.add('warn');
-        }
-        arrow.style.left = '';
-        arrow.style.right = '12px';
-      }
-    }
-
-    function start_flight() {
-      // Emit the flight start event
-        console.log('Starting flight...');
-    //   window.socket.emit('flight_start', { start: true });
-        window.socket.emit('start_flight');
-        notify('Requesting flight start...', 'good');
-        // window.socket.emit('notification', { message: 'Requesting flight start...', warning: 'good' });
-    }
-
-    function land_flight() {
-      // Emit the flight land event
-        console.log('Landing flight...');
-      window.socket.emit('land_flight');
-      notify('Requesting flight land...', 'good');
-    }
-
-    function setKnobPosition(pos, animate = true) {
-      knob.style.transition = animate ? 'left 0.2s cubic-bezier(.4,2,.6,1), background 0.2s' : 'none';
-      knob.style.left = `${pos}px`;
-    }
-
-    function bounceKnob() {
-      if (!startCondition) {
-        setKnobPosition(minLeft);
-      } else {
-        setKnobPosition(maxLeft);
-      }
-    }
-
-    function onDragStart(e) {
-      dragging = true;
-      startX = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
-      knobStartLeft = parseInt(knob.style.left, 10) || minLeft;
-      knob.style.transition = 'none';
-      document.addEventListener('mousemove', onDragMove);
-      document.addEventListener('mouseup', onDragEnd);
-      document.addEventListener('touchmove', onDragMove, {passive: false});
-      document.addEventListener('touchend', onDragEnd);
-    }
-
-    function onDragMove(e) {
-      if (!dragging) return;
-      e.preventDefault();
-      const clientX = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
-      let dx = clientX - startX;
-      let newLeft = knobStartLeft + dx;
-      newLeft = Math.max(minLeft, Math.min(maxLeft, newLeft));
-      setKnobPosition(newLeft, false);
-    }
-
-    function onDragEnd(e) {
-      if (!dragging) return;
-      dragging = false;
-      const left = parseInt(knob.style.left, 10) || minLeft;
-      if (knob_status == 1) {
-          startCondition = false;
-          setKnobState();
-          setKnobPosition(minLeft);
-      }
-      else if (!startCondition) {
-        if (left > maxLeft - 10) {
-          // Dragged all the way right: activate start
-          startCondition = true;
-          setKnobState();
-          setKnobPosition(maxLeft);
-        } else {
-          // Not far enough: bounce back left
-          setKnobPosition(minLeft);
-        }
-      } else {
-        if (left < minLeft + 10) {
-          // Dragged all the way left: deactivate start
-          startCondition = false;
-          setKnobState();
-          setKnobPosition(minLeft);
-        } else{
-          // Not far enough: bounce back right
-          setKnobPosition(maxLeft);
-        }
-      }
-      document.removeEventListener('mousemove', onDragMove);
-      document.removeEventListener('mouseup', onDragEnd);
-      document.removeEventListener('touchmove', onDragMove);
-      document.removeEventListener('touchend', onDragEnd);
-    }
-
-    knob.addEventListener('mousedown', onDragStart);
-    knob.addEventListener('touchstart', onDragStart, {passive: false});
-
-    // On hover, show correct arrow
-    knob.addEventListener('mouseenter', () => {
-      if (knob_status == 1) {
-        arrow.style.opacity = '0';
-      } else {
-        arrow.style.opacity = '1';
-      }
-      
-        if (knob.classList.contains('active')) {
-            // knob.querySelector('.knob-text').textContent = 'Land';
-            set_knob_appearance();
-        } else {
-            // knob.querySelector('.knob-text').textContent = 'Start';
-
-            set_knob_appearance();
-        }
-    });
-    knob.addEventListener('mouseleave', () => {
-        if (knob.classList.contains('active')) {
-            knob.querySelector('.knob-text').textContent = 'Flying';
-        }
-      arrow.style.opacity = '0';
-    });
-
-    window.socket.on('flight_status', data => {
-      if (data) {
-        if (data.status === 'idle') {
-          console.log('Flight idle received');
-          knob_status = 1; // Set to idle state
-          reset_knob();
-        } else if (data.status === 'param_receive') {
-          console.log('Flight parameters received by server');
-          knob_status = 0; // Set to safe state
-          reset_knob();
-        }
-      }
-    });
-
-    function reset_knob() {
-      knob.querySelector('.knob-text').textContent = 'Start';
-      knob.classList.remove('active');
-      // Right arrow SVG
-      arrow.innerHTML = `
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M5 12h14M13 6l6 6-6 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      `;
-      arrow.style.left = '';
-      arrow.style.right = '12px';
-      startCondition = false;
-      setKnobPosition(minLeft);
-   }
-
-    // Initialize
-    setKnobState();
-    setKnobPosition(minLeft);
-
-    // If you want to expose the startCondition to other scripts, you can do so here.
-    // window.getFlightStartCondition = () => startCondition;
-  </script>
+    <script>
+      window.currentUnits = "{{ units }}";
+    </script>
+    <script type="module" src="/static/main.js"></script>
 </body>
 </html>

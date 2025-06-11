@@ -26,13 +26,9 @@ setup(
             glob(os.path.join("host", "web", "templates", "widgets", "*.html")),
         ),
         # Install all static files (CSS, JS, etc.)
-        # (
-        #     os.path.join("share", package_name, "web", "static"),
-        #     glob(os.path.join("host", "web", "static", "*")),
-        # ),
         (
-            os.path.join("share", package_name, "web", "static", "flight_config"),
-            glob(os.path.join("host", "web", "static", "flight_config", "*")),
+            os.path.join("share", package_name, "web", "static"),
+            glob(os.path.join("host", "web", "static", "**", "*", "*.css", "*.js"), recursive=True),
         ),
     ],
     install_requires=["setuptools"],
@@ -58,9 +54,9 @@ setup(
     },
     package_data={
         'host': [
-        'web/templates/*.html',
-        'web/templates/widgets/*.html',
-        'web/static/flight_config/*',
-]
+            'web/templates/*.html',
+            'web/templates/widgets/*.html',
+            'web/static/**/*',
+        ]
     }
 )
