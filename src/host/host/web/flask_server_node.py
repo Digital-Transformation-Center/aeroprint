@@ -55,7 +55,7 @@ class FlaskWebApp:
 
         @self.app.route('/widgets/flight_config')
         def flight_config_widget():
-            return render_template('widgets/flight_config.html')
+            return render_template('widgets/flight_config.html', units=self.units)
         
 
     def setup_socketio_handlers(self):
@@ -86,6 +86,17 @@ class FlaskWebApp:
             self.units = data.get('units', 'meters')
             self.emit_notification(f"Units set to {self.units}.", warning='warn')
             self.socketio.emit('units_changed', {'units': self.units})
+
+        @self.socketio.on('notification')
+        def handle_notification(data):
+            message = data.get('message', 'No message provided')
+            warning = data.get('warning', 'warn')
+            self.emit_notification(message, warning=warning)
+            self.node.get_logger().info(f"Notification: {message} (Warning: {warning})")
+
+        @self.socketio.on('path_values_changed')
+        def handle_path_values_changed(data):
+            self.emit_status('params_changed')
 
     def status_callback(self, data):
         self.emit_notification('ROS Callback functions.')
