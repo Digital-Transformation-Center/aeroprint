@@ -21,6 +21,41 @@ let flight_path_height = 0.0;
 let flight_path_turns = 0;
 let flight_path_start_height = 0.0;
 let path_did_change = false;
+let max_axis_length = 15; // Maximum length for axes markers
+let danger_radius = 0;
+let danger_height = 0;
+
+const radius_slider = document.getElementById('radius');
+const height_slider = document.getElementById('height');
+const turns_slider = document.getElementById('turns');
+
+const metric_slider_limits = {
+    radius: { min: 0.3, max: 3, steps: 0.1, currentValue: 1 },
+    height: { min: 0.1, max: 3, steps: 0.1, currentValue: 1 },
+    turns: { min: 1, max: 10, steps: 1, currentValue: 2 }
+};
+
+const imperial_slider_limits = {
+    radius: { min: 1, max: 10, steps: 0.1, currentValue: 3 },
+    height: { min: 0.3, max: 10, steps: 0.1, currentValue: 3 },
+    turns: { min: 1, max: 10, steps: 1, currentValue: 2 }
+};
+
+export function updateSliderLimits(units) {
+    const limits = units === 'feet' ? imperial_slider_limits : metric_slider_limits;
+    updateSlider(radius_slider, limits.radius);
+    updateSlider(height_slider, limits.height);
+    updateSlider(turns_slider, limits.turns);
+}
+
+function updateSlider(slider, { min, max, steps, currentValue }) {
+    slider.dispatchEvent(new Event('input'));
+    slider.min = min;
+    slider.max = max;
+    slider.value = currentValue;
+    slider.step = steps;
+    document.getElementById(slider.id + 'Value').textContent = slider.value;
+}
 
 export function createTextSprite(text, color = "#fff") {
     const scale = 0.5;
@@ -75,6 +110,8 @@ export function createAxesMarkers(length = 5, step = 1) {
     });
     return group;
 }
+
+
 
 export function createHelixGeometry(radius, pitch, turns, points, baseY = 0, minY = 0.1) {
     const geometry = new THREE.BufferGeometry();
@@ -165,12 +202,15 @@ export function updateScene() {
     pulseLine._helixPoints = points;
 }
 
+
+
 export function addInputListeners() {
     ["radius", "height", "turns"].forEach(id => {
         // document.getElementById(id).addEventListener("input", updateScene);
         // document.getElementById(id + 'Value').textContent = document.getElementById(id).value;
         // console.log('Input listener added for:', id);
         document.getElementById(id).addEventListener("input", (event) => {
+            window.socket.emit('path_values_changed', { [id]: event.target.value });
             const value = event.target.value;
             document.getElementById(id + 'Value').textContent = value;
             updateScene();
@@ -203,13 +243,39 @@ export function addInputListeners() {
     });
 }
 
+const unitLabel = document.getElementById('unitLabel');
+unitLabel.textContent = window.currentUnits || 'meters';
+
+window.socket.on('units_changed', (data) => {
+    console.log('Received units_changed:', data);
+    window.currentUnits = data.units;
+    updateSliderLimits(window.currentUnits);
+    unitLabel.textContent = window.currentUnits;
+});
+
 export function getParameters() {
-    return {
-        radius: flight_path_radius,
-        height: flight_path_height,
-        turns: flight_path_turns,
-        startHeight: flight_path_start_height,
-    };
+    if (window.currentUnits == 'meters') {
+        danger_radius = Math.ceil((flight_path_radius + 0.3) * 10) / 10;
+        danger_height = Math.ceil((flight_path_height + 0.3) * 10) / 10;
+        window.socket.emit('notification', { message: 'Path saved. Ensure space is at least ' + danger_radius + ' meters in radius and ' + danger_height + ' meters in height.', warning: 'bad' });
+        return {
+            radius: flight_path_radius,
+            height: flight_path_height,
+            turns: flight_path_turns,
+            startHeight: flight_path_start_height,
+        };
+    } else if (window.currentUnits == 'feet') {
+        danger_radius = Math.ceil((flight_path_radius + 1) * 10) / 10;
+        danger_height = Math.ceil((flight_path_height + 1) * 10) / 10;
+        window.socket.emit('notification', { message: 'Path saved. Ensure space is at least ' + danger_radius + ' feet in radius and ' + danger_height + ' feet in height.', warning: 'bad' });
+        return {
+            radius: flight_path_radius / 3.28084,
+            height: flight_path_height / 3.28084,
+            turns: flight_path_turns,
+            startHeight: flight_path_start_height / 3.28084,
+        };
+    }
+    console.error('Unknown units:', window.currentUnits);
 }
 
 export function animate() {
@@ -280,13 +346,67 @@ export function init() {
     const directional = new THREE.DirectionalLight(0xffffff, 0.8);
     directional.position.set(10, 10, 10);
     scene.add(directional);
-    axesGroup = createAxesMarkers(5, 1);
+    axesGroup = createAxesMarkers(max_axis_length, 1);
     scene.add(axesGroup);
     updateScene();
     // Orbit controls
     let isDragging = false, prevX, prevY;
+    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    if (isTouchDevice) {
+        renderer.domElement.addEventListener('touchstart', (e) => {
+            const touch = e.changedTouches[0];
+            const x = touch.clientX;
+            const y = touch.clientY;
+            isDragging = true;
+            prevX = x; prevY = y;
+        });
+
+        
+        renderer.domElement.addEventListener('touchend', () => {
+            isDragging = false;
+        });
+        let initialPinchDistance = null;
+        let initialCameraDistance = cameraDistance;
+
+        renderer.domElement.addEventListener('touchmove', (e) => {
+            if (e.touches.length === 2) {
+                e.preventDefault();
+                const dx = e.touches[0].clientX - e.touches[1].clientX;
+                const dy = e.touches[0].clientY - e.touches[1].clientY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                if (initialPinchDistance === null) {
+                    initialPinchDistance = distance;
+                    initialCameraDistance = cameraDistance;
+                } else {
+                    const scale = initialPinchDistance / distance;
+                    cameraDistance = Math.max(3, Math.min(30, initialCameraDistance * scale));
+                    updateCameraPosition();
+                }
+            }
+            else if (e.touches.length < 2) {
+                initialPinchDistance = null; // Reset pinch distance when only one finger is on screen
+                if (!isDragging) return;
+                const touch = e.changedTouches[0];
+                const x = touch.clientX;
+                const y = touch.clientY;
+                theta -= (x - prevX) * 0.01;
+                phi += (y - prevY) * 0.01;
+                phi = Math.max(-Math.PI/2 + 0.1, Math.min(Math.PI/2 - 0.1, phi));
+                updateCameraPosition();
+                prevX = x; prevY = y;
+            }
+        }, { passive: false });
+
+        renderer.domElement.addEventListener('touchend', (e) => {
+            if (e.touches.length < 2) {
+                initialPinchDistance = null;
+            }
+        });
+
+    }
     renderer.domElement.addEventListener('mousedown', e => {
         isDragging = true; prevX = e.clientX; prevY = e.clientY;
+        console.log('Mouse down at:', prevX, prevY);
     });
     window.addEventListener('mousemove', e => {
         if (!isDragging) return;
