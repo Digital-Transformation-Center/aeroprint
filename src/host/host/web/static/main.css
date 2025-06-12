@@ -19,6 +19,10 @@ html, body {
 body {
     margin: 0;
     padding: 0;
+    background-color: #121212;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 /* Modal styles */
 .modal {
@@ -361,17 +365,7 @@ input:checked + .slider:before {
     min-width: 70px;
     text-align: left;
 }
-/* Settings icon style */
-#settingsBtn {
-    position: absolute;
-    top: 18px;
-    right: 24px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    z-index: 10;
-    padding: 0;
-}
+
 #settings-dialog {
     justify-content: flex-end;
 
@@ -447,4 +441,27 @@ input:checked + .slider:before {
     justify-content: center;
     color: white;
     gap: 1em;
+}
+
+.navbar {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    gap: 1em;
+    position: absolute;
+    /* top: 1em; */
+    width: calc(100% - 2em);
+    box-sizing: border-box;
+    /* background-color: rgba(255, 255, 255, 0.7); */
+    /* border: #fff 3px inset; */
+    padding: 0.5em 1em;
+    border-bottom: 2px solid white;
+    border-radius: 1em;
+}
+/* Settings icon style */
+.nav-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
 }
