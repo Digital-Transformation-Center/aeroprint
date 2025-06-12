@@ -322,6 +322,12 @@ window.socket.on('flight_status', data => {
         knob.querySelector('.knob-text').textContent = 'Landing';
     } else if (data.status == 'flight_error') {
         knob.querySelector('.knob-text').textContent = 'Error';
+    } else if (data.status == 'params_changed') {
+        console.log('Flight warning received');
+        knob_status = 1; // Set to idle state
+        warning_message = 'Please save your flight path.';
+        // reset_knob();
+        set_knob_appearance();
     }
     }
 });
