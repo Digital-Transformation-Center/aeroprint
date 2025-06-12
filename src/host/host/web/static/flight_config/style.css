@@ -59,3 +59,24 @@ label {
     border: 2px solid #1976d2;
     border-radius: 8px;
 }
+.current-units {
+    position:fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+}
+.current-units span {
+    color: #fff;
+    border-radius: 8px;
+}
+.value-label {
+    display: inline-block;
+    width: 2em;
+    min-width: 3em;
+    max-width: 3em;
+    text-align: center;
+    box-sizing: border-box;
+    overflow: hidden;
+    white-space: nowrap;
+}
