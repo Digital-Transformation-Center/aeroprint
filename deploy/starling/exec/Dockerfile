@@ -26,6 +26,8 @@ RUN git clone --depth 1 https://github.com/ros/ros_tutorials.git src/ros_tutoria
 # Need to switch back to root temporarily for rosdep install.
 USER root
 RUN apt-get update && \
+    # FIX: Remove the default rosdep sources list if it already exists, to prevent 'file already exists' error.
+    rm -f /etc/ros/rosdep/sources.list.d/20-default.list && \
     rosdep init && \
     rosdep update && \
     rosdep install --from-paths ros2_ws/src --ignore-src -y --rosdistro humble && \
