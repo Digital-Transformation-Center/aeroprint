@@ -9,7 +9,12 @@ StartLimitBurst=5
 RemainAfterExit=true
 
 WorkingDirectory=/home/root/aeroprint/deploy/starling
-ExecStartPre=/bin/bash -c 'ip a > /tmp/ip_output.txt && docker network ls >> /tmp/docker_net.txt'
+ExecStartPre=/bin/bash -c '
+  until ip -4 addr show wlan0 | grep "inet "; do
+    echo "Waiting for wlan0 IP..." >> /tmp/wait-for-wlan.log
+    sleep 1
+  done
+'
 ExecStart=/usr/bin/docker compose up
 ExecStop=/usr/bin/docker compose down
 Restart=on-failure
