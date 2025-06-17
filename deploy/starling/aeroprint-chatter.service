@@ -4,6 +4,7 @@ After=docker-autorun.service network-online.target voxl-wait-for-fs.service
 Requires=docker-autorun.service network-online.target voxl-wait-for-fs.service
 
 [Service]
+User=root
 StartLimitIntervalSec=30
 StartLimitBurst=5
 
