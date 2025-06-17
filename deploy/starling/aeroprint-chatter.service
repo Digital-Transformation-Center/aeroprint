@@ -1,7 +1,7 @@
 [Unit]
-Description=px4
-After=docker-autorun.service
-Requires=docker-autorun.service
+Description=ROS Humble Talker
+After=docker-autorun.service network-online.target
+Requires=docker-autorun.service network-online.target
 
 [Service]
 StartLimitIntervalSec=30
@@ -9,7 +9,8 @@ StartLimitBurst=5
 
 
 WorkingDirectory=/home/root/aeroprint/deploy/starling
-ExecStart=/usr/bin/docker compose up
+ExecStart=/usr/bin/docker compose up -d
+ExecStop=/usr/bin/docker compose down
 Restart=on-failure
 RestartSec=5s
 
