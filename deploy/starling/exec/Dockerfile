@@ -56,16 +56,15 @@ RUN sudo apt-get update && \
 # Ensure ROS environment is sourced before building
 RUN source /opt/ros/$ROS_DISTRO/setup.bash && \
     colcon build --symlink-install --packages-select px4_msgs && \
-    rm -rf ros2_ws/log ros2_ws/build # Clean up build artifacts
+    rm -rf ros2_ws/log ros2_ws/build
 
 # Copy your custom ROS 2 source code into the workspace
 # Make sure your custom packages also declare px4_msgs as a dependency in their package.xml
-COPY --chown=$USERNAME:$USERNAME ./src /home/$USERNAME/ros2_ws/src/your_custom_packages # Adjust path if needed
+COPY --chown=$USERNAME:$USERNAME ../../../src /home/$USERNAME/ros2_ws/src/your_custom_packages
 RUN source /opt/ros/$ROS_DISTRO/setup.bash && \
     source /home/$USERNAME/ros2_ws/install/setup.bash && \
     colcon build && \
-    rm -rf ros2_ws/log ros2_ws/build # Build your custom packages and clean up
-
+    rm -rf ros2_ws/log ros2_ws/build 
 # Ensure both ROS and workspace overlays are sourced in .bashrc
 # This makes them available when you exec into the container
 RUN echo "source /opt/ros/$ROS_DISTRO/setup.bash" >> /home/$USERNAME/.bashrc && \
@@ -80,4 +79,4 @@ RUN chmod +x /home/$USERNAME/entrypoint.sh
 # If you just want to run the entrypoint, you can simplify.
 # "/usr/bin/env bash" is often more robust than just "bash" for the shell.
 ENTRYPOINT ["/usr/bin/env", "bash", "-c", "/home/aeroprint_user/entrypoint.sh; exec bash"]
-CMD [""] # No default arguments to the entrypoint script
+CMD [""] 
