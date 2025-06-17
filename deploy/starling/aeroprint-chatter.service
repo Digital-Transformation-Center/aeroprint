@@ -9,7 +9,7 @@ StartLimitBurst=5
 
 
 WorkingDirectory=/home/root/aeroprint/deploy/starling
-ExecStart=/usr/bin/docker compose up -d
+ExecStart=/usr/bin/docker compose up
 ExecStop=/usr/bin/docker compose down
 Restart=on-failure
 RestartSec=5s
