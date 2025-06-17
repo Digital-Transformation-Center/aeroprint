@@ -2,7 +2,7 @@
 FROM ros:foxy
 
 ENV DEBIAN_FRONTEND=noninteractive
-ENV ROS_DISTRO=foxy # Explicitly set ROS_DISTRO to foxy
+ENV ROS_DISTRO=foxy
 
 # Define user arguments
 ARG USERNAME=aeroprint_user
