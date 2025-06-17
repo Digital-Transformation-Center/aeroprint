@@ -25,7 +25,7 @@ USER $USERNAME
 WORKDIR /home/$USERNAME
 
 # Create ROS 2 workspace
-RUN mkdir -p ros2_ws/src
+RUN mkdir -p external_packages/src
 
 # --- Install px4_msgs from source compatible with ROS Foxy ---
 # Important: Choose the correct branch for PX4_msgs that is compatible with ROS Foxy and your PX4 firmware
@@ -35,11 +35,13 @@ RUN mkdir -p ros2_ws/src
 ARG PX4_MSGS_BRANCH="release/1.14"
 
 # Clone px4_msgs into the workspace src directory
-RUN git clone --branch ${PX4_MSGS_BRANCH} https://github.com/PX4/px4_msgs.git ros2_ws/src/px4_msgs
+RUN git clone --branch ${PX4_MSGS_BRANCH} https://github.com/PX4/px4_msgs.git external_packages/src/px4_msgs
 
 # Install dependencies (including those for px4_msgs) and build the workspace
 # Using SHELL for proper sourcing during the build command
 SHELL ["/bin/bash", "-c"]
+
+USER root
 
 # Install common ROS 2 tools and python requirements
 COPY --chown=$USERNAME:$USERNAME exec/requirements.txt /tmp/requirements.txt
@@ -50,29 +52,36 @@ RUN sudo apt-get update && \
     # python3-colcon-common-extensions \
     iputils-ping && \
     pip3 install --no-cache-dir -r /tmp/requirements.txt && \
-    rm -rf /var/lib/apt/lists/* /tmp/requirements.txt # Clean up apt lists and tmp file
+    rm -rf /var/lib/apt/lists/* /tmp/requirements.txt
 
 # Build the workspace (including px4_msgs)
 # Ensure ROS environment is sourced before building
+WORKDIR /home/$USERNAME/external_packages
+
+USER $USERNAME
 RUN source /opt/ros/$ROS_DISTRO/setup.bash && \
-    colcon build --symlink-install --packages-select px4_msgs && \
-    rm -rf ros2_ws/log ros2_ws/build
+    colcon build --packages-select px4_msgs && \
+    rm -rf external_packages/log external_packages/build
 
 # Copy your custom ROS 2 source code into the workspace
 # Make sure your custom packages also declare px4_msgs as a dependency in their package.xml
 # COPY --chown=$USERNAME:$USERNAME ../../src /home/$USERNAME/ros2_ws/src/your_custom_packages
+# RUN mkdir -p /home/$USERNAME/aeroprint/src
+WORKDIR /home/$USERNAME/aeroprint/
+
 RUN source /opt/ros/$ROS_DISTRO/setup.bash && \
-    source /home/$USERNAME/ros2_ws/install/setup.bash && \
-    colcon build && \
-    rm -rf ros2_ws/log ros2_ws/build 
+    source /home/$USERNAME/external_packages/install/setup.bash && \
+    colcon build
 # Ensure both ROS and workspace overlays are sourced in .bashrc
 # This makes them available when you exec into the container
 RUN echo "source /opt/ros/$ROS_DISTRO/setup.bash" >> /home/$USERNAME/.bashrc && \
-    echo "source /home/$USERNAME/ros2_ws/install/setup.bash" >> /home/$USERNAME/.bashrc
+    echo "source /home/$USERNAME/external_packages/install/setup.bash" >> /home/$USERNAME/.bashrc
 
 # Copy entrypoint.sh and set permissions
 COPY --chown=$USERNAME:$USERNAME exec/entrypoint.sh /home/$USERNAME/entrypoint.sh
 RUN chmod +x /home/$USERNAME/entrypoint.sh
+
+USER root
 
 # Set the default command for the container
 # ENTRYPOINT sets the primary command. CMD provides default arguments.

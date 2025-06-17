@@ -7,7 +7,7 @@ package_name = "host"
 setup(
     name=package_name,
     version="0.0.0",
-    packages=['host', 'host.gui', 'host.gui.gui_pages', 'host.gui.gui_pages.tensor_flow', 'host.gui.resources', 'host.gui.gui_pages.settings', 'host.gui.gui_pages.flight', 'host.web', 'host.web.templates', 'host.web.templates.widgets'],
+    packages=['host', 'host.gui', 'host.gui.gui_pages', 'host.gui.gui_pages.tensor_flow', 'host.gui.resources', 'host.gui.gui_pages.settings', 'host.gui.gui_pages.flight', 'host.web', 'host.web.templates', 'host.web.templates.widgets', 'host.web.static', 'host.web.static.flight_config'],
     data_files=[
         ("share/ament_index/resource_index/packages", ["resource/" + package_name]),
         ("share/" + package_name, ["package.xml"]),
@@ -28,7 +28,11 @@ setup(
         # Install all static files (CSS, JS, etc.)
         (
             os.path.join("share", package_name, "web", "static"),
-            glob(os.path.join("host", "web", "static", "**", "*", "*.css", "*.js"), recursive=True),
+            glob(os.path.join("host", "web", "static","*.*")),
+        ),
+        (
+            os.path.join("share", package_name, "web", "static", "flight_config"),
+            glob(os.path.join("host", "web", "static","flight_config","*.*")),
         ),
     ],
     install_requires=["setuptools"],
@@ -56,7 +60,12 @@ setup(
         'host': [
             'web/templates/*.html',
             'web/templates/widgets/*.html',
-            'web/static/**/*',
+            'web/static/*.css',
+            'web/static/*.js',
+            'web/static/flight_config/*.css',
+            'web/static/flight_config/*.js',
+
         ]
-    }
+    },
+    include_package_data=True
 )
