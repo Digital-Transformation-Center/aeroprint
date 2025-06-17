@@ -8,8 +8,21 @@ services:
     # Build the Docker image from the current directory where the Dockerfile is located.
     # This assumes your Dockerfile is named 'Dockerfile' and is in the same directory as this docker-compose.yml file.
     build:
-      context: . # The context is the directory where the Dockerfile is located
-      dockerfile: Dockerfile # Explicitly specify the Dockerfile name if it's not 'Dockerfile'
+      context: .
+      dockerfile: exec/Dockerfile # Explicitly specify the Dockerfile name if it's not 'Dockerfile'
+
+    # The command to execute when the container starts.
+    # Since the Dockerfile already sets an ENTRYPOINT, you might not strictly need this
+    # unless you want to override the default command.
+    # However, explicitly setting it here ensures clarity.
+    # Note: The ENTRYPOINT in your Dockerfile is already set to run the talker node.
+    # If you wanted to override it to, for example, run bash for debugging, you would change this.
+    # command: /bin/bash -c ". /opt/ros/humble/setup.bash && . /home/rosuser/ros2_ws/install/setup.bash && ros2 run rclcpp_tutorials talker"
+    # Or, if your Dockerfile had CMD ["ros2", "run", "rclcpp_tutorials", "talker"], you could just use:
+    # command: ros2 run rclcpp_tutorials talker
+
+    # For now, let's omit 'command' here and rely on the Dockerfile's ENTRYPOINT for running the talker node.
+    # If you want to explicitly set a different command here, uncomment and modify the 'command' line above.
 
     # Restart the container if it exits, unless it was explicitly stopped.
     restart: on-failure
