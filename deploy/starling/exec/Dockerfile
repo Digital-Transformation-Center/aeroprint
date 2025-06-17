@@ -60,7 +60,7 @@ RUN source /opt/ros/$ROS_DISTRO/setup.bash && \
 
 # Copy your custom ROS 2 source code into the workspace
 # Make sure your custom packages also declare px4_msgs as a dependency in their package.xml
-COPY --chown=$USERNAME:$USERNAME ../../src /home/$USERNAME/ros2_ws/src/your_custom_packages
+# COPY --chown=$USERNAME:$USERNAME ../../src /home/$USERNAME/ros2_ws/src/your_custom_packages
 RUN source /opt/ros/$ROS_DISTRO/setup.bash && \
     source /home/$USERNAME/ros2_ws/install/setup.bash && \
     colcon build && \
