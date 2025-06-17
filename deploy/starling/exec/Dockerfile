@@ -1,8 +1,8 @@
 # Use a ROS Foxy base image for compatibility with your Starling's Foxy installation
-FROM ros:foxy
+FROM ros:humble
 
 ENV DEBIAN_FRONTEND=noninteractive
-ENV ROS_DISTRO=foxy
+ENV ROS_DISTRO=humble
 
 # Define user arguments
 ARG USERNAME=aeroprint_user
@@ -45,9 +45,9 @@ SHELL ["/bin/bash", "-c"]
 COPY --chown=$USERNAME:$USERNAME exec/requirements.txt /tmp/requirements.txt
 RUN sudo apt-get update && \
     sudo apt-get install -y \
-    ros-foxy-ros-base \
-    ros-foxy-rqt* \
-    python3-colcon-common-extensions \
+    # ros-foxy-ros-base \
+    # ros-foxy-rqt* \
+    # python3-colcon-common-extensions \
     iputils-ping && \
     pip3 install --no-cache-dir -r /tmp/requirements.txt && \
     rm -rf /var/lib/apt/lists/* /tmp/requirements.txt # Clean up apt lists and tmp file
