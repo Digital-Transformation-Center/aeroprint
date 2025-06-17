@@ -17,12 +17,12 @@ RUN groupadd --gid $USER_GID $USERNAME ; \
 # COPY --chown=$USERNAME:$USERNAME ./src /home/$USERNAME/ros2_ws/src
 
 # Copy prebuilt px4_msgs
-COPY px4_msgs_install.tar.gz /tmp/
+COPY exec/px4_msgs_install.tar.gz /tmp/
 
 RUN mkdir -p /opt/px4_msgs && \
     tar -xzf /tmp/px4_msgs_install.tar.gz -C /opt/px4_msgs
 
-COPY requirements.txt /tmp/
+COPY exec/requirements.txt /tmp/
 RUN apt-get update && \
     apt-get install -y python3-pip && \
     pip3 install --no-cache-dir -r /tmp/requirements.txt && \
@@ -36,7 +36,7 @@ USER root
 
 WORKDIR /home/$USERNAME
 
-COPY --chown=aeroprint_user:aeroprint_user entrypoint.sh /home/$USERNAME/entrypoint.sh
+COPY --chown=aeroprint_user:aeroprint_user exec/entrypoint.sh /home/$USERNAME/entrypoint.sh
 RUN chmod +x /home/$USERNAME/entrypoint.sh
 
 # RUN echo "source /opt/ros/$ROS_DISTRO/setup.bash" >> /home/$USERNAME/.bashrc && \
