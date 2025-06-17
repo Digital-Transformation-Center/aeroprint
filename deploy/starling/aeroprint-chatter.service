@@ -4,17 +4,18 @@ After=docker-autorun.service network-online.target voxl-wait-for-fs.service
 Requires=docker-autorun.service network-online.target voxl-wait-for-fs.service
 
 [Service]
-User=root
 StartLimitIntervalSec=30
 StartLimitBurst=5
-
+RemainAfterExit=true
 
 WorkingDirectory=/home/root/aeroprint/deploy/starling
-ExecStartPre=/bin/sleep 5
+ExecStartPre=/bin/bash -c 'ip a > /tmp/ip_output.txt && docker network ls >> /tmp/docker_net.txt'
 ExecStart=/usr/bin/docker compose up
 ExecStop=/usr/bin/docker compose down
 Restart=on-failure
 RestartSec=5s
+User=root
+Group=root
 
 
 [Install]
