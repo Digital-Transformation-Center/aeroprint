@@ -12,6 +12,14 @@ RUN groupadd -g $GID rosuser && useradd -m -s /bin/bash -u $UID -g $GID rosuser
 USER rosuser
 WORKDIR /home/rosuser
 
+# Install the demo_nodes_py package.
+# It's crucial to run apt-get update before installing new packages.
+USER root # Temporarily switch to root to install packages
+RUN apt-get update && \
+    apt-get install -y ros-humble-demo-nodes-py && \
+    rm -rf /var/lib/apt/lists/* # Clean up apt cache to keep image small
+USER rosuser # Switch back to rosuser
+
 # Set the entrypoint to directly run the ROS 2 Python talker node.
 # This sources the ROS environment and then executes the talker node immediately.
 ENTRYPOINT ["/bin/bash", "-c", ". /opt/ros/humble/setup.bash && ros2 run demo_nodes_py talker"]
