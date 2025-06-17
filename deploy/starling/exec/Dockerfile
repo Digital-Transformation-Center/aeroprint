@@ -1,36 +1,17 @@
-# Use an official ROS Humble base image.
-# ros-base includes only the core ROS 2 packages, keeping the image size smaller.
-FROM ros:humble-ros-base
+# Use the ROS Humble ros-core base image, which includes Python 3 and core ROS 2 packages.
+FROM ros:humble-ros-core
 
-# Set the locale to avoid warnings during ROS 2 setup.
+# Set locale to avoid warnings and ensure proper character encoding.
 ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
 
-# Set up a non-root user (optional but recommended for security)
+# Set up a non-root user for better security practices.
 ARG UID=1000
 ARG GID=1000
 RUN groupadd -g $GID rosuser && useradd -m -s /bin/bash -u $UID -g $GID rosuser
 USER rosuser
 WORKDIR /home/rosuser
 
-
-# Clone the ros_tutorials repository which contains the rclcpp_tutorials talker node.
-# This assumes Git is available in the base image, which it typically is.
-# Using --depth 1 to reduce clone size.
-RUN git clone --depth 1 https://github.com/ros/ros_tutorials.git src/ros_tutorials
-
-
-# Build the ROS 2 workspace.
-# --symlink-install creates symlinks for executables, which is useful for development.
-# --cmake-args -DCMAKE_BUILD_TYPE=Release for optimized builds.
-RUN . /opt/ros/humble/setup.bash && \
-    colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
-
-# Source the ROS 2 setup file and the workspace setup file, then execute the talker node.
-# Using ENTRYPOINT to ensure the ROS environment is always sourced.
-# CMD provides default arguments to the ENTRYPOINT.
-# This will run the talker node repeatedly.
-ENTRYPOINT ["/bin/bash", "-c", ". /opt/ros/humble/setup.bash && ros2 run rclcpp_tutorials talker"]
-
-# You can also use CMD if you prefer to override the command more easily when running the container:
-# CMD ["ros2", "run", "rclcpp_tutorials", "talker"]
+# Set the entrypoint to directly run the ROS 2 Python talker node.
+# This sources the ROS environment and then executes the talker node immediately.
+ENTRYPOINT ["/bin/bash", "-c", ". /opt/ros/humble/setup.bash && ros2 run demo_nodes_py talker"]
