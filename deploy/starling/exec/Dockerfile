@@ -1,51 +1,83 @@
-FROM osrf/ros:humble-desktop
+# Use a ROS Foxy base image for compatibility with your Starling's Foxy installation
+FROM ros:foxy
 
 ENV DEBIAN_FRONTEND=noninteractive
-ENV ROS_DISTRO=humble
+ENV ROS_DISTRO=foxy # Explicitly set ROS_DISTRO to foxy
 
+# Define user arguments
 ARG USERNAME=aeroprint_user
 ARG USER_UID=1000
 ARG USER_GID=1000
 
-RUN groupadd --gid $USER_GID $USERNAME ; \
-    useradd --uid $USER_UID --gid $USER_GID -m $USERNAME && \
-    usermod -aG sudo $USERNAME && \
-    echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
-
-# Create ROS 2 workspace and copy src
-# RUN mkdir -p /home/$USERNAME/ros2_ws/src
-# COPY --chown=$USERNAME:$USERNAME ./src /home/$USERNAME/ros2_ws/src
-
-# Copy prebuilt px4_msgs
-COPY exec/px4_msgs_install.tar.gz /tmp/
-
-RUN mkdir -p /opt/px4_msgs && \
-    tar -xzf /tmp/px4_msgs_install.tar.gz -C /opt/px4_msgs
-
-COPY exec/requirements.txt /tmp/
+# Create user and grant sudo permissions without password (adjust if not desired)
+# Using sudo to add to sudoers and then removing sudo from the path for security
 RUN apt-get update && \
-    apt-get install -y python3-pip && \
-    pip3 install --no-cache-dir -r /tmp/requirements.txt && \
-    rm /tmp/requirements.txt
+    apt-get install -y sudo git python3-pip && \
+    groupadd --gid $USER_GID $USERNAME ; \
+    useradd --uid $USER_UID --gid $USER_GID -m $USERNAME -s /bin/bash && \
+    usermod -aG sudo $USERNAME && \
+    echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
+    chmod 0440 /etc/sudoers && \
+    rm -rf /var/lib/apt/lists/*
 
-# Ensure both ROS and px4_msgs overlays are sourced
-RUN echo 'source /opt/px4_msgs/setup.bash' >> /home/$USERNAME/.bashrc
-
-# USER $USERNAME
-USER root
-
+# Switch to the new user
+USER $USERNAME
 WORKDIR /home/$USERNAME
 
-COPY --chown=aeroprint_user:aeroprint_user exec/entrypoint.sh /home/$USERNAME/entrypoint.sh
+# Create ROS 2 workspace
+RUN mkdir -p ros2_ws/src
+
+# --- Install px4_msgs from source compatible with ROS Foxy ---
+# Important: Choose the correct branch for PX4_msgs that is compatible with ROS Foxy and your PX4 firmware
+# Refer to https://github.com/PX4/px4_msgs and check their compatibility table.
+# For ROS Foxy, 'release/1.13' or 'release/1.14' or 'main' depending on your PX4 version
+# Let's assume 'main' or a specific release branch for Foxy
+ARG PX4_MSGS_BRANCH="release/1.14"
+
+# Clone px4_msgs into the workspace src directory
+RUN git clone --branch ${PX4_MSGS_BRANCH} https://github.com/PX4/px4_msgs.git ros2_ws/src/px4_msgs
+
+# Install dependencies (including those for px4_msgs) and build the workspace
+# Using SHELL for proper sourcing during the build command
+SHELL ["/bin/bash", "-c"]
+
+# Install common ROS 2 tools and python requirements
+COPY --chown=$USERNAME:$USERNAME exec/requirements.txt /tmp/requirements.txt
+RUN sudo apt-get update && \
+    sudo apt-get install -y \
+    ros-foxy-ros-base \
+    ros-foxy-rqt* \
+    python3-colcon-common-extensions \
+    iputils-ping && \
+    pip3 install --no-cache-dir -r /tmp/requirements.txt && \
+    rm -rf /var/lib/apt/lists/* /tmp/requirements.txt # Clean up apt lists and tmp file
+
+# Build the workspace (including px4_msgs)
+# Ensure ROS environment is sourced before building
+RUN source /opt/ros/$ROS_DISTRO/setup.bash && \
+    colcon build --symlink-install --packages-select px4_msgs && \
+    rm -rf ros2_ws/log ros2_ws/build # Clean up build artifacts
+
+# Copy your custom ROS 2 source code into the workspace
+# Make sure your custom packages also declare px4_msgs as a dependency in their package.xml
+COPY --chown=$USERNAME:$USERNAME ./src /home/$USERNAME/ros2_ws/src/your_custom_packages # Adjust path if needed
+RUN source /opt/ros/$ROS_DISTRO/setup.bash && \
+    source /home/$USERNAME/ros2_ws/install/setup.bash && \
+    colcon build && \
+    rm -rf ros2_ws/log ros2_ws/build # Build your custom packages and clean up
+
+# Ensure both ROS and workspace overlays are sourced in .bashrc
+# This makes them available when you exec into the container
+RUN echo "source /opt/ros/$ROS_DISTRO/setup.bash" >> /home/$USERNAME/.bashrc && \
+    echo "source /home/$USERNAME/ros2_ws/install/setup.bash" >> /home/$USERNAME/.bashrc
+
+# Copy entrypoint.sh and set permissions
+COPY --chown=$USERNAME:$USERNAME exec/entrypoint.sh /home/$USERNAME/entrypoint.sh
 RUN chmod +x /home/$USERNAME/entrypoint.sh
 
-# RUN echo "source /opt/ros/$ROS_DISTRO/setup.bash" >> /home/$USERNAME/.bashrc && \
-#     echo "source /opt/px4_msgs/setup.bash" >> /home/$USERNAME/.bashrc
-
-# COPY --chown=$USERNAME:$USERNAME ./px4_msgs/px4_msgs_install/ ./install/
-# COPY --chown=$USERNAME:$USERNAME ./px4_msgs/px4_msgs_build/ ./build/
-
-# RUN /bin/bash -c "source /opt/ros/$ROS_DISTRO/setup.bash && colcon build"
-
-CMD ["/bin/bash"]
-ENTRYPOINT ["/bin/bash", "-c", "/home/aeroprint_user/entrypoint.sh; exec bash"]
+# Set the default command for the container
+# ENTRYPOINT sets the primary command. CMD provides default arguments.
+# If you just want to run the entrypoint, you can simplify.
+# "/usr/bin/env bash" is often more robust than just "bash" for the shell.
+ENTRYPOINT ["/usr/bin/env", "bash", "-c", "/home/aeroprint_user/entrypoint.sh; exec bash"]
+CMD [""] # No default arguments to the entrypoint script
