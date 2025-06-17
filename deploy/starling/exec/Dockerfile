@@ -1,25 +1,13 @@
-# Use the ROS Humble ros-core base image, which includes Python 3 and core ROS 2 packages.
-FROM ros:humble-ros-core
+FROM ros:humble
 
-# Set locale to avoid warnings and ensure proper character encoding.
-ENV LANG C.UTF-8
-ENV LC_ALL C.UTF-8
-
-# Set up a non-root user for better security practices.
-ARG UID=1000
-ARG GID=1000
-RUN groupadd -g $GID rosuser && useradd -m -s /bin/bash -u $UID -g $GID rosuser
-USER rosuser
-WORKDIR /home/rosuser
-
-# Install the demo_nodes_py package.
-# It's crucial to run apt-get update before installing new packages.
-USER root # Temporarily switch to root to install packages
+# Install demo_nodes_py package
 RUN apt-get update && \
     apt-get install -y ros-humble-demo-nodes-py && \
-    rm -rf /var/lib/apt/lists/* # Clean up apt cache to keep image small
-USER rosuser # Switch back to rosuser
+    rm -rf /var/lib/apt/lists/*
 
-# Set the entrypoint to directly run the ROS 2 Python talker node.
-# This sources the ROS environment and then executes the talker node immediately.
-ENTRYPOINT ["/bin/bash", "-c", ". /opt/ros/humble/setup.bash && ros2 run demo_nodes_py talker"]
+# Set up ROS 2 environment
+SHELL ["/bin/bash", "-c"]
+ENTRYPOINT ["/ros_entrypoint.sh"]
+
+# Run the talker node
+CMD ["ros2", "run", "demo_nodes_py", "talker"]
