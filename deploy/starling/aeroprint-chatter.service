@@ -1,7 +1,7 @@
 [Unit]
 Description=ROS Humble Talker
-After=docker-autorun.service network-online.target
-Requires=docker-autorun.service network-online.target
+After=docker-autorun.service network-online.target voxl-wait-for-fs.service
+Requires=docker-autorun.service network-online.target voxl-wait-for-fs.service
 
 [Service]
 StartLimitIntervalSec=30
