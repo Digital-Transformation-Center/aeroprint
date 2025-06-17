@@ -27,10 +27,6 @@ services:
     # Restart the container if it exits, unless it was explicitly stopped.
     restart: on-failure
 
-    # Ensure the container is removed when it's stopped (e.g., with 'docker compose down').
-    # This keeps your system clean.
-    remove_orphans: true
-
     # Name the container explicitly for easier identification
     container_name: ros_humble_talker_node
 
