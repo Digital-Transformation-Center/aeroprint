@@ -1,7 +1,8 @@
 // Shutdown button logic
 const shutdownBtn = document.getElementById('shutdownBtn');
 shutdownBtn.onclick = () => {
-    window.socket.emit('shutdown_test_node');
+    // window.socket.emit('shutdown_test_node');
+    land_flight();
 };
 const openBtn = document.getElementById('openModalBtn');
 const closeBtn = document.getElementById('closeModalBtn');
