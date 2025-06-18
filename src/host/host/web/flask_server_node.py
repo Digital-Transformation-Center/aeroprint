@@ -143,6 +143,12 @@ class FlaskServerNode(Node):
         self.heartbeat_publisher = self.create_publisher(
             std_msgs.msg.Int8, '/fcu/in/heartbeat', 10
         )
+        self.est_time_subscriber = self.create_subscription(
+            std_msgs.msg.Float32, '/fcu/out/est_time', self.est_time_callback, 10
+        )
+        self.time_remaining_subscriber = self.create_subscription(
+            std_msgs.msg.Float32, '/fcu/out/time_remaining', self.time_remaining_callback, 10
+        )
 
         import threading
         self._heartbeat_timeout = 0.5  # seconds
@@ -235,6 +241,13 @@ class FlaskServerNode(Node):
             if hasattr(self, 'flask_web_app'):
                 self.flask_web_app.emit_status('flight_error')
 
+    def est_time_callback(self, msg):
+        if hasattr(self, 'flask_web_app'):
+            self.flask_web_app.socketio.emit('flight_time_estimate', {'time': msg.data})
+
+    def time_remaining_callback(self, msg):
+        if hasattr(self, 'flask_web_app'):
+            self.flask_web_app.socketio.emit('flight_time_remaining', {'time': msg.data})
 
     def attach_status_callback(self, fn):
         self.flask_status_callback = fn

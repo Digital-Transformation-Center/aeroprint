@@ -421,3 +421,51 @@ unitToggle.addEventListener('change', function() {
         window.socket.emit('set_units', { units: 'meters' });
     }
 });
+
+const camera_widget = document.getElementById('camera_widget');
+const camera_btn = document.getElementById('cameraBtn');
+camera_btn.onclick = () => {
+    console.log('Toggling camera widget');
+    if (camera_widget.style.display === 'none' || camera_widget.style.display === '') {
+        camera_widget.style.display = 'block';
+        camera_btn.classList.add('active');
+    } else {
+        camera_widget.style.display = 'none';
+        camera_btn.classList.remove('active');
+    }
+};
+
+let flight_time_est = 0;
+let time_remaining = 0;
+const flightTimeDisplay = document.getElementById('flight_time');
+const flight_time_status_container = document.getElementById('flight_time_status');
+const flight_time_status_indicator = document.getElementById('flight_time_progress');
+if (flight_time_status_indicator) {
+    console.log('Flight time status indicator found');
+} else {
+    console.log('Flight time status indicator not found');
+}
+
+window.socket.on('flight_time_estimate', data => {
+    flight_time_est = data.time;
+    updateFlightTimeDisplay(flight_time_est);    
+});
+
+window.socket.on('flight_time_remaining', data => {
+    time_remaining = data.time;
+    updateFlightTimeDisplay(time_remaining);
+});
+
+function updateFlightTimeDisplay(time_remaining) {
+    if (flight_time_est == 0) {
+        flight_time_status_container.style.display = 'none';
+    }
+    else {
+        flight_time_status_container.style.display = '';
+        // Format as mm:ss
+        const minutes = Math.floor(time_remaining / 60);
+        const seconds = Math.floor(time_remaining % 60).toString().padStart(2, '0');
+        flightTimeDisplay.textContent = `${minutes}:${seconds}`;
+        flight_time_status_indicator.style.width = `${(1 - time_remaining / flight_time_est) * 100}%`;
+    }
+}

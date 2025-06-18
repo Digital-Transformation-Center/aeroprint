@@ -13,7 +13,7 @@ from rclpy.node import Node
 from rclpy.duration import Duration
 from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy
 from math import pi
-from std_msgs.msg import Bool, Float32MultiArray, Int8
+from std_msgs.msg import Bool, Float32MultiArray, Int8, Float32
 from starling.flightdefs.helix import Helix
 
 from px4_msgs.msg import (
@@ -69,6 +69,14 @@ class HeartbeatNode(Node):
             "/start_flight",
             self.start_flight,
             10
+        )
+
+        self.flight_time_est_publisher = self.create_publisher(
+            Float32, "/flight_time_est", 10
+        )
+
+        self.time_remaining_publisher = self.create_publisher(
+            Float32, "/flight_time_remaining", 10
         )
 
         self.param_subscriber = self.create_subscription(

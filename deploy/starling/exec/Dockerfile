@@ -47,9 +47,6 @@ USER root
 COPY --chown=$USERNAME:$USERNAME exec/requirements.txt /tmp/requirements.txt
 RUN sudo apt-get update && \
     sudo apt-get install -y \
-    # ros-foxy-ros-base \
-    # ros-foxy-rqt* \
-    # python3-colcon-common-extensions \
     iputils-ping && \
     pip3 install --no-cache-dir -r /tmp/requirements.txt && \
     rm -rf /var/lib/apt/lists/* /tmp/requirements.txt

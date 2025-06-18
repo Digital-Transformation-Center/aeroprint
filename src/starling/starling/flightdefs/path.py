@@ -42,3 +42,11 @@ class Path:
         :return: The number of steps in the path.
         """
         raise NotImplementedError("Subclasses must implement this method")
+    
+    def get_duration(self):
+        """
+        Returns the duration of the path.
+        This method must be implemented by subclasses.
+        :return: The duration of the path.
+        """
+        raise NotImplementedError("Subclasses must implement this method")

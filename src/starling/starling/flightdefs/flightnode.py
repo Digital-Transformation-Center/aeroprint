@@ -13,7 +13,7 @@ from rclpy.node import Node
 from rclpy.duration import Duration
 from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy
 from math import pi
-from std_msgs.msg import Bool, Int8
+from std_msgs.msg import Bool, Int8, Float32
 from starling.flightdefs.helix import Helix
 from starling.flightdefs.path import Path
 import starling.flightdefs.flight_status_codes as flight_status_codes
@@ -74,6 +74,14 @@ class FlightNode(Node):
             qos_profile,
         )
 
+        self.flight_time_est_publisher = self.create_publisher(
+            Float32, "/fcu/out/est_time", 10
+        )
+
+        self.time_remaining_publisher = self.create_publisher(
+            Float32, "/fcu/out/time_remaining", 10
+        )
+
         # Timer for the main control loop (e.g., every 0.1 seconds = 10Hz)
         # PX4 typically requires OffboardControlMode messages at >2Hz.
         self.control_timer_period = 0.1  # seconds
@@ -112,7 +120,21 @@ class FlightNode(Node):
         self.steps = self.path.get_num_steps()
         self.hit_flight = False
         self.offboard_arr_counter = 0
+        self.publish_time_estimate(self.path.get_duration())
         self.publish_status(flight_status_codes.FLIGHT_PATH_LOADED)
+
+    def publish_time_estimate(self, time_estimate: float) -> None:
+        """Publish the estimated flight time."""
+        msg = Float32()
+        msg.data = time_estimate
+        self.flight_time_est_publisher.publish(msg)
+
+    def publish_time_remaining(self, time_remaining: float) -> None:
+        """Publish the estimated time remaining for the flight."""
+        self.get_logger().info(f"Time remaining: {time_remaining:.2f} seconds")
+        msg = Float32()
+        msg.data = time_remaining
+        self.time_remaining_publisher.publish(msg)
 
     def publish_status(self, status_code: int) -> None:
         """Publish the current flight status code."""
@@ -148,6 +170,7 @@ class FlightNode(Node):
             self._publish_trajectory_setpoint(
                 position, yaw, velocity=velocity, acceleration=acceleration, yawspeed=yawspeed
             )   
+            self.publish_time_remaining(self.path.get_duration() *  (1-(self.offboard_arr_counter / self.steps)))
 
         if self.offboard_arr_counter >= self.steps:
             self._publish_trajectory_setpoint(
