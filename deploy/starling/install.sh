@@ -62,7 +62,13 @@ systemctl start "${WAIT_FOR_IP_SERVICE_FILE}" || { echo "Failed to start wait-fo
 
 echo "Installation and startup complete for ${AEROPRINT_CHATTER_SERVICE_FILE}!"
 echo "---"
-echo "To check service status: sudo systemctl status ${AEROPRINT_CHATTER_SERVICE_FILE}"
-echo "To view service logs: sudo journalctl -u ${AEROPRINT_CHATTER_SERVICE_FILE} -f"
-echo "To stop the service: sudo systemctl stop ${AEROPRINT_CHATTER_SERVICE_FILE}"
-echo "To disable the service (prevent autostart on boot): sudo systemctl disable ${AEROPRINT_CHATTER_SERVICE_FILE}"
+echo "Setting up AeroPrint Paths..."
+# --- Set up AeroPrint Paths ---
+if [ ! -d "/etc/aeroprint" ]; then
+  mkdir /etc/aeroprint
+  mkdir /etc/aeroprint/logs
+  mkdir /etc/aeroprint/config
+  mkdir /etc/aeroprint/artifacts
+fi
+
+
