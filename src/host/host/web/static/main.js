@@ -3,6 +3,10 @@ const shutdownBtn = document.getElementById('shutdownBtn');
 shutdownBtn.onclick = () => {
     // window.socket.emit('shutdown_test_node');
     land_flight();
+    knob_status = 1; // Set to idle state
+    warning_message = 'Please save a new flight path';
+    reset_knob();
+    set_knob_appearance();
 };
 const openBtn = document.getElementById('openModalBtn');
 const closeBtn = document.getElementById('closeModalBtn');
