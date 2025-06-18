@@ -1,0 +1,6 @@
+pyqt5
+tensorflow
+paramiko
+open3d
+trimesh
+opencv-python-headless
