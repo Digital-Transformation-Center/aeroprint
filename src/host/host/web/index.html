@@ -348,7 +348,7 @@
       <div class="heartbeat-indicator" id="heartbeatIndicator">
         <span class="heartbeat-dot disconnected" id="heartbeatDot"></span>
         <span id="heartbeatText">Disconnected</span>
-        <button class="shutdown-btn" id="shutdownBtn">Shutdown</button>
+        <button class="shutdown-btn" id="shutdownBtn">Land</button>
       </div>
       
     </div>
@@ -369,7 +369,8 @@
         // Shutdown button logic
         const shutdownBtn = document.getElementById('shutdownBtn');
         shutdownBtn.onclick = () => {
-            window.socket.emit('shutdown_test_node');
+          land_flight();
+            // window.socket.emit('shutdown_test_node');
         };
         const openBtn = document.getElementById('openModalBtn');
         const closeBtn = document.getElementById('closeModalBtn');
