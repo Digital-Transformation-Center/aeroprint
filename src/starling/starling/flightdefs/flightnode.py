@@ -131,7 +131,6 @@ class FlightNode(Node):
 
     def publish_time_remaining(self, time_remaining: float) -> None:
         """Publish the estimated time remaining for the flight."""
-        self.get_logger().info(f"Time remaining: {time_remaining:.2f} seconds")
         msg = Float32()
         msg.data = time_remaining
         self.time_remaining_publisher.publish(msg)
@@ -158,6 +157,8 @@ class FlightNode(Node):
         else:
             self.get_logger().info("Entering landing sequence.")
             self.current_system_state = "LANDING"
+            if hasattr(self, "external_land_callback") and self.external_land_callback:
+                self.external_land_callback()
                 
     def offboard_move_callback(self):
         if self.offboard_arr_counter < self.steps:
@@ -183,9 +184,36 @@ class FlightNode(Node):
             self.figure8_timer.cancel()
             self.current_system_state = "LANDING"
             self.get_logger().info("Figure path completed, landing now.")
+            if hasattr(self, "external_land_callback") and self.external_land_callback:
+                self.external_land_callback()
 
         self.offboard_arr_counter += 1
 
+
+    def set_external_arm_callback(self, callback):
+        """Set an external callback to engage the offboard control mode."""
+        self.external_arm_callback = callback
+        self.get_logger().info("External arm callback set.")
+
+    def set_external_takeoff_callback(self, callback):
+        """Set an external callback to takeoff the vehicle."""
+        self.external_takeoff_callback = callback
+        self.get_logger().info("External takeoff callback set.")
+
+    def set_external_engage_callback(self, callback):
+        """Set an external callback to engage the offboard control mode."""
+        self.external_engage_callback = callback
+        self.get_logger().info("External engage callback set.")
+
+    def set_external_land_callback(self, callback):
+        """Set an external callback to land the vehicle."""
+        self.external_land_callback = callback
+        self.get_logger().info("External land callback set.")
+
+    def set_external_disarm_callback(self, callback):
+        """Set an external callback to disarm the vehicle."""
+        self.external_disarm_callback = callback
+        self.get_logger().info("External disarm callback set.")
 
     def _control_loop_callback(self) -> None:
         """Main control loop executed by the timer."""
@@ -199,6 +227,8 @@ class FlightNode(Node):
                 self.offboard_mode_set_time = self.get_clock().now()
                 self.current_system_state = "OFFBOARD_ENGAGING"
                 self.get_logger().info("Attempting to engage Offboard mode.")
+                if hasattr(self, "external_arm_callback") and self.external_arm_callback:
+                    self.external_arm_callback()
 
         elif self.current_system_state == "OFFBOARD_ENGAGING":
             # Wait a short period for mode switch to take effect (e.g., 0.5s)
@@ -208,6 +238,8 @@ class FlightNode(Node):
                 self.armed_time = self.get_clock().now()
                 self.current_system_state = "ARMED"
                 self.get_logger().info("Vehicle arm command sent.")
+                if hasattr(self, "external_takeoff_callback") and self.external_takeoff_callback:
+                    self.external_takeoff_callback()
 
         elif self.current_system_state == "ARMED":
             if self.armed_time and \
@@ -215,6 +247,8 @@ class FlightNode(Node):
                 self.flight_start_time = self.get_clock().now()
                 self.current_system_state = "FLIGHT_ENGAGED"
                 self.get_logger().info("Takeoff complete. Starting flight sequence.")
+                if hasattr(self, "external_engage_callback") and self.external_engage_callback:
+                    self.external_engage_callback()
             else:
                 try:
                     self._publish_trajectory_setpoint([self.start_position.x, self.start_position.y, self.start_position.z], self.hold_yaw)
@@ -248,6 +282,8 @@ class FlightNode(Node):
 
             if self.land_counter > 50:  # Wait for 5 seconds at 10Hz
                 self.current_system_state = "DISARMED_IDLE"
+                if hasattr(self, "external_disarm_callback") and self.external_disarm_callback:
+                    self.external_disarm_callback()
 
             self.land_counter += 1
             # msg = Int8()

@@ -18,8 +18,23 @@ class HelixNode(FlightNode):
             self.start_flight,
             10
         )
-
+        self.start_scan_publisher = self.create_publisher(
+            Bool, 
+            "/fcu/out/start_scan", 
+            10
+        )
+        self.set_external_engage_callback(self.publish_scan_start)
         self.init_heartbeat()
+
+    def publish_scan_start(self):
+        """
+        Publishes a message to start the scan.
+        """
+        self.get_logger().info("Publishing start scan command.")
+        msg = Bool()
+        msg.data = True
+        self.start_scan_publisher.publish(msg)
+        self.get_logger().info("Published start scan command.")
 
     def helix_params_callback(self, data):
         self.get_logger().info(f"Received helix parameters: {data.data}")
