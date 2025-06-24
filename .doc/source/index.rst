@@ -7,7 +7,7 @@ AeroPrint documentation
 =======================
 For development documentation, please see the `AeroPrint GitHub <https://github.com/Digital-Transformation-Center/aeroprint/wiki>`_.
 
-Version 0.1.0
+Version 0.2.0
 -----------
 
 Introduction
