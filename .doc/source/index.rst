@@ -3,15 +3,9 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-AeroPrint documentation
+AeroPrint 1.02 Documentation
 =======================
-For development documentation, please see the `AeroPrint GitHub <https://github.com/Digital-Transformation-Center/aeroprint/wiki>`_.
 
-Workflow: 0.0.1
------------
-
-Introduction
--------------
 AeroPrint is a student-led research project designed to explore real-world application of the `digital thread <https://en.wikipedia.org/wiki/Digital_thread>`_. AeroPrint employs a small `UAS <https://www.faa.gov/uas>`_ to perform automated 3D digital scanning of objects. Using a `ToF (Time of Flight) sensor <https://en.wikipedia.org/wiki/Time-of-flight_camera>`_, the AeroPrint drone performs a systematic scan of a given object by flying an automatically generated flight plan.
 
 
@@ -24,15 +18,18 @@ Currently, AeroPrint implements rudimentary path planning and 3D localization te
 
 Path Planning
 -------------
-In the current AeroPrint software release, the flight path is defined by a set of user-defined parameters such as the height of the object, the height of the base of the object (for objects propped above the ground), and the drone's starting radius from the center of the object.
+In version 1.02, AeroPrint has been redesigned to implement a helical flight path, which allows the drone to capture all sides of an object while maintaining smooth flight characteristics. The drone will begin flight at a height above the object, and then revolve around the object in a helical pattern, capturing data at each level of the flight path. This allows for a more comprehensive scan of the object, as it captures data from the top surface, sides, and base of the object.
 
+User Interface
+-------------
+AeroPrint version 1.0.2 introduces a more intuitive user interface, making it easier for users to define scan parameters and monitor the scanning process in real-time. The AeroPrint UI is now web-based, allowing users to access it from any device with a web browser. The UI provides options for defining the scan area, adjusting flight parameters, and monitoring the drone's status during the scan.
 
-The drone will begin flight slightly higher than the object based on the input parameters which allows data to be captured of the top surface of the object and the sides. After revolving around the object and capturing incremental ToF data, the drone will drop to a level adjacent to the middle of the object and do the same. Finally, the drone will drop to a low level to capture the base of the object.
+The new UI is broken out into widgets, creating a modular structure that can be expanded as features are added. Widgets can be embedded as a popup, a separate page, or integrated into a control panel.
 
-.. image:: _static/images/flight-path.png
-   :alt: Flight Path Diagram
-   :width: 600
-   :align: center
+**Flight Control Page**
+
+The flight control page allows users to define the scan area, adjust flight parameters, and monitor the drone's status during the scan. Users can set the size and location of the scan and the number of passes to ensure a comprehensive scan of the object. This functionality is integrated with an all-new 3D visualization widget, called `Config 3D`, which provides a real-time 3D view of the drone's flight path and the scan area.
+
 
 Data Collection
 ----------------
@@ -56,7 +53,7 @@ AeroPrint captures several types of data that can either be used as-is, or furth
 
 3D Printing
 -------------
-AeroPrint takes seversl steps towards completing the 'digital thread' by automating the process not only of collecting and processing data, but by automatically slicing and 3D printing replica objects. The current version of AeroPrint utilizes the `Slic3r <https://slic3r.org>`_ library to automate the processing of meshes into code for a 3d printer.
+AeroPrint takes several steps towards completing the 'digital thread' by automating the process not only of collecting and processing data, but by automatically slicing and 3D printing replica objects. The current version of AeroPrint utilizes the `Slic3r <https://slic3r.org>`_ library to automate the processing of meshes into code for a 3d printer.
 
 
 The printer chosen for integration with AeroPrint is the `Prusa Mk4 <https://www.prusa3d.com>`_ due to its open-source compatibility and reliability. Using Prusa's API, AeroPrint is able to automatically establish a connection to a networked printer and initiate prints.

@@ -7,8 +7,11 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Host Package documentation &mdash; AeroPrint 1.0.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/custom.css?v=de8117f2" />
+      <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/dark.css?v=70edf1c7" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
@@ -16,11 +19,13 @@
       <script src="_static/documentation_options.js?v=292eb321"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+      <script src="_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Starling Package documentation" href="starling.html" />
-    <link rel="prev" title="AeroPrint documentation" href="index.html" /> 
+    <link rel="prev" title="AeroPrint 1.02 Documentation" href="index.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -441,7 +446,7 @@ It initializes and displays the GUI, then starts the application’s event loop.
 <span id="module-host.gui.gui_pages.settings.settings_widget"></span><h2>Settings Wdget<a class="headerlink" href="#settings-wdget" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="host.gui.gui_pages.settings.settings_widget.SettingWidget">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">host.gui.gui_pages.settings.settings_widget.</span></span><span class="sig-name descname"><span class="pre">SettingWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">setting</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.settings.settings_widget.SettingWidget" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">host.gui.gui_pages.settings.settings_widget.</span></span><span class="sig-name descname"><span class="pre">SettingWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.settings.settings_widget.SettingWidget" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QWidget</span></code></p>
 <p>A widget for displaying and editing a setting.</p>
 <dl class="py attribute">
@@ -556,7 +561,7 @@ It initializes and displays the GUI, then starts the application’s event loop.
 
 <dl class="py class">
 <dt class="sig sig-object py" id="host.gui.gui_pages.settings.settings_widget.SettingWidget.FilePickerWidget">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">FilePickerWidget</span></span><a class="headerlink" href="#host.gui.gui_pages.settings.settings_widget.SettingWidget.FilePickerWidget" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">FilePickerWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.settings.settings_widget.SettingWidget.FilePickerWidget" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QWidget</span></code></p>
 <p>A custom widget that allows the user to select a folder from the file system.</p>
 <dl class="py attribute">
@@ -681,7 +686,7 @@ from the ‘edit_widget’. The type of the value is determined by the ‘type�
 
 <dl class="py class">
 <dt class="sig sig-object py" id="host.gui.gui_pages.settings.settings_widget.SettingsWidget">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">host.gui.gui_pages.settings.settings_widget.</span></span><span class="sig-name descname"><span class="pre">SettingsWidget</span></span><a class="headerlink" href="#host.gui.gui_pages.settings.settings_widget.SettingsWidget" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">host.gui.gui_pages.settings.settings_widget.</span></span><span class="sig-name descname"><span class="pre">SettingsWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.settings.settings_widget.SettingsWidget" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QWidget</span></code></p>
 <p>A widget for displaying and managing application settings.</p>
 <dl class="py attribute">
@@ -775,7 +780,7 @@ UDRI DTC AEROPRINT</p>
 <h2>Flight Widget<a class="headerlink" href="#flight-widget" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.CircleWidget">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">host.gui.gui_pages.flight.flight_widget.</span></span><span class="sig-name descname"><span class="pre">CircleWidget</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.CircleWidget" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">host.gui.gui_pages.flight.flight_widget.</span></span><span class="sig-name descname"><span class="pre">CircleWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.CircleWidget" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QWidget</span></code></p>
 <p>A custom QWidget that displays a colored circle with text centered inside it.
 .. attribute:: text</p>
@@ -805,7 +810,7 @@ UDRI DTC AEROPRINT</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.CircleWidget.paintEvent">
-<span class="sig-name descname"><span class="pre">paintEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPaintEvent</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.CircleWidget.paintEvent" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">paintEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.CircleWidget.paintEvent" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -827,7 +832,7 @@ UDRI DTC AEROPRINT</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.FlightWidget">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">host.gui.gui_pages.flight.flight_widget.</span></span><span class="sig-name descname"><span class="pre">FlightWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resources_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scroll_container</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mlui</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.FlightWidget" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">host.gui.gui_pages.flight.flight_widget.</span></span><span class="sig-name descname"><span class="pre">FlightWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.FlightWidget" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QWidget</span></code></p>
 <p>A widget for the AEROPRINT application that integrates various components
 such as image exporting, parameter configuration, and ROS communication.</p>
@@ -1256,7 +1261,7 @@ Optionally, it can take arguments to initialize the ROS client library.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.GUItoROS.qvio_callback">
-<span class="sig-name descname"><span class="pre">qvio_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_msg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Image</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.qvio_callback" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">qvio_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_msg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">sensor_msgs.msg.Image</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.GUItoROS.qvio_callback" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -1283,11 +1288,11 @@ Optionally, it can take arguments to initialize the ROS client library.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.HeightGraphic">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">host.gui.gui_pages.flight.flight_widget.</span></span><span class="sig-name descname"><span class="pre">HeightGraphic</span></span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.HeightGraphic" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">host.gui.gui_pages.flight.flight_widget.</span></span><span class="sig-name descname"><span class="pre">HeightGraphic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.HeightGraphic" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QWidget</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.HeightGraphic.paintEvent">
-<span class="sig-name descname"><span class="pre">paintEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">QPaintEvent</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.HeightGraphic.paintEvent" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">paintEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">e</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.HeightGraphic.paintEvent" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -1426,7 +1431,7 @@ Optionally, it can take arguments to initialize the ROS client library.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.ParameterWidget">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">host.gui.gui_pages.flight.flight_widget.</span></span><span class="sig-name descname"><span class="pre">ParameterWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g2r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_exporter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resources_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">host.gui.gui_pages.flight.flight_widget.</span></span><span class="sig-name descname"><span class="pre">ParameterWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.ParameterWidget" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QWidget</span></code></p>
 <p>A widget for configuring and managing flight parameters for a scanning operation.
 This widget allows the user to select a dataset, input scan details such as title, radius, height, and starting height,
@@ -1738,7 +1743,7 @@ description accordingly.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="host.gui.gui_pages.flight.flight_widget.QVIOWidget">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">host.gui.gui_pages.flight.flight_widget.</span></span><span class="sig-name descname"><span class="pre">QVIOWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_exporter</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.QVIOWidget" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">host.gui.gui_pages.flight.flight_widget.</span></span><span class="sig-name descname"><span class="pre">QVIOWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.flight.flight_widget.QVIOWidget" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QWidget</span></code></p>
 <p>QVIOWidget is a custom QWidget that displays video frames from a video source.</p>
 <dl class="py attribute">
@@ -1853,7 +1858,7 @@ useful for debugging or logging purposes.</p>
 <span id="module-host.gui.gui_pages.tensor_flow.ml_ui"></span><h2>TensorFlow Widget<a class="headerlink" href="#tensorflow-widget" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.ImageScrollWidget">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">host.gui.gui_pages.tensor_flow.ml_ui.</span></span><span class="sig-name descname"><span class="pre">ImageScrollWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">settings_utility</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent_widget</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.ImageScrollWidget" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">host.gui.gui_pages.tensor_flow.ml_ui.</span></span><span class="sig-name descname"><span class="pre">ImageScrollWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.ImageScrollWidget" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QWidget</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.ImageScrollWidget.load_images">
@@ -1864,7 +1869,7 @@ useful for debugging or logging purposes.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.LoadingPopup">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">host.gui.gui_pages.tensor_flow.ml_ui.</span></span><span class="sig-name descname"><span class="pre">LoadingPopup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.LoadingPopup" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">host.gui.gui_pages.tensor_flow.ml_ui.</span></span><span class="sig-name descname"><span class="pre">LoadingPopup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.LoadingPopup" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QWidget</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.LoadingPopup.close_popup">
@@ -1885,7 +1890,7 @@ useful for debugging or logging purposes.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.MLUI">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">host.gui.gui_pages.tensor_flow.ml_ui.</span></span><span class="sig-name descname"><span class="pre">MLUI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scroll_container</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.MLUI" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">host.gui.gui_pages.tensor_flow.ml_ui.</span></span><span class="sig-name descname"><span class="pre">MLUI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.MLUI" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QWidget</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.MLUI.image_select">
@@ -1987,7 +1992,7 @@ useful for debugging or logging purposes.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionWidget">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">host.gui.gui_pages.tensor_flow.ml_ui.</span></span><span class="sig-name descname"><span class="pre">ModelInteractionWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_generator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_tester</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">classes_directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">class_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">next_button</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionWidget" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">host.gui.gui_pages.tensor_flow.ml_ui.</span></span><span class="sig-name descname"><span class="pre">ModelInteractionWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionWidget" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QWidget</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.ModelInteractionWidget.load_model_popup">
@@ -2043,13 +2048,13 @@ useful for debugging or logging purposes.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.ScanOutputWidget">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">host.gui.gui_pages.tensor_flow.ml_ui.</span></span><span class="sig-name descname"><span class="pre">ScanOutputWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">images_file_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.ScanOutputWidget" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">host.gui.gui_pages.tensor_flow.ml_ui.</span></span><span class="sig-name descname"><span class="pre">ScanOutputWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.ScanOutputWidget" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QWidget</span></code></p>
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="host.gui.gui_pages.tensor_flow.ml_ui.SplashWidget">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">host.gui.gui_pages.tensor_flow.ml_ui.</span></span><span class="sig-name descname"><span class="pre">SplashWidget</span></span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.SplashWidget" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">host.gui.gui_pages.tensor_flow.ml_ui.</span></span><span class="sig-name descname"><span class="pre">SplashWidget</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#host.gui.gui_pages.tensor_flow.ml_ui.SplashWidget" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">QWidget</span></code></p>
 </dd></dl>
 
@@ -2154,7 +2159,7 @@ completion of the mesh processing.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="index.html" class="btn btn-neutral float-left" title="AeroPrint documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="index.html" class="btn btn-neutral float-left" title="AeroPrint 1.02 Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="starling.html" class="btn btn-neutral float-right" title="Starling Package documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
