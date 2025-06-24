@@ -8,12 +8,17 @@ import Scans from "./pages/Scans";
 import Settings from "./pages/Settings";
 import Game from "./pages/Game";
 import theme from "./styles/theme";
+import { ScanProvider } from "./context/ScanContext";
+import Viewer from "./pages/Viewer";
+
 
 function App() {
   return (
     <ThemeProvider theme={theme}>
+      <ScanProvider>
       <Router>
         <Routes>
+          <Route path="/viewer" element={<Viewer />} />
           <Route path="/" element={<Home />} />
           <Route path="/scan" element={<Scan />} />
           <Route path="/demo" element={<Demo />} />
@@ -22,6 +27,7 @@ function App() {
           <Route path="/game" element={<Game />} />
         </Routes>
       </Router>
+      </ScanProvider>
     </ThemeProvider>
   );
 }
