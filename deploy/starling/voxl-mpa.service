@@ -5,7 +5,7 @@ After=network.target
 [Service]
 User=root
 Environment="HOME=root"
-ExecStart=/usr/bin/bash /usr/local/bin/voxl_mpa.sh
+ExecStart=/bin/bash /usr/local/bin/voxl_mpa.sh
 Restart=on-failure
 
 [Install]
