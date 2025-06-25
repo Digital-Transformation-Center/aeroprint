@@ -3,7 +3,8 @@ import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import PointCloud2
 import tf2_ros
-import tf2_sensor_msgs  # This module provides do_transform_cloud
+from tf2_sensor_msgs import do_transform_cloud
+# import tf2_sensor_msgs  # This module provides do_transform_cloud
 from tf2_geometry_msgs import do_transform_pose_stamped # Not directly used for PC2, but useful to know
 
 class PointCloudTransformer(Node):
@@ -65,7 +66,7 @@ class PointCloudTransformer(Node):
             )
 
             # Transform the point cloud
-            transformed_cloud = tf2_sensor_msgs.do_transform_cloud(msg, transform)
+            transformed_cloud = do_transform_cloud(msg, transform)
 
             # Update the header of the transformed cloud
             transformed_cloud.header.frame_id = target_frame
