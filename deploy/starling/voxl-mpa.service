@@ -1,0 +1,24 @@
+[Unit]
+Description=ROS 2 VOXL MPA to ROS2 Node
+After=wait-for-ip.service
+
+[Service]
+Type=simple
+User=root
+# Change to your actual workspace directory if different
+WorkingDirectory=/home/root/
+
+# Source ROS 2 and your workspace environment.
+# It's crucial to use 'bash -c' to ensure sourcing works correctly within systemd.
+# Adjust paths if your ROS_DISTRO is not 'foxy' or your install path differs.
+ExecStart=/bin/bash -c "source /opt/ros/foxy/setup.bash && ros2 run voxl_mpa_to_ros2 voxl_mpa_to_ros2_node"
+
+Restart=on-failure
+RestartSec=5 # Wait 5 seconds before attempting to restart
+
+# Standard output and error handling
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
