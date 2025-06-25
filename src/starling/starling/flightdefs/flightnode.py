@@ -17,6 +17,7 @@ from std_msgs.msg import Bool, Int8, Float32
 from starling.flightdefs.helix import Helix
 from starling.flightdefs.path import Path
 import starling.flightdefs.flight_status_codes as flight_status_codes
+from starling.flightdefs.tf_manager import TransformManager
 
 from px4_msgs.msg import (
     OffboardControlMode,
@@ -36,6 +37,8 @@ class FlightNode(Node):
         super().__init__(name)
 
         self.get_logger().info("Flight Node Alive!")
+
+        self.tm = TransformManager() # Transform manager for managing coordinates
 
         # Configure QoS profile for publishing
         # For control messages, RELIABLE might be preferred, but BEST_EFFORT is used
@@ -107,6 +110,9 @@ class FlightNode(Node):
 
         self.flight_start_time = None
 
+        self.is_landing = False
+        self.figure8_timer = None
+
         self.rate = 20  # Hz, rate of the helix path
 
     def init_heartbeat(self, period: float = 0.5):
@@ -157,6 +163,7 @@ class FlightNode(Node):
         else:
             self.get_logger().info("Entering landing sequence.")
             self.current_system_state = "LANDING"
+            self.is_landing = True
             if hasattr(self, "external_land_callback") and self.external_land_callback:
                 self.external_land_callback()
                 
@@ -168,6 +175,7 @@ class FlightNode(Node):
             velocity = state.get_velocity()
             acceleration = state.get_acceleration()
             yawspeed = state.get_yaw_rate()
+            self.get_logger().info(f"yaw rate : {yawspeed}")
             self._publish_trajectory_setpoint(
                 position, yaw, velocity=velocity, acceleration=acceleration, yawspeed=yawspeed
             )   
@@ -183,6 +191,7 @@ class FlightNode(Node):
         if self.offboard_arr_counter == self.steps + 50:
             self.figure8_timer.cancel()
             self.current_system_state = "LANDING"
+            self.is_landing = True
             self.get_logger().info("Figure path completed, landing now.")
             if hasattr(self, "external_land_callback") and self.external_land_callback:
                 self.external_land_callback()
@@ -272,14 +281,16 @@ class FlightNode(Node):
                     
 
         elif self.current_system_state == "LANDING":
-            if self.hit_flight:
-                self.publish_status(flight_status_codes.FLIGHT_LANDING)
-                self.figure8_timer.cancel()
-                self.hit_flight = False
-                self.land_counter = 0
-            
             self._land_vehicle()
+            if self.figure8_timer is not None:
+                self.figure8_timer.cancel()
 
+            if self.hit_flight or self.is_landing:
+                self.land_counter = 0
+                self.is_landing = False
+                self.hit_flight = False
+                self.publish_status(flight_status_codes.FLIGHT_LANDING)
+            
             if self.land_counter > 50:  # Wait for 5 seconds at 10Hz
                 self.current_system_state = "DISARMED_IDLE"
                 if hasattr(self, "external_disarm_callback") and self.external_disarm_callback:
@@ -317,38 +328,49 @@ class FlightNode(Node):
         """Publish the trajectory setpoint, adjusting position, acceleration, and yaw based on home position and yaw."""
         msg = TrajectorySetpoint()
 
-        # Helper to rotate a vector by a given yaw (radians)
-        def rotate_vector(vec, yaw):
-            if vec is None:
-                return None
-            if len(vec) != 3:
-                raise ValueError("Vector must be length 3")
-            cos_yaw = math.cos(yaw)
-            sin_yaw = math.sin(yaw)
-            x, y, z = vec
-            x_r = x * cos_yaw - y * sin_yaw
-            y_r = x * sin_yaw + y * cos_yaw
-            return [float(x_r), float(y_r), float(z)]
+        # # Helper to rotate a vector by a given yaw (radians)
+        # def rotate_vector(vec, yaw):
+        #     if vec is None:
+        #         return None
+        #     if len(vec) != 3:
+        #         raise ValueError("Vector must be length 3")
+        #     cos_yaw = math.cos(yaw)
+        #     sin_yaw = math.sin(yaw)
+        #     x, y, z = vec
+        #     x_r = x * cos_yaw - y * sin_yaw
+        #     y_r = x * sin_yaw + y * cos_yaw
+        #     return [float(x_r), float(y_r), float(z)]
 
-        # Adjust position: rotate by home_yaw, then translate by home_position
-        rotated_position = rotate_vector([float(p) for p in position], self.home_yaw)
-        msg.position = [rotated_position[i] + float(self.home_position[i]) for i in range(3)]
+        # # Adjust position: rotate by home_yaw, then translate by home_position
+        # rotated_position = rotate_vector([float(p) for p in position], self.home_yaw)
+        # msg.position = [rotated_position[i] + float(self.home_position[i]) for i in range(3)]
 
-        # Adjust acceleration: rotate by home_yaw
-        if acceleration is not None:
-            msg.acceleration = rotate_vector(acceleration, self.home_yaw)
+        # # Adjust acceleration: rotate by home_yaw
+        # if acceleration is not None:
+        #     msg.acceleration = rotate_vector(acceleration, self.home_yaw)
 
-        # Adjust velocity: rotate by home_yaw
-        if velocity is not None:
-            msg.velocity = rotate_vector(velocity, self.home_yaw)
+        # # Adjust velocity: rotate by home_yaw
+        # if velocity is not None:
+        #     msg.velocity = rotate_vector(velocity, self.home_yaw)
 
-        # Adjust yaw: add home_yaw
-        msg.yaw = float(yaw) + self.home_yaw
+        # # Adjust yaw: add home_yaw
+        # msg.yaw = float(yaw) + self.home_yaw
 
         # Adjust yawspeed: no change needed (already in body frame)
         if yawspeed is not None:
             msg.yawspeed = float(yawspeed)
+        pos = self.tm.get_position_wrt_world(position)
+        if pos is None:
+            raise AssertionError("Failed to transform position to world frame.")
+        msg.position = pos
+        if velocity is not None:
+            msg.velocity = self.tm.get_vector_wrt_world(velocity)
+        if acceleration is not None:
+            msg.acceleration = self.tm.get_vector_wrt_world(acceleration)
+        
 
+        yaw_uv = self.tm.get_vector_wrt_world([math.cos(yaw), math.sin(yaw), 0.0])
+        msg.yaw = math.atan2(yaw_uv[1], yaw_uv[0])
         msg.timestamp = int(self.get_clock().now().nanoseconds / 1000)
         self.trajectory_setpoint_publisher.publish(msg)
 
@@ -414,12 +436,18 @@ class FlightNode(Node):
     def _update_home_position(self) -> None:
         if self.current_vehicle_position_timestamp is None:
             self.get_logger().info("Current vehicle position not available, cannot update home position.")
+            rclpy.spin_once(self, timeout_sec=0.1)
+            self._update_home_position()  # Retry after a short delay
             return
         elif self.get_clock().now() - self.current_vehicle_position_timestamp < Duration(seconds=0.1):
-            self.home_position = self.current_vehicle_position.copy()
-            self.home_yaw = self.current_vehicle_yaw
-            self.get_logger().info(f"Home position updated: {self.home_position}")
-            self.get_logger().info(f"Home yaw updated: {self.home_yaw} radians")
+            self.tm.set_home(
+                self.current_vehicle_position, self.current_vehicle_yaw)
+            self.tm.wait_for_home_transform()
+            self.get_logger().info("Home position updated successfully.")
+            # self.home_position = self.current_vehicle_position.copy()
+            # self.home_yaw = self.current_vehicle_yaw
+            # self.get_logger().info(f"Home position updated: {self.home_position}")
+            # self.get_logger().info(f"Home yaw updated: {self.home_yaw} radians")
             return
         else:
             self.get_logger().warn("Current vehicle position is too old, not updating home position.")
