@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Model Viewer</title>
+    <!-- Tailwind CSS CDN for basic styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for the body and canvas */
+        body {
+            margin: 0;
+            overflow: hidden; /* Hide scrollbars */
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background-color: #202020; /* Dark background */
+            color: #e2e8f0; /* Light text */
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        #info-box {
+            position: absolute;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            color: #e2e8f0;
+            font-size: 0.875rem;
+            z-index: 10;
+            display: none; /* Hidden by default */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        #loading-indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 1.5rem 2rem;
+            border-radius: 1rem;
+            color: #a0aec0;
+            font-size: 1.125rem;
+            z-index: 20;
+            display: none; /* Hidden by default */
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center p-4">
+    <div id="info-box" role="alert" aria-live="polite"></div>
+    <div id="loading-indicator" role="status" aria-live="polite">Loading 3D model...</div>
+
+    <div class="mb-4 text-center flex flex-wrap justify-center gap-4">
+        <label for="pcdFileInput" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer transition ease-in-out duration-150">
+            <svg class="-ml-1 mr-3 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M.003 4.175A.75.75 0 01.75 3h18.5a.75.75 0 01.747 1.175L15.93 11.25a.75.75 0 01-1.385.045L11.5 6.75l-2.47 5.76c-.347.81-.983 1.076-1.564.717l-3.69-2.274a.75.75 0 01.597-1.326L6.5 9.175l.597-1.392a.75.75 0 011.385.045l1.047 2.443L14.75 5.25a.75.75 0 01.697-.425z" clip-rule="evenodd" />
+            </svg>
+            Upload .PCD File
+        </label>
+        <input type="file" id="pcdFileInput" accept=".pcd" class="hidden">
+
+        <label for="stlFileInput" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 cursor-pointer transition ease-in-out duration-150">
+            <svg class="-ml-1 mr-3 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M.003 4.175A.75.75 0 01.75 3h18.5a.75.75 0 01.747 1.175L15.93 11.25a.75.75 0 01-1.385.045L11.5 6.75l-2.47 5.76c-.347.81-.983 1.076-1.564.717l-3.69-2.274a.75.75 0 01.597-1.326L6.5 9.175l.597-1.392a.75.75 0 011.385.045l1.047 2.443L14.75 5.25a.75.75 0 01.697-.425z" clip-rule="evenodd" />
+            </svg>
+            Upload .STL File
+        </label>
+        <input type="file" id="stlFileInput" accept=".stl" class="hidden">
+
+        <button id="clearModelsButton" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition ease-in-out duration-150">
+            <svg class="-ml-1 mr-3 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 006 3.75v.42c-.394.026-.788.08-1.183.16L3 5.485V14.5A2.75 2.75 0 005.75 17h8.5A2.75 2.75 0 0017 14.5V5.485l-1.817-.456a48.115 48.115 0 00-1.183-.16v-.42A2.75 2.75 0 0011.25 1h-2.5zM3.75 5.25l-.466.116A1.25 1.25 0 002 6.551V14.5a1.25 1.25 0 001.25 1.25h13.5a1.25 1.25 0 001.25-1.25V6.551a1.25 1.25 0 00-.534-1.185L16.25 5.25H3.75z" clip-rule="evenodd" />
+            </svg>
+            Clear All Models
+        </button>
+    </div>
+
+    <div id="container" class="w-full flex-grow relative rounded-xl overflow-hidden shadow-lg border border-gray-700">
+        <!-- Three.js renderer will append its canvas here -->
+    </div>
+
+    <!-- Three.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- OrbitControls for camera interaction -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <!-- STLLoader for STL files -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/STLLoader.js"></script>
+
+    <script>
+        // Global variables for Three.js scene
+        let scene, camera, renderer, controls;
+        let loadedObjects = []; // Array to store all loaded 3D objects (PCDs and STLs)
+        const container = document.getElementById('container');
+        const pcdFileInput = document.getElementById('pcdFileInput');
+        const stlFileInput = document.getElementById('stlFileInput');
+        const clearModelsButton = document.getElementById('clearModelsButton');
+        const infoBox = document.getElementById('info-box');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const pointColor = new THREE.Color(0x007bff); // Default point color for PCDs
+
+        // Function to display messages to the user
+        function showMessage(message, duration = 3000) {
+            infoBox.textContent = message;
+            infoBox.style.display = 'block';
+            if (duration > 0) {
+                setTimeout(() => {
+                    infoBox.style.display = 'none';
+                }, duration);
+            }
+        }
+
+        // Function to show/hide loading indicator
+        function showLoading(show) {
+            loadingIndicator.style.display = show ? 'block' : 'none';
+        }
+
+        // Initialize the Three.js scene
+        function init() {
+            // Scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x202020); // Dark background
+
+            // Camera
+            camera = new THREE.PerspectiveCamera(75, container.offsetWidth / container.offsetHeight, 0.1, 1000);
+            camera.position.z = 2; // Initial camera position
+
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(container.offsetWidth, container.offsetHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            container.appendChild(renderer.domElement);
+
+            // Controls (OrbitControls for interaction)
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true; // Smooth rotation
+            controls.dampingFactor = 0.05;
+            controls.screenSpacePanning = false; // Panning in screen space
+            controls.minDistance = 0.1; // Minimum zoom distance
+            controls.maxDistance = 500; // Maximum zoom distance
+
+            // Add some basic light (optional for point clouds, but good practice for meshes)
+            const ambientLight = new THREE.AmbientLight(0x404040, 2); // Soft white light
+            scene.add(ambientLight);
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+            directionalLight.position.set(1, 1, 1).normalize();
+            scene.add(directionalLight);
+
+            // Handle window resizing
+            window.addEventListener('resize', onWindowResize, false);
+            onWindowResize(); // Initial sizing
+        }
+
+        // Handle window resize events
+        function onWindowResize() {
+            camera.aspect = container.offsetWidth / container.offsetHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.offsetWidth, container.offsetHeight);
+        }
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update(); // Update controls for smooth damping
+            renderer.render(scene, camera);
+        }
+
+        // Function to parse a PCD file (supports ASCII and Binary)
+        function parsePCD(arrayBuffer) {
+            const decoder = new TextDecoder('utf-8');
+            // Read header as text from the beginning of the ArrayBuffer
+            // Limiting to 4KB for header to avoid reading entire large binary files as text
+            const headerMaxBytes = Math.min(arrayBuffer.byteLength, 4096);
+            const headerText = decoder.decode(arrayBuffer.slice(0, headerMaxBytes));
+
+            let header = {};
+            let dataStartByteOffset = -1;
+            const lines = headerText.split('\n');
+
+            let currentLineByteOffset = 0; // Tracks byte offset as we parse lines in headerText
+
+            // Parse header line by line
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i]; // Get the full line including potential '\r' or '\n'
+                const trimmedLine = line.trim();
+
+                if (trimmedLine.startsWith('#') || trimmedLine === '') {
+                    currentLineByteOffset += line.length + 1; // +1 for '\n' character
+                    continue;
+                }
+                if (trimmedLine.startsWith('DATA')) {
+                    header.DATA = trimmedLine.split(' ')[1];
+                    // Data starts immediately after the 'DATA' line (including its newline character)
+                    dataStartByteOffset = currentLineByteOffset + line.length + 1;
+                    break;
+                }
+                const parts = trimmedLine.split(' ');
+                if (parts.length >= 2) {
+                    header[parts[0]] = parts.slice(1).join(' ');
+                }
+                currentLineByteOffset += line.length + 1; // +1 for '\n' character
+            }
+
+            // Validate essential header fields
+            if (!header.FIELDS || !header.SIZE || !header.TYPE || !header.COUNT || !header.POINTS) {
+                throw new Error("Missing essential PCD header fields (FIELDS, SIZE, TYPE, COUNT, POINTS).");
+            }
+
+            const fields = header.FIELDS.split(' ');
+            const sizes = header.SIZE.split(' ').map(Number);
+            const types = header.TYPE.split(' ');
+            const counts = header.COUNT.split(' ').map(Number);
+            const numPoints = parseInt(header.POINTS);
+
+            if (isNaN(numPoints) || numPoints <= 0) {
+                throw new Error("Invalid number of points in PCD header.");
+            }
+
+            const positions = [];
+            const colors = [];
+
+            let pointByteSize = 0;
+            // Calculate the total byte size of one point
+            for (let i = 0; i < fields.length; i++) {
+                pointByteSize += sizes[i] * counts[i];
+            }
+
+            // Map of field names to their byte offsets within a single point's data structure
+            const fieldOffsets = {};
+            let currentFieldOffsetInPoint = 0;
+            for (let i = 0; i < fields.length; i++) {
+                fieldOffsets[fields[i]] = currentFieldOffsetInPoint;
+                currentFieldOffsetInPoint += sizes[i] * counts[i];
+            }
+
+            // Process data based on DATA format
+            if (header.DATA === 'ascii') {
+                console.log("Processing ASCII PCD data...");
+                // For ASCII, parse text data starting from dataStartByteOffset
+                // Ensure we only process lines up to the reported number of points
+                const dataLines = decoder.decode(arrayBuffer.slice(dataStartByteOffset)).split('\n').slice(0, numPoints);
+
+                for (let i = 0; i < dataLines.length; i++) {
+                    const line = dataLines[i].trim();
+                    if (line === '') continue; // Skip empty lines in data
+
+                    const values = line.split(' ').map(Number);
+
+                    let xIndex = fields.indexOf('x');
+                    let yIndex = fields.indexOf('y');
+                    let zIndex = fields.indexOf('z');
+                    let rgbIndex = fields.indexOf('rgb');
+
+                    // 'x', 'y', 'z' are mandatory for a 3D point cloud
+                    if (xIndex === -1 || yIndex === -1 || zIndex === -1) {
+                        throw new Error("PCD file must contain 'x', 'y', and 'z' fields.");
+                    }
+
+                    positions.push(values[xIndex], values[yIndex], values[zIndex]);
+
+                    // Parse RGB if available and valid
+                    if (rgbIndex !== -1 && !isNaN(values[rgbIndex])) {
+                        // PCD RGB is often a packed 32-bit unsigned int (0xAARRGGBB)
+                        const rgb = values[rgbIndex];
+                        const r = (rgb >> 16) & 0x0000ff;
+                        const g = (rgb >> 8) & 0x0000ff;
+                        const b = (rgb >> 0) & 0x0000ff;
+                        colors.push(r / 255, g / 255, b / 255);
+                    } else {
+                        // Default color if no RGB or invalid
+                        colors.push(0.7, 0.7, 0.7); // Light gray
+                    }
+                }
+            } else if (header.DATA === 'binary') {
+                console.log("Processing Binary PCD data...");
+                const dataView = new DataView(arrayBuffer, dataStartByteOffset);
+                let byteCursor = 0; // Cursor within the DataView's buffer, relative to its start
+
+                const littleEndian = true; // PCD binary is typically little-endian on most systems
+                console.log(`Point byte size: ${pointByteSize}, Total points: ${numPoints}`);
+                for (let i = 0; i < numPoints; i++) {
+                    let x, y, z;
+                    let r, g, b;
+
+                    // Iterate through each field for the current point
+                    for (let f = 0; f < fields.length; f++) {
+                        const fieldName = fields[f];
+                        const fieldSize = sizes[f];
+                        const fieldType = types[f];
+                        const fieldOffsetInPoint = fieldOffsets[fieldName]; // Offset from current point's start
+
+                        // Extract value based on field type and size
+                        // Only handling common float32 for XYZ and uint32 for RGB for simplicity
+                        if (fieldName === 'x' && fieldType === 'F' && fieldSize === 4) {
+                            x = dataView.getFloat32(byteCursor + fieldOffsetInPoint, littleEndian);
+                        } else if (fieldName === 'y' && fieldType === 'F' && fieldSize === 4) {
+                            y = dataView.getFloat32(byteCursor + fieldOffsetInPoint, littleEndian);
+                        } else if (fieldName === 'z' && fieldType === 'F' && fieldSize === 4) {
+                            z = dataView.getFloat32(byteCursor + fieldOffsetInPoint, littleEndian);
+                        } else if (fieldName === 'rgb' && fieldType === 'U' && fieldSize === 4) {
+                            const packedRgb = dataView.getUint32(byteCursor + fieldOffsetInPoint, littleEndian);
+                            // Unpack ARGB or RGB depending on convention (PCD usually AARRGGBB or just RRGGBB)
+                            r = (packedRgb >> 16) & 0x0000ff;
+                            g = (packedRgb >> 8) & 0x0000ff;
+                            b = (packedRgb >> 0) & 0x0000ff;
+                        }
+                        // Extend this section for other data types (e.g., I, U, other sizes) if needed
+                    }
+
+                    // Ensure mandatory XYZ coordinates are present
+                    if (x === undefined || y === undefined || z === undefined) {
+                         console.warn(`Missing x, y, or z for binary point ${i}. Skipping point.`);
+                         byteCursor += pointByteSize; // Still advance cursor to avoid infinite loop
+                         continue;
+                    }
+
+                    positions.push(x, y, z);
+                    // Add color if RGB was parsed, otherwise use default
+                    if (r !== undefined && g !== undefined && b !== undefined) {
+                        colors.push(r / 255, g / 255, b / 255);
+                    } else {
+                        colors.push(pointColor.r, pointColor.g, pointColor.b); // Default color if RGB not present
+                    }
+
+                    byteCursor += pointByteSize; // Move to the start of the next point
+                }
+            } else if (header.DATA === 'binary_compressed') {
+                throw new Error("Binary compressed PCD files are not supported in this viewer.");
+            } else {
+                throw new Error(`Unsupported PCD data format: ${header.DATA}. Please use 'ascii' or 'binary'.`);
+            }
+
+            // Create BufferGeometry
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+            // Only add color attribute if color data was actually parsed
+            if (colors.length > 0 && colors.length === positions.length) {
+                geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+            }
+
+            geometry.computeBoundingSphere(); // Important for camera framing
+            return geometry;
+        }
+
+        // Adjusts camera and controls to frame all loaded objects
+        function adjustCameraToAllObjects() {
+            if (loadedObjects.length === 0) {
+                // If no objects, reset camera to a default view
+                camera.position.set(0, 0, 2);
+                controls.target.set(0, 0, 0);
+                controls.update();
+                return;
+            }
+
+            const boundingBox = new THREE.Box3();
+            for (const object of loadedObjects) {
+                if (object.geometry && object.geometry.boundingBox) {
+                    boundingBox.union(object.geometry.boundingBox);
+                } else if (object.geometry && object.geometry.boundingSphere) {
+                    // For point clouds, boundingSphere might be computed more readily
+                    // We can create a temporary box from the sphere
+                    const sphere = object.geometry.boundingSphere;
+                    const min = new THREE.Vector3().copy(sphere.center).subScalar(sphere.radius);
+                    const max = new THREE.Vector3().copy(sphere.center).addScalar(sphere.radius);
+                    boundingBox.expandByPoint(min);
+                    boundingBox.expandByPoint(max);
+                } else {
+                    // If boundingBox or boundingSphere not computed, compute it now
+                    object.geometry.computeBoundingBox();
+                    boundingBox.union(object.geometry.boundingBox);
+                }
+            }
+
+            if (boundingBox.isEmpty()) {
+                 // If for some reason the bounding box is still empty, revert to default
+                camera.position.set(0, 0, 2);
+                controls.target.set(0, 0, 0);
+                controls.update();
+                return;
+            }
+
+            const size = new THREE.Vector3();
+            boundingBox.getSize(size);
+            const center = new THREE.Vector3();
+            boundingBox.getCenter(center);
+
+            // Determine the maximum dimension to fit the view
+            const maxDim = Math.max(size.x, size.y, size.z);
+            const fov = camera.fov * (Math.PI / 180);
+            let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2)) * 1.2; // Add padding
+
+            // Ensure the camera is not too close or too far for very small/large models
+            cameraZ = Math.max(cameraZ, 0.5); // Minimum distance
+            cameraZ = Math.min(cameraZ, 500); // Maximum distance
+
+            // Set camera position and target
+            camera.position.copy(center);
+            camera.position.z += cameraZ; // Move camera back
+            camera.position.y += maxDim * 0.5; // Slight elevation for better view
+            camera.lookAt(center);
+
+            controls.target.copy(center);
+            controls.update();
+        }
+
+        // Load and display PCD file
+        async function loadPCDFile(file) {
+            if (!file) return;
+
+            showLoading(true);
+            showMessage('Loading ' + file.name + '...', 0); // Display message indefinitely while loading
+
+            try {
+                // Read the file as an ArrayBuffer to handle both ASCII and Binary data
+                const arrayBuffer = await file.arrayBuffer();
+                const geometry = parsePCD(arrayBuffer);
+
+                // Material for the points
+                const material = new THREE.PointsMaterial({
+                    size: 0.01, // Size of each point
+                    vertexColors: geometry.attributes.color !== undefined, // Use vertex colors if available
+                    sizeAttenuation: true // Points get smaller when zooming out
+                });
+
+                const newPointCloud = new THREE.Points(geometry, material);
+                scene.add(newPointCloud);
+                loadedObjects.push(newPointCloud); // Add to loaded objects array
+
+                adjustCameraToAllObjects(); // Adjust camera to new content
+
+                showMessage(`Successfully loaded ${file.name} with ${geometry.attributes.position.count} points.`, 5000);
+            } catch (error) {
+                console.error("Error loading or parsing PCD file:", error);
+                showMessage(`Error: ${error.message}. Please ensure it's a valid ASCII or binary .pcd file (binary_compressed is not supported).`, 10000); // Display error for longer
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Load and display STL file
+        async function loadSTLFile(file) {
+            if (!file) return;
+
+            showLoading(true);
+            showMessage('Loading ' + file.name + '...', 0);
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const geometry = new THREE.STLLoader().parse(event.target.result);
+                    geometry.computeVertexNormals(); // Ensure normals are computed for lighting
+
+                    // Create a mesh material. Basic for now, can be customized.
+                    const material = new THREE.MeshPhongMaterial({
+                        color: 0x007bff, // Blue color for STL, matches Indigo/Blue from buttons
+                        specular: 0x111111,
+                        shininess: 200
+                    });
+
+                    const mesh = new THREE.Mesh(geometry, material);
+                    scene.add(mesh);
+                    loadedObjects.push(mesh); // Add to loaded objects array
+
+                    adjustCameraToAllObjects(); // Adjust camera to new content
+                    showMessage(`Successfully loaded ${file.name} with ${geometry.attributes.position.count / 3} triangles.`, 5000);
+                } catch (error) {
+                    console.error("Error loading or parsing STL file:", error);
+                    showMessage(`Error: ${error.message}. Please ensure it's a valid .stl file.`, 10000);
+                } finally {
+                    showLoading(false);
+                }
+            };
+            reader.onerror = (error) => {
+                console.error("FileReader error:", error);
+                showMessage(`File read error: ${error.message}`, 10000);
+                showLoading(false);
+            };
+            reader.readAsArrayBuffer(file); // Read as ArrayBuffer for binary/ASCII parsing by STLLoader
+        }
+
+        // Clears all loaded models from the scene
+        function clearAllModels() {
+            if (loadedObjects.length === 0) {
+                showMessage("No models to clear.", 3000);
+                return;
+            }
+
+            showMessage("Clearing all models...", 2000);
+            for (const object of loadedObjects) {
+                scene.remove(object);
+                if (object.geometry) {
+                    object.geometry.dispose();
+                }
+                if (object.material) {
+                    // Dispose array materials if present
+                    if (Array.isArray(object.material)) {
+                        for (const mat of object.material) {
+                            mat.dispose();
+                        }
+                    } else {
+                        object.material.dispose();
+                    }
+                }
+            }
+            loadedObjects = []; // Clear the array
+            adjustCameraToAllObjects(); // Reset camera view
+            showMessage("All models cleared.", 3000);
+        }
+
+        // Event listeners
+        pcdFileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                loadPCDFile(file);
+            }
+        });
+
+        stlFileInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                loadSTLFile(file);
+            }
+        });
+
+        clearModelsButton.addEventListener('click', clearAllModels);
+
+        // Initialize and start animation when the window loads
+        window.onload = function() {
+            init();
+            animate();
+            showMessage('Upload .pcd or .stl files to view your 3D models!', 5000);
+        };
+    </script>
+</body>
+</html>

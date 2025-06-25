@@ -1,0 +1,6 @@
+{
+    "liveServer.settings.port": 5501,
+    "python.analysis.extraPaths": [
+        "./src/starling"
+    ]
+}
