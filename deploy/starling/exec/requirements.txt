@@ -1,2 +1,4 @@
 flask
 flask-socketio
+numpy
+transforms3d
