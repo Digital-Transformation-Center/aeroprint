@@ -1,27 +1,12 @@
 [Unit]
-Description=ROS 2 VOXL MPA to ROS2 Node
-After=wait-for-ip.service
+Description=VOXL MPA to ROS2 Node
+After=network.target
 
 [Service]
-StartLimitIntervalSec=10
-StartLimitBurst=5
-RemainAfterExit=true
-
-Type=simple
 User=root
-Group=root
-# Change to your actual workspace directory if different
-WorkingDirectory=/home/root/
-
-# Source ROS 2 and your workspace environment.
-ExecStart=/bin/bash -c 'source /opt/ros/foxy/setup.bash && ros2 run voxl_mpa_to_ros2 voxl_mpa_to_ros2_node'
-
+WorkingDirectory=/opt/ros/foxy/mpa-to-ros2/install
+ExecStart=/opt/ros/foxy/bin/ros2 run voxl_mpa_to_ros2 voxl_mpa_to_ros2_node
 Restart=on-failure
-RestartSec=5 # Wait 5 seconds before attempting to restart
-
-# Standard output and error handling
-StandardOutput=journal
-StandardError=journal
 
 [Install]
 WantedBy=multi-user.target
