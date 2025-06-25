@@ -4,6 +4,7 @@ After=network.target
 
 [Service]
 User=root
+Environment="HOME=root"
 WorkingDirectory=/opt/ros/foxy/mpa-to-ros2/install
 ExecStart=/opt/ros/foxy/bin/ros2 run voxl_mpa_to_ros2 voxl_mpa_to_ros2_node
 Restart=on-failure
