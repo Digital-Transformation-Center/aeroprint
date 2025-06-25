@@ -5,6 +5,6 @@ colcon build
 # sudo colcon build --symlink-install --packages-select host starling
 source install/setup.bash
 # ros2 run host flask_server_node
-ros2 launch host web_test.launch.py
+ros2 launch starling tf.launch.py
 echo "Starting the host entrypoint script..."
 # ros2 run host test_node
