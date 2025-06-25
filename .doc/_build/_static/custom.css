@@ -1,0 +1,24 @@
+/* Customizing the sidebar background and header */
+.wy-side-nav-search,
+.wy-nav-top {
+    background: #000000 !important; /* Red */
+}
+
+
+/* Changing the main body link color */
+a {
+    color: #3594d3 !important; /* Blue */
+}
+
+.caption-text {
+    color: #ff3f3f !important; /* White */
+}
+
+/* If using Sphinx Design CSS variables (often found in newer themes) */
+:root {
+    --sd-color-primary: #ffe100; /* Bootstrap primary yellow */
+    --sd-color-primary-highlight: #b30000;
+    --sd-color-primary-text: #ffffff;
+    --sd-color-info: #17a2b8;
+    /* ... and so on for other semantic colors */
+}
