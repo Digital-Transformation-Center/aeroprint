@@ -10,6 +10,6 @@ def generate_launch_description():
                     name="voxl_mpa"),
             Node(package="starling", executable="odometry-tf-publisher", name="odometry_tf_pub"), 
             Node(package="starling", executable="point-cloud-transformer", name="point_cloud_transformer"),
-            Node(package="starling", executable="static_tof_tf_publisher", name="static_tof_tf_publisher"),
+            Node(package="starling", executable="static-tof-tf-publisher", name="static_tof_tf_publisher"),
         ]
     )
