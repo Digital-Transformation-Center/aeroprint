@@ -39,6 +39,7 @@ echo "Starting systemd service installation for '${VOXL_MPA_SERVICE_FILE}'..."
 
 echo "Copying '${VOXL_MPA_EXEC_FILE}' to '/usr/local/bin/${VOXL_MPA_EXEC_FILE}'..."
 cp "./exec/${VOXL_MPA_EXEC_FILE}" "/usr/local/bin/${VOXL_MPA_EXEC_FILE}" || { echo "Failed to copy VOXL MPA executable file."; exit 1; }
+chmod +x /usr/local/bin/voxl_mpa.sh
 
 if [ ! -f "./${VOXL_MPA_SERVICE_FILE}" ]; then
   echo "Error: Service file '${VOXL_MPA_SERVICE_FILE}' not found in the current directory."
