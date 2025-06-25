@@ -30,7 +30,7 @@ setup(
             "circle-flight = starling.circle_flight:main",
             "custom-pc-pub = starling.custom_pc_publisher:main",
             "helical-flight = starling.helical_flight_node:main",
-            "new-helix = starling.modular_helix_node:main"
+            "new-helix = starling.modular_helix_node:main",
             "odometry-tf-publisher = starling.odometry_tf_publisher:main",
             "point-cloud-transformer = starling.point_cloud_transformer:main",
             "static-tof-tf-publisher = starling.static_tof_tf_publisher:main",
