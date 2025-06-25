@@ -5,6 +5,7 @@
 # IMPORTANT: Replace 'your-service-name.service' with the actual name of your .service file.
 AEROPRINT_CHATTER_SERVICE_FILE="aeroprint-chatter.service" # Example: 'my-web-app.service' or 'ros-talker-app.service'
 VOXL_MPA_SERVICE_FILE="voxl-mpa.service" # Example: 'voxl-mpa.service'
+VOXL_MPA_EXEC_FILE="voxl_mpa.sh" # Example: 'exec/voxl_mpa.sh'
 WAIT_FOR_IP_SERVICE_FILE="wait-for-ip.service" # Example: 'wait-for-ip.service'
 
 AEROPRINT_CHATTER_SERVICE_PATH="/etc/systemd/system/${AEROPRINT_CHATTER_SERVICE_FILE}"
@@ -35,6 +36,9 @@ cp "./${AEROPRINT_CHATTER_SERVICE_FILE}" "${AEROPRINT_CHATTER_SERVICE_PATH}" || 
 chmod 644 "${AEROPRINT_CHATTER_SERVICE_PATH}" || { echo "Failed to set permissions on service file."; exit 1; }
 
 echo "Starting systemd service installation for '${VOXL_MPA_SERVICE_FILE}'..."
+
+echo "Copying '${VOXL_MPA_EXEC_FILE}' to '/usr/local/bin/${VOXL_MPA_EXEC_FILE}'..."
+cp "./exec/${VOXL_MPA_EXEC_FILE}" "/usr/local/bin/${VOXL_MPA_EXEC_FILE}" || { echo "Failed to copy VOXL MPA executable file."; exit 1; }
 
 if [ ! -f "./${VOXL_MPA_SERVICE_FILE}" ]; then
   echo "Error: Service file '${VOXL_MPA_SERVICE_FILE}' not found in the current directory."
