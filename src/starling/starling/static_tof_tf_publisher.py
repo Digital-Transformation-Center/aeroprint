@@ -57,9 +57,9 @@ class StaticToFTransformPublisher(Node):
         # r = R_scipy.from_euler('y', -90, degrees=True) # Rotate around Y-axis by -90 degrees (pitch down)
         # quat = r.as_quat() # [x, y, z, w]
 
-        # Apply a 90 degree rotation about the X axis
+        # Apply a -90 degree rotation about the Y axis (pitch down)
         from scipy.spatial.transform import Rotation as R_scipy
-        quat = R_scipy.from_euler('x', 90, degrees=True).as_quat()  # [x, y, z, w]
+        quat = R_scipy.from_euler('y', -90, degrees=True).as_quat()  # [x, y, z, w]
         t.transform.rotation.x = quat[0]
         t.transform.rotation.y = quat[1]
         t.transform.rotation.z = quat[2]
