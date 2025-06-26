@@ -45,7 +45,7 @@ class StaticToFTransformPublisher(Node):
         # Translation from base_link to tof_sensor_frame (in meters)
         # Assuming sensor is mounted on the front, facing forward, slightly below center.
         translation = [0.068, -0.0116, -0.0168]
-        rpy_degrees = [0, -90, -180]
+        rpy_degrees = [0, -90, 0]
         rotation_scipy = R.from_euler('xyz', rpy_degrees, degrees=True)  # Convert roll, pitch, yaw to rotation matrix
 
         t.transform.translation.x = translation[0]
