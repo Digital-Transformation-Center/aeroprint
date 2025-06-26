@@ -47,14 +47,13 @@ USER root
 # Ensure ROS environment is sourced before building
 WORKDIR /home/$USERNAME/external_packages
 
-USER $USERNAME
 RUN source /opt/ros/$ROS_DISTRO/setup.bash && \
     colcon build --packages-select px4_msgs && \
     rm -rf external_packages/log external_packages/build
 
     # Install additional ros packages
-RUN apt-get update && \
-    apt-get install -y \
+RUN sudo apt-get update && \
+    sudo apt-get install -y \
     ros-${ROS_DISTRO}-tf2-sensor-msgs
 
 # Install common ROS 2 tools and python requirements
@@ -72,6 +71,7 @@ RUN sudo apt-get update && \
 # COPY --chown=$USERNAME:$USERNAME ../../src /home/$USERNAME/ros2_ws/src/your_custom_packages
 # RUN mkdir -p /home/$USERNAME/aeroprint/src
 WORKDIR /home/$USERNAME/aeroprint/
+# USER $USERNAME
 
 RUN source /opt/ros/$ROS_DISTRO/setup.bash && \
     source /home/$USERNAME/external_packages/install/setup.bash && \
