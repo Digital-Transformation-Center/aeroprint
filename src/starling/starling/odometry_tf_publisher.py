@@ -42,9 +42,9 @@ class OdometryToTFPublisher(Node):
         t.child_frame_id = 'base_link'   # Child frame: the drone's body/center
 
         # Populate translation from the odometry message
-        t.transform.translation.x = msg.position[0]
-        t.transform.translation.y = msg.position[1]
-        t.transform.translation.z = msg.position[2]
+        t.transform.translation.x = msg.position[0].item()
+        t.transform.translation.y = msg.position[1].item()
+        t.transform.translation.z = msg.position[2].item()
 
         # Populate rotation (quaternion) from the odometry message
         # PX4 uses (w, x, y, z) order for quaternions in VehicleOdometry
