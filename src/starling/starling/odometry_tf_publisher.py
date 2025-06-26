@@ -13,48 +13,58 @@ class OdometryToTFPublisher(Node):
     def __init__(self):
         super().__init__('odometry_tf_publisher')
         self.tf_broadcaster = TransformBroadcaster(self)
-
-        # Subscribe to the PX4 VehicleOdometry topic
-        # Ensure the QoS profile matches the publisher's QoS if possible for reliability.
+        self.initial_position = None  # Will be numpy array
+        self.initial_orientation = None  # Will be numpy quaternion (w, x, y, z)
         self.subscription = self.create_subscription(
             VehicleOdometry,
             '/fmu/out/vehicle_odometry',
             self.odometry_callback,
-            rclpy.qos.qos_profile_sensor_data # Use sensor data QoS for odometry
+            rclpy.qos.qos_profile_sensor_data
         )
         self.get_logger().info('Odometry to TF Publisher Node Started.')
 
     def odometry_callback(self, msg: VehicleOdometry):
         """
         Callback function for incoming VehicleOdometry messages.
-        Extracts pose information and publishes it as a TF transform.
+        Publishes odom->base_link as the pose relative to the initial pose (odom).
         """
+        import numpy as np
+        from scipy.spatial.transform import Rotation as R
+
+        # Get current pose
+        pos = np.array([msg.position[0].item(), msg.position[1].item(), msg.position[2].item()])
+        q = np.array([msg.q[0].item(), msg.q[1].item(), msg.q[2].item(), msg.q[3].item()])  # (w, x, y, z)
+
+        if self.initial_position is None:
+            self.initial_position = pos
+            self.initial_orientation = q
+            # Precompute inverse rotation for efficiency
+            self.initial_rot_inv = R.from_quat([q[1], q[2], q[3], q[0]]).inv()  # scipy uses (x, y, z, w)
+            self.get_logger().info('Saved initial odometry pose for odom frame.')
+
+        # Compute relative translation (in initial frame)
+        rel_pos = pos - self.initial_position
+        rel_pos = self.initial_rot_inv.apply(rel_pos)
+
+        # Compute relative rotation: q_rel = q_init_inv * q_curr
+        curr_rot = R.from_quat([q[1], q[2], q[3], q[0]])
+        rel_rot = self.initial_rot_inv * curr_rot
+        rel_quat = rel_rot.as_quat()  # (x, y, z, w)
+
         t = TransformStamped()
-
-        t.header.stamp = self.get_clock().now().to_msg() # Use current ROS time for TF message
-        # PX4 Odometry data can be in a different timestamp domain (e.g., microseconds since boot).
-        # For tf2, it's generally best to use the ROS time associated with when the message is processed.
-        # If strict time synchronization with the odometry message's internal timestamp is needed,
-        # you might convert msg.timestamp to rclpy.Time().
-        # Example: t.header.stamp = rclpy.time.Time(nanoseconds=msg.timestamp * 1000).to_msg()
-        
-        t.header.frame_id = 'odom'       # Parent frame: typically the world or fixed origin for odometry
-        t.child_frame_id = 'base_link'   # Child frame: the drone's body/center
-
-        # Populate translation from the odometry message
-        t.transform.translation.x = msg.position[0].item()
-        t.transform.translation.y = msg.position[1].item()
-        t.transform.translation.z = msg.position[2].item()
-
-        # Populate rotation (quaternion) from the odometry message
-        # PX4 uses (w, x, y, z) order for quaternions in VehicleOdometry
-        t.transform.rotation.w = msg.q[0].item()
-        t.transform.rotation.x = msg.q[1].item()
-        t.transform.rotation.y = msg.q[2].item()
-        t.transform.rotation.z = msg.q[3].item()
+        t.header.stamp = self.get_clock().now().to_msg()
+        t.header.frame_id = 'odom'
+        t.child_frame_id = 'base_link'
+        t.transform.translation.x = rel_pos[0]
+        t.transform.translation.y = rel_pos[1]
+        t.transform.translation.z = rel_pos[2]
+        t.transform.rotation.x = rel_quat[0]
+        t.transform.rotation.y = rel_quat[1]
+        t.transform.rotation.z = rel_quat[2]
+        t.transform.rotation.w = rel_quat[3]
 
         self.tf_broadcaster.sendTransform(t)
-        # self.get_logger().info(f'Published transform: {t.child_frame_id} from {t.header.frame_id}')
+        # self.get_logger().info(f'Published relative transform: {t.child_frame_id} from {t.header.frame_id}')
 
 def main(args=None):
     rclpy.init(args=args)
