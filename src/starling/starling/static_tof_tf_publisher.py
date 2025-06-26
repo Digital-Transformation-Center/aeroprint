@@ -57,11 +57,13 @@ class StaticToFTransformPublisher(Node):
         # r = R_scipy.from_euler('y', -90, degrees=True) # Rotate around Y-axis by -90 degrees (pitch down)
         # quat = r.as_quat() # [x, y, z, w]
 
-        # For now, using an identity quaternion (no rotation relative to base_link)
-        t.transform.rotation.x = 0.0
-        t.transform.rotation.y = 0.0
-        t.transform.rotation.z = 0.0
-        t.transform.rotation.w = 1.0
+        # Apply a 90 degree rotation about the X axis
+        from scipy.spatial.transform import Rotation as R_scipy
+        quat = R_scipy.from_euler('x', 90, degrees=True).as_quat()  # [x, y, z, w]
+        t.transform.rotation.x = quat[0]
+        t.transform.rotation.y = quat[1]
+        t.transform.rotation.z = quat[2]
+        t.transform.rotation.w = quat[3]
 
         self.tf_broadcaster.sendTransform(t)
         # self.get_logger().info(f'Published static transform: {t.child_frame_id} from {t.header.frame_id}')
