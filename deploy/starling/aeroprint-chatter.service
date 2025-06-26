@@ -3,7 +3,6 @@ Description=ROS Humble Talker
 After=wait-for-ip.service
 
 [Service]
-StartLimitIntervalSec=30
 StartLimitBurst=5
 RemainAfterExit=true
 

@@ -1,4 +1,8 @@
 flask
 flask-socketio
+<<<<<<< HEAD
 numpy
 transforms3d
+=======
+scipy
+>>>>>>> 153-mesh-reconstruction
