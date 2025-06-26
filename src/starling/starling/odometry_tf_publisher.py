@@ -48,10 +48,10 @@ class OdometryToTFPublisher(Node):
 
         # Populate rotation (quaternion) from the odometry message
         # PX4 uses (w, x, y, z) order for quaternions in VehicleOdometry
-        t.transform.rotation.w = msg.q[0]
-        t.transform.rotation.x = msg.q[1]
-        t.transform.rotation.y = msg.q[2]
-        t.transform.rotation.z = msg.q[3]
+        t.transform.rotation.w = msg.q[0].item()
+        t.transform.rotation.x = msg.q[1].item()
+        t.transform.rotation.y = msg.q[2].item()
+        t.transform.rotation.z = msg.q[3].item()
 
         self.tf_broadcaster.sendTransform(t)
         # self.get_logger().info(f'Published transform: {t.child_frame_id} from {t.header.frame_id}')
