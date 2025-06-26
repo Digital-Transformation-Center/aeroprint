@@ -46,7 +46,7 @@ class PointCloudTransformer(Node):
         """
         # Define the source and target frames for the transformation
         source_frame = msg.header.frame_id # The frame in which the incoming point cloud is defined (e.g., 'tof_sensor_frame')
-        target_frame = 'odom'             # The desired output frame (the world frame based on odometry)
+        target_frame = 'world'             # The desired output frame (the fixed world frame)
 
         # If the incoming message doesn't have a frame_id set, assume 'tof_sensor_frame'
         if not source_frame:
