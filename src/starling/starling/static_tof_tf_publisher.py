@@ -4,7 +4,7 @@ from rclpy.node import Node
 from tf2_ros import StaticTransformBroadcaster
 from geometry_msgs.msg import TransformStamped
 import numpy as np
-from scipy.spatial.transform import Rotation as R_scipy
+from scipy.spatial.transform import Rotation as R
 
 class StaticToFTransformPublisher(Node):
     """
@@ -48,6 +48,15 @@ class StaticToFTransformPublisher(Node):
         t.transform.translation.y = -0.01   # Example: 1 cm right
         t.transform.translation.z = 0.02 # Example: 2 cm down (if drone Z is down)
 
+        rotation_matrix = np.array([
+            [0, 0, -1], [0, 1, 0], [1, 0, 0]
+        ])
+        rotation_scipy = R.from_matrix(rotation_matrix)
+        r_quat = rotation_scipy.as_quat()  # Convert rotation matrix to quaternion (x, y, z, w)
+        t.transform.rotation.x = r_quat[0]
+        t.transform.rotation.y = r_quat[1]
+        t.transform.rotation.z = r_quat[2]
+        t.transform.rotation.w = r_quat[3]
         # Rotation from base_link to tof_sensor_frame (as a quaternion x, y, z, w)
         # Example: If the sensor is aligned with the base_link axes, this is identity quaternion.
         # If it's rotated, you'll need to convert roll, pitch, yaw to quaternion or get directly.
