@@ -49,7 +49,7 @@ class StaticToFTransformPublisher(Node):
         t.transform.translation.z = 0.02 # Example: 2 cm down (if drone Z is down)
 
         rotation_matrix = np.array([
-            [0, 0, -1], [0, 1, 0], [1, 0, 0]
+            [0, 0, 1], [0, 1, 0], [-1, 0, 0]
         ])
         rotation_scipy = R.from_matrix(rotation_matrix)
         r_quat = rotation_scipy.as_quat()  # Convert rotation matrix to quaternion (x, y, z, w)
