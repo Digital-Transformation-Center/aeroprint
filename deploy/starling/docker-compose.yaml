@@ -1,0 +1,56 @@
+# docker-compose.yml
+
+version: '3.8' # Specify the Docker Compose file format version
+
+services:
+  # Define a service named 'talker'
+  talker:
+    # Build the Docker image from the current directory where the Dockerfile is located.
+    # This assumes your Dockerfile is named 'Dockerfile' and is in the same directory as this docker-compose.yml file.
+    build:
+      context: .
+      dockerfile: exec/Dockerfile # Explicitly specify the Dockerfile name if it's not 'Dockerfile'
+
+    # The command to execute when the container starts.
+    # Since the Dockerfile already sets an ENTRYPOINT, you might not strictly need this
+    # unless you want to override the default command.
+    # However, explicitly setting it here ensures clarity.
+    # Note: The ENTRYPOINT in your Dockerfile is already set to run the talker node.
+    # If you wanted to override it to, for example, run bash for debugging, you would change this.
+    # command: /bin/bash -c ". /opt/ros/humble/setup.bash && . /home/rosuser/ros2_ws/install/setup.bash && ros2 run rclcpp_tutorials talker"
+    # Or, if your Dockerfile had CMD ["ros2", "run", "rclcpp_tutorials", "talker"], you could just use:
+    # command: ros2 run rclcpp_tutorials talker
+
+    # For now, let's omit 'command' here and rely on the Dockerfile's ENTRYPOINT for running the talker node.
+    # If you want to explicitly set a different command here, uncomment and modify the 'command' line above.
+
+    # Restart the container if it exits, unless it was explicitly stopped.
+    restart: on-failure
+
+    # Name the container explicitly for easier identification
+    container_name: ros_humble_talker_node
+
+    # If you want to see the talker output directly in your terminal,
+    # you can set tty and stdin_open to true (useful for interactive debugging)
+    tty: true
+    stdin_open: true
+
+    volumes:
+    - /dev/shm:/dev/shm
+    - ../../src/:/home/aeroprint_user/aeroprint/src
+
+    # *** CHANGED: Use host networking mode ***
+    # This allows the container to share the host's network namespace,
+    # making ROS 2 discovery easier across containers or with host processes.
+    network_mode: host
+    ipc: host
+
+    command: tail -f /dev/null
+
+    # environment:
+    #   - FASTDDS_BUILTIN_TRANSPORTS=UDPv4 # Force Fast-DDS to use only UDP transport
+
+# *** REMOVED: No custom networks needed when using host networking mode ***
+# networks:
+#   ros_network:
+#     driver: bridge
