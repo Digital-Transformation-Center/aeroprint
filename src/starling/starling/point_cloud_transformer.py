@@ -49,8 +49,8 @@ class PointCloudTransformer(Node):
         target_frame = 'world'             # The desired output frame (the fixed world frame)
 
         # If the incoming message doesn't have a frame_id set, assume 'tof_sensor_frame'
-        if not source_frame:
-            source_frame = 'tof_sensor_frame'
+        # if not source_frame:
+        source_frame = 'tof_sensor_frame'
             # self.get_logger().warn(f"Incoming PointCloud2 message has no frame_id. Assuming '{source_frame}'.")
 
         try:
