@@ -45,13 +45,22 @@ class StaticToFTransformPublisher(Node):
         # Translation from base_link to tof_sensor_frame (in meters)
         # Assuming sensor is mounted on the front, facing forward, slightly below center.
         translation = [0.068, -0.0116, -0.0168]
-        rpy_degrees = [0, -90, 0]
+        rpy_degrees = [0, -90, -180]
         rotation_scipy = R.from_euler('xyz', rpy_degrees, degrees=True)  # Convert roll, pitch, yaw to rotation matrix
 
         t.transform.translation.x = translation[0]
         t.transform.translation.y = translation[1]
         t.transform.translation.z = translation[2]
 
+        r_quat = rotation_scipy.as_quat()  # Convert rotation matrix to quaternion (x, y, z, w)
+        t.transform.rotation.x = r_quat[0]
+        t.transform.rotation.y = r_quat[1]
+        t.transform.rotation.z = r_quat[2]
+        t.transform.rotation.w = r_quat[3]
+
+        # Flip about the new x axis by 180 degrees for upright image
+        rpy_degrees = [180, 0, 0]  # Flip about the new x axis
+        rotation_scipy = R.from_euler('xyz', rpy_degrees, degrees=True)  # Convert roll, pitch, yaw to rotation matrix
         r_quat = rotation_scipy.as_quat()  # Convert rotation matrix to quaternion (x, y, z, w)
         t.transform.rotation.x = r_quat[0]
         t.transform.rotation.y = r_quat[1]
