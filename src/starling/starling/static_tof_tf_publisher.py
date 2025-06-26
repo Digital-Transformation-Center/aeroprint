@@ -44,14 +44,15 @@ class StaticToFTransformPublisher(Node):
 
         # Translation from base_link to tof_sensor_frame (in meters)
         # Assuming sensor is mounted on the front, facing forward, slightly below center.
-        t.transform.translation.x = 0.05  # Example: 5 cm forward
-        t.transform.translation.y = -0.01   # Example: 1 cm right
-        t.transform.translation.z = 0.02 # Example: 2 cm down (if drone Z is down)
+        translation = [0.068, -0.0116, -0.0168]
+        rpy_degrees = [0, 90, 180]
+        rotation_scipy = R.from_euler('zyx', [rpy_degrees[2], rpy_degrees[1], rpy_degrees[0]], degrees=True)
 
-        rotation_matrix = np.array([
-            [0, 0, 1], [0, 1, 0], [-1, 0, 0]
-        ])
-        rotation_scipy = R.from_matrix(rotation_matrix)
+
+        t.transform.translation.x = translation[0]
+        t.transform.translation.y = translation[1]
+        t.transform.translation.z = translation[2]
+
         r_quat = rotation_scipy.as_quat()  # Convert rotation matrix to quaternion (x, y, z, w)
         t.transform.rotation.x = r_quat[0]
         t.transform.rotation.y = r_quat[1]
