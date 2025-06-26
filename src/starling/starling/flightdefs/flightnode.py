@@ -164,6 +164,7 @@ class FlightNode(Node):
             self.get_logger().info("Entering landing sequence.")
             self.current_system_state = "LANDING"
             self.is_landing = True
+            self._land_vehicle()
             if hasattr(self, "external_land_callback") and self.external_land_callback:
                 self.external_land_callback()
                 
@@ -281,6 +282,7 @@ class FlightNode(Node):
                     
 
         elif self.current_system_state == "LANDING":
+            self._engage_offboard_mode()
             self._land_vehicle()
             if self.figure8_timer is not None:
                 self.figure8_timer.cancel()
