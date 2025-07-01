@@ -229,14 +229,11 @@ class FlaskServerNode(Node):
 
 
     def flight_status_callback(self, msg):
-        self.get_logger().info(f"Flight status received: {msg.data}")
         status = msg.data
         if status == FLIGHT_DISARMED:
-            self.get_logger().info("Flight is idle.")
             if hasattr(self, 'flask_web_app'):
                 self.flask_web_app.emit_status('idle')
         elif status == FLIGHT_PATH_LOADED:
-            self.get_logger().info("Flight received parameters.")
             if hasattr(self, 'flask_web_app'):
                 self.flask_web_app.emit_status('param_receive')
         elif status == FLIGHT_ENGAGED:
@@ -244,15 +241,12 @@ class FlaskServerNode(Node):
             if hasattr(self, 'flask_web_app'):
                 self.flask_web_app.emit_status('flight_engaged')
         elif status == FLIGHT_ARMED:
-            self.get_logger().info("Flight armed.")
             if hasattr(self, 'flask_web_app'):
                 self.flask_web_app.emit_status('flight_armed')
         elif status == FLIGHT_LANDING:
-            self.get_logger().info("Flight landing.")
             if hasattr(self, 'flask_web_app'):
                 self.flask_web_app.emit_status('flight_landing')
         elif status == FLIGHT_ERROR:
-            self.get_logger().error("Flight error occurred.")
             if hasattr(self, 'flask_web_app'):
                 self.flask_web_app.emit_status('flight_error')
 
