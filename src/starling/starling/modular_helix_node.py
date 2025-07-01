@@ -2,6 +2,7 @@ from starling.flightdefs.flightnode import FlightNode
 from starling.flightdefs.helix import Helix
 from std_msgs.msg import Float32MultiArray, Bool
 import rclpy
+from rclpy.qos import qos_profile_system_default
 
 class HelixNode(FlightNode):
     def __init__(self):
@@ -21,7 +22,12 @@ class HelixNode(FlightNode):
         self.start_scan_publisher = self.create_publisher(
             Bool, 
             "/fcu/out/start_scan", 
-            10
+            qos_profile_system_default
+        )
+        self.end_scan_publisher = self.create_publisher(
+            Bool, 
+            "/fcu/out/end_scan", 
+            qos_profile_system_default
         )
         self.set_external_engage_callback(self.publish_scan_start)
         self.init_heartbeat()
@@ -35,6 +41,16 @@ class HelixNode(FlightNode):
         msg.data = True
         self.start_scan_publisher.publish(msg)
         self.get_logger().info("Published start scan command.")
+
+    def publish_scan_end(self):
+        """
+        Publishes a message to end the scan.
+        """
+        self.get_logger().info("Publishing end scan command.")
+        msg = Bool()
+        msg.data = True
+        self.end_scan_publisher.publish(msg)
+        self.get_logger().info("Published end scan command.")
 
     def helix_params_callback(self, data):
         self.get_logger().info(f"Received helix parameters: {data.data}")
