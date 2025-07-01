@@ -17,6 +17,9 @@ class TransformManager(Node):
         self.tf_buffer = tf2_ros.Buffer()
         self.tf_listener = tf2_ros.TransformListener(self.tf_buffer, self)
 
+        self.parent_frame = 'world'
+        self.child_frame = 'odom'
+
         self.home_transform_published = False
         self.home_position = None
         self.home_orientation = None
@@ -31,8 +34,8 @@ class TransformManager(Node):
 
             t = TransformStamped()
             t.header.stamp = self.get_clock().now().to_msg()
-            t.header.frame_id = 'world'
-            t.child_frame_id = 'starling_home'
+            t.header.frame_id = self.parent_frame
+            t.child_frame_id = self.child_frame
             t.transform.translation.x = self.home_position[0]
             t.transform.translation.y = self.home_position[1]
             t.transform.translation.z = self.home_position[2]
@@ -52,7 +55,7 @@ class TransformManager(Node):
             # self.publish_home_transform()
             rclpy.spin_once(self, timeout_sec=0.1)
             try:
-                self.tf_buffer.lookup_transform('world', 'starling_home', rclpy.time.Time())
+                self.tf_buffer.lookup_transform(self.parent_frame, self.child_frame, rclpy.time.Time())
                 self.home_transform_published = True
             except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException) as e:
                 self.get_logger().warn(f"Transform not found yet: {e}")
@@ -88,12 +91,12 @@ class TransformManager(Node):
         """
         v = Vector3Stamped()
         v.header.stamp = self.get_clock().now().to_msg() # Use current time for lookup
-        v.header.frame_id = 'starling_home'
+        v.header.frame_id = self.child_frame
         v.vector.x = float(vector[0])
         v.vector.y = float(vector[1])
         v.vector.z = float(vector[2])
         try:
-            transformed_vector = self.tf_buffer.transform(v, 'world', timeout=rclpy.duration.Duration(seconds=0.06))
+            transformed_vector = self.tf_buffer.transform(v, self.parent_frame, timeout=rclpy.duration.Duration(seconds=0.06))
             return [float(transformed_vector.vector.x), float(transformed_vector.vector.y), float(transformed_vector.vector.z)]
         except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException) as e:
             self.get_logger().error(f"Error getting transform for vector: {e}")
@@ -108,7 +111,7 @@ class TransformManager(Node):
         """
         p = PointStamped()
         p.header.stamp = self.get_clock().now().to_msg()
-        p.header.frame_id = 'starling_home'
+        p.header.frame_id = self.child_frame
         p.point.x = position[0]
         p.point.y = position[1]
         p.point.z = position[2]
