@@ -105,6 +105,7 @@ class PCNode(Node):
                o3d.io.write_point_cloud(self.pcd_dir + "/pointcloud" + str(data.header.stamp.nanosec) + ".pcd", o3dpc)
                self.last_pc = now # Update time
             except Exception as e:
+               self.get_logger().warn("Error in pcd processing...")
                self.get_logger().info(e)
 
 
