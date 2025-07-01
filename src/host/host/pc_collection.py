@@ -75,6 +75,7 @@ class PCNode(Node):
    def scan_end_callback(self, msg):
       """Stop scanning"""
       self.scan_end = msg.data
+      self.scan_start = not self.scan_end
       #   dc = Bool()
       #   dc.data = True
       self.dump_complete_pub.publish(msg)
@@ -86,11 +87,10 @@ class PCNode(Node):
 
    def pc2_callback(self, data):
       """Dump point clouds if scan started"""
-      self.get_logger().info("PC2 Data Received...")
       if self.scan_start and not self.scan_end:
          now = self.get_clock().now().nanoseconds
          if now - self.last_pc >= self.pc_interval * 1e9:
-            print(data.header.stamp.nanosec) # For debugging
+            self.get_logger().info("Saving pointcloud data...")
             # Convert ROS PointCloud2 to Open 3D point cloud
             points = np.frombuffer(data.data, dtype=np.float32).reshape(-1, 3)
             o3dpc = o3d.geometry.PointCloud()
