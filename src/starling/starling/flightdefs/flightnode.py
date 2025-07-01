@@ -175,7 +175,7 @@ class FlightNode(Node):
             velocity = state.get_velocity()
             acceleration = state.get_acceleration()
             yawspeed = state.get_yaw_rate()
-            self.get_logger().info(f"yaw rate : {yawspeed}")
+            # self.get_logger().info(f"yaw rate : {yawspeed}")
             self._publish_trajectory_setpoint(
                 position, yaw, velocity=velocity, acceleration=acceleration, yawspeed=yawspeed
             )   
