@@ -44,26 +44,6 @@ class PCNode(Node):
          qos_profile_system_default
       )
 
-      self.scan_title_sub = self.create_subscription(
-         String, 
-         "/host/gui/out/scan_title", 
-         self.scan_title_callback, 
-         qos_profile_system_default
-      )
-
-      self.scan_dataset_sub = self.create_subscription(
-         String, 
-         "/host/gui/out/scan_ds", 
-         self.scan_dataset_callback, 
-         qos_profile_system_default
-      )
-      
-      self.dump_directory_pub = self.create_publisher(
-         String, 
-         "/host/out/pcc/dump_directory", 
-         qos_profile_system_default
-      )
-
       self.pcd_directory_subscriber = self.create_subscription(
          String,
          "/web/pcd_directory",
@@ -80,7 +60,7 @@ class PCNode(Node):
       self.scan_start = False
       self.scan_end = False
 
-      self.dump_dir = self.output_path # Dump directory
+      self.dump_dir = ""
       self.pcd_dir = ""
       self.pc_interval = 2.0 # Point cloud interval in seconds
       # Keep a timestamp to limit scan frequency
@@ -98,25 +78,6 @@ class PCNode(Node):
       #   dc = Bool()
       #   dc.data = True
       self.dump_complete_pub.publish(msg)
-
-
-   def scan_title_callback(self, msg):
-      """Make file directory from title, save and publish to ros."""
-      raw_title = msg.data
-      #   file_directory = raw_title.replace("/", "").replace("\\", "").replace(" ", "-").lower()
-      #   self.get_logger().info("File directory: " + file_directory)
-      #   self.dump_dir = os.path.join(self.output_path, file_directory)
-      
-      self.file_manager.set_class(raw_title)
-      
-      self.dump_dir = self.file_manager.get_pointclouds_path()
-      self.get_logger().info("Changing dump directory to: " + str(self.dump_dir))
-      dump_dir_ros_msg = String()
-      dump_dir_ros_msg.data = self.dump_dir
-      self.dump_directory_pub.publish(dump_dir_ros_msg)
-
-   def scan_dataset_callback(self, msg):
-      self.file_manager.set_dataset(msg.data)
 
    def pcd_directory_callback(self, msg):
       """Callback for receiving the PCD directory from the web interface."""
