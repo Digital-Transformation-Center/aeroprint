@@ -90,19 +90,23 @@ class PCNode(Node):
       if self.scan_start and not self.scan_end:
          now = self.get_clock().now().nanoseconds
          if now - self.last_pc >= self.pc_interval * 1e9:
-            self.get_logger().info("Saving pointcloud data...")
-            # Convert ROS PointCloud2 to Open 3D point cloud
-            points = np.frombuffer(data.data, dtype=np.float32).reshape(-1, 3)
-            self.get_logger().info("Converted PointCloud2 to Open3D format.")
-            o3dpc = o3d.geometry.PointCloud()
-            o3dpc.points = o3d.utility.Vector3dVector(points)
-            self.get_logger().info("Created Open3D point cloud.")
-            num_points = len(points)
-            self.get_logger().info("Pointcloud with points: " + str(num_points))
+            try:
+               self.get_logger().info("Saving pointcloud data...")
+               # Convert ROS PointCloud2 to Open 3D point cloud
+               points = np.frombuffer(data.data, dtype=np.float32).reshape(-1, 3)
+               self.get_logger().info("Converted PointCloud2 to Open3D format.")
+               o3dpc = o3d.geometry.PointCloud()
+               o3dpc.points = o3d.utility.Vector3dVector(points)
+               self.get_logger().info("Created Open3D point cloud.")
+               num_points = len(points)
+               self.get_logger().info("Pointcloud with points: " + str(num_points))
 
-            # Write point clouds to files
-            o3d.io.write_point_cloud(self.pcd_dir + "/pointcloud" + str(data.header.stamp.nanosec) + ".pcd", o3dpc)
-            self.last_pc = now # Update time
+               # Write point clouds to files
+               o3d.io.write_point_cloud(self.pcd_dir + "/pointcloud" + str(data.header.stamp.nanosec) + ".pcd", o3dpc)
+               self.last_pc = now # Update time
+            except Exception as e:
+               self.get_logger().info(e)
+
 
 def main(args=None) -> None:
     rclpy.init(args=args)
