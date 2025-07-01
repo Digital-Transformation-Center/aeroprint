@@ -96,7 +96,8 @@ class PCNode(Node):
                points = np.frombuffer(data.data, dtype=np.float32).reshape(-1, 3)
                self.get_logger().info("Converted PointCloud2 to Open3D format.")
                size = points.size
-               self.get_logger().info(f"Array created with size: {size}")
+               shape = points.shape
+               self.get_logger().info(f"Array created with size: {size} and shape: {shape}")
                # o3dpc = o3d.geometry.PointCloud()
                # o3dpc.points = o3d.utility.Vector3dVector(points)
                # self.get_logger().info("Created Open3D point cloud.")
