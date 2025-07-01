@@ -86,6 +86,7 @@ class PCNode(Node):
 
    def pc2_callback(self, data):
       """Dump point clouds if scan started"""
+      self.get_logger().info("PC2 Data Received...")
       if self.scan_start and not self.scan_end:
          now = self.get_clock().now().nanoseconds
          if now - self.last_pc >= self.pc_interval * 1e9:
