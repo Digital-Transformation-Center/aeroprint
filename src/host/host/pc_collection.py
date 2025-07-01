@@ -98,7 +98,7 @@ class PCNode(Node):
                size = points.size
                shape = points.shape
                self.get_logger().info(f"Array created with size: {size} and shape: {shape}")
-               # o3dpc = o3d.geometry.PointCloud()
+               o3dpc = o3d.geometry.PointCloud()
                # o3dpc.points = o3d.utility.Vector3dVector(points)
                # self.get_logger().info("Created Open3D point cloud.")
                # num_points = len(points)
