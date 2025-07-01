@@ -93,8 +93,10 @@ class PCNode(Node):
             self.get_logger().info("Saving pointcloud data...")
             # Convert ROS PointCloud2 to Open 3D point cloud
             points = np.frombuffer(data.data, dtype=np.float32).reshape(-1, 3)
+            self.get_logger().info("Converted PointCloud2 to Open3D format.")
             o3dpc = o3d.geometry.PointCloud()
             o3dpc.points = o3d.utility.Vector3dVector(points)
+            self.get_logger().info("Created Open3D point cloud.")
             num_points = len(points)
             self.get_logger().info("Pointcloud with points: " + str(num_points))
 
