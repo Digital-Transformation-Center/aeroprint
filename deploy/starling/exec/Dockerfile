@@ -60,6 +60,11 @@ RUN sudo apt-get update && \
 COPY --chown=$USERNAME:$USERNAME exec/requirements.txt /tmp/requirements.txt
 RUN sudo apt-get update && \
     sudo apt-get install -y \
+    libgl1 \
+    libgomp1 \
+    libsm6 \
+    libxext6 \
+    ffmpeg \
     iputils-ping && \
     pip3 install --no-cache-dir -r /tmp/requirements.txt && \
     rm -rf /var/lib/apt/lists/* /tmp/requirements.txt
