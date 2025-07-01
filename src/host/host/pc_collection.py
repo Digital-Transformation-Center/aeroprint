@@ -15,6 +15,7 @@ from rclpy.qos import qos_profile_sensor_data, qos_profile_system_default
 from rclpy.node import Node
 import numpy as np
 import open3d as o3d
+from ros2_numpy.point_cloud2 import point_cloud2_to_array
 
 class PCNode(Node):
    """Class for dumping ROS PointCloud2 messages to files"""
@@ -85,22 +86,36 @@ class PCNode(Node):
       self.get_logger().info(f"Received PCD directory: {msg.data}")
       self.pcd_dir = msg.data
 
-   def pc2_callback(self, data):
+   def pc2_callback(self, msg):
       """Dump point clouds if scan started"""
       if self.scan_start and not self.scan_end:
          now = self.get_clock().now().nanoseconds
          if now - self.last_pc >= self.pc_interval * 1e9:
             try:
+               data = msg.data
                self.get_logger().info("Saving pointcloud data...")
+               point_data = point_cloud2_to_array(data)
+
+               if not all(f in point_data.dtype.names for f in ['x', 'y', 'z']):
+                  self.get_logger().error("PointCloud2 message does not contain 'x', 'y', and 'z' fields.")
+                  return
+
+               points = np.zeros((point_data.shape[0], 3), dtype=np.float32)
+               points[:, 0] = point_data['x']
+               points[:, 1] = point_data['y']
+               points[:, 2] = point_data['x']
+
+
+
                # Convert ROS PointCloud2 to Open 3D point cloud
-               points = np.frombuffer(data.data, dtype=np.float32).reshape(-1, 3)
-               self.get_logger().info("Converted PointCloud2 to Open3D format.")
+               # points = np.frombuffer(data.data, dtype=np.float32).reshape(-1, 3)
+               # self.get_logger().info("Converted PointCloud2 to Open3D format.")
                size = points.size
                shape = points.shape
                self.get_logger().info(f"Array created with size: {size} and shape: {shape}")
                o3dpc = o3d.geometry.PointCloud()
                o3dpc.points = o3d.utility.Vector3dVector(points)
-               # self.get_logger().info("Created Open3D point cloud.")
+               self.get_logger().info("Created Open3D point cloud.")
                # num_points = len(points)
                # self.get_logger().info("Pointcloud with points: " + str(num_points))
 
