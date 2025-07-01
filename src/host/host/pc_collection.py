@@ -25,7 +25,7 @@ class PCNode(Node):
 
       self.pc2_sub = self.create_subscription(
          PointCloud2, 
-         "/starling/out/world_posed_pc", 
+         "/starling/out/relative_posed_pc", 
          self.pc2_callback, 
          qos_profile_sensor_data
       )
