@@ -11,19 +11,14 @@ __status__ = "Beta"
 import rclpy
 from sensor_msgs.msg import PointCloud2
 from std_msgs.msg import Bool, String
-import open3d as o3d
-import numpy as np
 from rclpy.qos import qos_profile_sensor_data, qos_profile_system_default
 from rclpy.node import Node
 import numpy as np
 import open3d as o3d
-import os
-from host.file_manager import FileManager
 
 class PCNode(Node):
    """Class for dumping ROS PointCloud2 messages to files"""
    def __init__(self) -> None:
-      self.file_manager = FileManager()
       # Create the node and subscriber
       super().__init__("point_cloud_handler_node")
       self.get_logger().info("Point cloud collector alive")
