@@ -14,7 +14,7 @@ const Card = styled.div`
     transform: scale(1.03);
     box-shadow: 0 0 20px rgba(0, 255, 198, 0.4);
   }
-`;
+`; 
 
 function FeatureCard({ title, onClick, children }) {
   return (
