@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import { Canvas, useLoader } from "@react-three/fiber";
 import { OrbitControls, Edges, Bounds } from "@react-three/drei";
 import { STLLoader } from "three/examples/jsm/loaders/STLLoader";
-import PropTypes from "prop-types";
+import PropTypes from "prop-types"; 
 
 function STLModel({ fileURL, finalColor }) {
   const geometry = useLoader(STLLoader, fileURL);
