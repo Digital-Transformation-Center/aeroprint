@@ -34,6 +34,7 @@ setup(
             "odometry-tf-publisher = starling.odometry_tf_publisher:main",
             "point-cloud-transformer = starling.point_cloud_transformer:main",
             "static-tof-tf-publisher = starling.static_tof_tf_publisher:main",
+            "static-cam-tf-publisher = starling.static_cam_tf_publisher:main",
             "static-world-to-odom-tf-publisher = starling.static_world_to_odom_tf_publisher:main",
         ],
     },
