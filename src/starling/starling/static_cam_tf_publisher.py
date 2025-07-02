@@ -17,10 +17,10 @@ class StaticToFTransformPublisher(Node):
     MODALAI STARLING'S EXTRINSICS.CONF FILE FOR THE TOF SENSOR.
     """
     def __init__(self):
-        super().__init__('static_tof_tf_publisher')
+        super().__init__('static_cam_tf_publisher')
         self.tf_broadcaster = StaticTransformBroadcaster(self)
         self.timer = self.create_timer(1.0, self.publish_static_transform)
-        self.get_logger().info('Static ToF Transform Publisher Node Started.')
+        self.get_logger().info('Static Camera Transform Publisher Node Started.')
 
     def publish_static_transform(self):
         """
