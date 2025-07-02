@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { io } from "socket.io-client";
 import styled from "styled-components";
 import ScanUpload from "../components/ScanUpload";
 import { useScans } from "../context/ScanContext";
+import LiveModel from "../components/LiveModel";
+import { Link } from "react-router-dom";
 
 const Container = styled.div`
   padding: 40px;
@@ -20,24 +22,17 @@ function Scan() {
 
   useEffect(() => {
     const socket = io("http://localhost:4000");
-
-    socket.on("scan-progress", (data) => {
-      setStatus(data.message);
-    });
-
-    socket.on("scan-complete", () => {
-      setStatus("✅ Real scan complete! Ready for upload.");
-    });
-
+    socket.on("scan-progress", (data) => setStatus(data.message));
+    socket.on("scan-complete", () =>
+      setStatus("✅ Real scan complete! Ready for upload.")
+    );
     return () => socket.disconnect();
   }, []);
 
   const handleStartScan = async () => {
     setStatus("🛫 Launching drone scan...");
     try {
-      const res = await fetch("http://localhost:4000/start-scan", {
-        method: "POST",
-      });
+      await fetch("http://localhost:4000/start-scan", { method: "POST" });
       setStatus("📡 Scan initiated. Listening for updates...");
     } catch (err) {
       console.error(err);
@@ -60,7 +55,12 @@ function Scan() {
       });
       const data = await res.json();
       setScanURL(data.url);
-      addScan({ name: file.name, url: data.url, timestamp: new Date().toISOString() });
+      addScan({
+        name: file.name,
+        url: data.url,
+        timestamp: new Date().toISOString(),
+        color: "#00ffc6",
+      });
       setStatus("🛰️ Scan received. Ready to print.");
     } catch (err) {
       console.error(err);
@@ -100,15 +100,46 @@ function Scan() {
     }, 300);
   };
 
+  const previewURL = useMemo(() => {
+    return scanFile ? URL.createObjectURL(scanFile) : null;
+  }, [scanFile]);
+
+  useEffect(() => {
+    return () => {
+      if (previewURL) URL.revokeObjectURL(previewURL);
+    };
+  }, [previewURL]);
+
   return (
     <Container>
+      <Link
+        to="/"
+        style={{
+          position: "absolute",
+          top: "20px",
+          right: "40px",
+          textDecoration: "none",
+          backgroundColor: "#1a1d24",
+          color: "#00ffc6",
+          padding: "10px 20px",
+          borderRadius: "8px",
+          fontWeight: "bold",
+          boxShadow: "0 0 10px rgba(0,255,198,0.3)",
+        }}
+      >
+        ⬅ Back to Home
+      </Link>
+
       <h1>🚀 Launch Scan</h1>
       <p>Simulate uploading a 3D scan from the drone.</p>
+
+      <ScanUpload onUpload={handleScanUpload} />
+      {uploading && <p>Uploading scan...</p>}
 
       <button
         onClick={handleStartScan}
         style={{
-          marginBottom: "20px",
+          margin: "20px 0",
           padding: "12px 28px",
           fontSize: "16px",
           borderRadius: "8px",
@@ -121,13 +152,11 @@ function Scan() {
         Start Drone Scan
       </button>
 
-      <ScanUpload onUpload={handleScanUpload} />
-      {uploading && <p>Uploading scan...</p>}
-
       {scanFile && (
         <div style={{ marginTop: "30px" }}>
           <h3>🖨️ Print Ready</h3>
           <p><strong>File:</strong> {scanFile.name}</p>
+
           <button
             onClick={handlePrint}
             disabled={printing}
@@ -145,7 +174,9 @@ function Scan() {
           </button>
 
           {printing && (
-            <div style={{ marginTop: "20px", width: "100%", maxWidth: "400px" }}>
+            <div
+              style={{ marginTop: "20px", width: "100%", maxWidth: "400px" }}
+            >
               <div
                 style={{
                   height: "12px",
@@ -166,6 +197,10 @@ function Scan() {
               <p style={{ marginTop: "8px" }}>{progress}%</p>
             </div>
           )}
+
+          <div style={{ marginTop: "40px" }}>
+            <LiveModel fileURL={previewURL} />
+          </div>
         </div>
       )}
 
