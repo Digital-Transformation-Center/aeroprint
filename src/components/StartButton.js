@@ -1,5 +1,5 @@
 import styled from "styled-components";
-
+ 
 const StartButton = styled.button`
   background: linear-gradient(145deg, #00ffc6, #4b8aff);
   border: none;
