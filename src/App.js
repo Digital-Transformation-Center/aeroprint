@@ -10,6 +10,10 @@ import Game from "./pages/Game";
 import theme from "./styles/theme";
 import { ScanProvider } from "./context/ScanContext";
 import Viewer from "./pages/Viewer";
+import EditScanModal from "./components/EditScanModal";
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
+
 
 
 function App() {
@@ -25,6 +29,7 @@ function App() {
           <Route path="/scans" element={<Scans />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/game" element={<Game />} />
+          <Route path="/edit-scan" element={<EditScanModal />} />
         </Routes>
       </Router>
       </ScanProvider>
