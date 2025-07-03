@@ -38,7 +38,7 @@ class StaticToFTransformPublisher(Node):
         # Translation from base_link to camera_frame (in meters)
         # Assuming sensor is mounted on the front, facing forward, slightly below center.
         translation = [-0.06, 0.0, 0.01]
-        rpy_degrees = [0.0, 0.0, -90.0]
+        rpy_degrees = [90.0, 0.0, 90.0]
         rotation_scipy = R.from_euler('xyz', rpy_degrees, degrees=True)  # Convert roll, pitch, yaw to rotation matrix
 
         t.transform.translation.x = translation[0]
