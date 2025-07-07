@@ -4,39 +4,50 @@ import { OrbitControls as DreiOrbitControls, Edges, Bounds } from "@react-three/
 import { STLLoader } from "three/examples/jsm/loaders/STLLoader";
 import * as THREE from "three";
 
-// ✅ OrbitControls wrapper for safe camera attachment
+// Safe OrbitControls wrapper
 function OrbitControlsWrapper() {
   const { camera, gl } = useThree();
   const controlsRef = useRef();
-
   useEffect(() => {
     if (controlsRef.current) controlsRef.current.update();
   }, []);
-
   return <DreiOrbitControls ref={controlsRef} args={[camera, gl.domElement]} />;
 }
 
-// ✅ STL model renderer with clean, flat shading
+// Model renderer that reacts to fileURL changes
 function STLModel({ fileURL, finalColor }) {
-  const rawGeometry = useLoader(STLLoader, fileURL);
+  const loader = useMemo(() => new STLLoader(), []);
   const meshRef = useRef();
+  const [geometry, setGeometry] = useState(null);
 
-  const [geometry] = useState(() => rawGeometry.clone());
+  useEffect(() => {
+    if (!fileURL) return;
 
-  useMemo(() => {
-    geometry.center();
-    geometry.computeVertexNormals();
+    loader.load(
+      fileURL,
+      (rawGeometry) => {
+        const geom = rawGeometry.clone();
+        geom.center();
+        geom.computeVertexNormals();
+        geom.computeBoundingBox();
 
-    // 💡 Normalize size
-    geometry.computeBoundingBox();
-    const size = geometry.boundingBox.getSize(new THREE.Vector3());
-    const maxAxis = Math.max(size.x, size.y, size.z);
-    geometry.scale(1 / maxAxis, 1 / maxAxis, 1 / maxAxis);
+        const size = geom.boundingBox.getSize(new THREE.Vector3());
+        const maxAxis = Math.max(size.x, size.y, size.z);
+        geom.scale(1 / maxAxis, 1 / maxAxis, 1 / maxAxis);
 
-    // ✅ Flatten shading: give each face its own set of vertices
-    geometry.toNonIndexed();
-    geometry.computeVertexNormals();
-  }, [geometry]);
+        geom.toNonIndexed();
+        geom.computeVertexNormals();
+        setGeometry(geom);
+      },
+      undefined,
+      (error) => {
+        console.error("Failed to load STL:", error);
+        setGeometry(null);
+      }
+    );
+  }, [fileURL, loader]);
+
+  if (!geometry) return null;
 
   return (
     <mesh ref={meshRef} geometry={geometry} castShadow receiveShadow>
@@ -52,8 +63,16 @@ function STLModel({ fileURL, finalColor }) {
   );
 }
 
-// ✅ Main viewer
 export default function LiveModel({ fileURL, color = "#00ffc6" }) {
+  // Clean up object URL on unmount
+  useEffect(() => {
+    return () => {
+      if (fileURL?.startsWith("blob:")) {
+        URL.revokeObjectURL(fileURL);
+      }
+    };
+  }, [fileURL]);
+
   return (
     <div style={{ height: "500px", width: "100%", marginTop: "2rem" }}>
       <Canvas shadows camera={{ position: [3, 3, 3], fov: 60 }}>
