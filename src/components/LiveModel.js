@@ -4,7 +4,7 @@ import { OrbitControls as DreiOrbitControls, Edges, Bounds } from "@react-three/
 import { STLLoader } from "three/examples/jsm/loaders/STLLoader";
 import * as THREE from "three";
 
-// Safe OrbitControls wrapper
+// Safe OrbitControls wrapper to avoid camera-readiness crashes
 function OrbitControlsWrapper() {
   const { camera, gl } = useThree();
   const controlsRef = useRef();
@@ -14,8 +14,8 @@ function OrbitControlsWrapper() {
   return <DreiOrbitControls ref={controlsRef} args={[camera, gl.domElement]} />;
 }
 
-// Model renderer that reacts to fileURL changes
-function STLModel({ fileURL, finalColor }) {
+// STL mesh loader with normalized geometry and reactive updates
+function STLModel({ fileURL, color = "#00ffc6", scale = 1 }) {
   const loader = useMemo(() => new STLLoader(), []);
   const meshRef = useRef();
   const [geometry, setGeometry] = useState(null);
@@ -30,18 +30,17 @@ function STLModel({ fileURL, finalColor }) {
         geom.center();
         geom.computeVertexNormals();
         geom.computeBoundingBox();
+        geom.toNonIndexed();
 
         const size = geom.boundingBox.getSize(new THREE.Vector3());
         const maxAxis = Math.max(size.x, size.y, size.z);
         geom.scale(1 / maxAxis, 1 / maxAxis, 1 / maxAxis);
 
-        geom.toNonIndexed();
-        geom.computeVertexNormals();
         setGeometry(geom);
       },
       undefined,
       (error) => {
-        console.error("Failed to load STL:", error);
+        console.error("❌ Failed to load STL:", error);
         setGeometry(null);
       }
     );
@@ -50,9 +49,15 @@ function STLModel({ fileURL, finalColor }) {
   if (!geometry) return null;
 
   return (
-    <mesh ref={meshRef} geometry={geometry} castShadow receiveShadow>
+    <mesh
+      ref={meshRef}
+      geometry={geometry}
+      castShadow
+      receiveShadow
+      scale={[scale, scale, scale]}
+    >
       <meshStandardMaterial
-        color={finalColor}
+        color={color}
         flatShading
         metalness={0.1}
         roughness={0.7}
@@ -63,25 +68,17 @@ function STLModel({ fileURL, finalColor }) {
   );
 }
 
-export default function LiveModel({ fileURL, color = "#00ffc6" }) {
-  // Clean up object URL on unmount
-  useEffect(() => {
-    return () => {
-      if (fileURL?.startsWith("blob:")) {
-        URL.revokeObjectURL(fileURL);
-      }
-    };
-  }, [fileURL]);
-
+// Main viewer canvas
+export default function LiveModel({ fileURL, color = "#00ffc6", scale = 1 }) {
   return (
-    <div style={{ height: "500px", width: "100%", marginTop: "2rem" }}>
+    <div style={{ height: "500px", width: "100%", marginTop: "1rem" }}>
       <Canvas shadows camera={{ position: [3, 3, 3], fov: 60 }}>
         <ambientLight intensity={0.6} />
-        <directionalLight position={[5, 10, 7.5]} intensity={1.2} castShadow />
-        <spotLight position={[0, 5, 2]} angle={0.35} penumbra={1} intensity={1.8} castShadow />
+        <directionalLight position={[5, 10, 7.5]} intensity={1.4} castShadow />
+        <spotLight position={[0, 5, 2]} angle={0.35} penumbra={1} intensity={2.0} castShadow />
         <OrbitControlsWrapper />
         <Bounds observe margin={1.2} fit clip>
-          <STLModel fileURL={fileURL} finalColor={color} />
+          <STLModel fileURL={fileURL} color={color} scale={scale} />
         </Bounds>
       </Canvas>
     </div>
