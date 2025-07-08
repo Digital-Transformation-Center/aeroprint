@@ -1,0 +1,16 @@
+# Build React frontend
+FROM node:18 as build
+WORKDIR /app
+COPY ./src/react_app/package.json ./src/react_app/package-lock.json ./
+RUN npm install
+COPY ./src/react_app/public/ ./public
+COPY ./src/react_app ./src
+RUN npm run build
+
+# Serve build with a lightweight static server
+FROM node:18-slim
+WORKDIR /app
+COPY --from=build /app/build ./build
+RUN npm install -g serve
+EXPOSE 3000
+CMD ["serve", "-s", "build", "-l", "3000"]

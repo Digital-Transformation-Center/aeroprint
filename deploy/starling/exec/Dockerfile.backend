@@ -1,0 +1,24 @@
+# Backend Dockerfile
+FROM python:3.11-slim
+WORKDIR /app
+
+# Install dependencies
+COPY ./src/node_backend_api/requirements.txt  .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy backend code
+COPY ./src/node_backend_api/ ./backend
+
+# Create uploads directory (will be mounted as a volume)
+RUN mkdir /uploads
+
+# Expose Flask port
+EXPOSE 4000
+
+# Set environment variables
+ENV FLASK_APP=backend/app.py
+ENV FLASK_RUN_HOST=0.0.0.0
+ENV UPLOAD_FOLDER=/uploads
+
+# Run Flask app
+CMD ["flask", "run"]
