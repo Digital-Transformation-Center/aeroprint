@@ -6,4 +6,5 @@ scans/
 src/data_management/data_management/datasets/
 src/data_management/data_management/models/
 docs/_build/
+src/react_app/node_modules/
 
