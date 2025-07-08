@@ -21,3 +21,13 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+install/
+build/
+log/
+scans/
+.venv/
+src/data_management/data_management/datasets/
+src/data_management/data_management/models/
+docs/_build/
+
+.doc/
