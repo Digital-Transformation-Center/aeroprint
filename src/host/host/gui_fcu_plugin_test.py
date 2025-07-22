@@ -16,23 +16,7 @@ class FCUGui(QWidget):
         self.ros_node = ros_node
         self.ros_node.set_heartbeat_alive_callback("heartbeat_alive", self)
         self.ros_node.set_heartbeat_dead_callback("heartbeat_dead", self)
-        self._ros_spin_running = True
-        import threading
-        self._ros_spin_thread = threading.Thread(target=self._ros_spin_loop, daemon=True)
-        self._ros_spin_thread.start()
         self.init_ui()
-
-    def _ros_spin_loop(self):
-        import time
-        while self._ros_spin_running:
-            rclpy.spin_once(self.ros_node, timeout_sec=0.01)
-            time.sleep(0.05)  # 20Hz
-
-    def closeEvent(self, event):
-        self._ros_spin_running = False
-        if self._ros_spin_thread.is_alive():
-            self._ros_spin_thread.join(timeout=1)
-        super().closeEvent(event)
 
     def init_ui(self):
         self.setWindowTitle('FCU Plugin Test')
