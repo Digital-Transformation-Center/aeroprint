@@ -58,13 +58,17 @@ class GUI_FCU_Plugin(Node):
         self._heartbeat_timeout = 0.5
         self._heartbeat_lock = threading.Lock()
         self._heartbeat_last = 0
-        self._heartbeat_running = True
-        self._heartbeat_thread = threading.Thread(target=self._heartbeat_monitor, daemon=True)
-
+        self._thread_running = True
         self._flight_path_loaded = False
+        self._main_thread = threading.Thread(target=self._main_loop, daemon=True)
 
     def run(self):
-        self._heartbeat_thread.start()
+        self._main_thread.start()
+
+    def kill(self):
+        """Stop the unified main thread."""
+        self._thread_running = False
+        rclpy.shutdown()
 
     def set_helix_params(self, radius, height, turns, start_height):
         msg = Float32MultiArray()
@@ -188,8 +192,17 @@ class GUI_FCU_Plugin(Node):
             import time
             self._heartbeat_last = time.time()
     
-    def _heartbeat_monitor(self):
-        while self._heartbeat_running:
+    def _main_loop(self):
+        """
+        Unified thread for ROS spinning and heartbeat monitoring.
+        """
+        while self._thread_running:
+            # Spin ROS node
+            try:
+                rclpy.spin_once(self, timeout_sec=0.01)
+            except Exception as e:
+                self.get_logger().error(f"Error in ROS spin: {e}")
+            # Heartbeat check
             now = time.time()
             with self._heartbeat_lock:
                 ok = (now - self._heartbeat_last) < self._heartbeat_timeout
@@ -198,4 +211,4 @@ class GUI_FCU_Plugin(Node):
                 self._user_heartbeat_alive_callback()
             elif not ok and not self._user_heartbeat_dead_callback == None:
                 self._user_heartbeat_dead_callback()
-            time.sleep(0.1)  # Check every 100ms
+            time.sleep(0.05)  # 20Hz
