@@ -117,6 +117,8 @@ class FlightNode(Node):
 
     def init_heartbeat(self, period: float = 0.5):
         self.heartbeat_manager = ServerHeartBeatManager(node = self, acceptable_loss = period)
+        # Land the drone if the heartbeat is lost
+        self.heartbeat_manager.set_dead_callback(self._land_vehicle())
 
     def update_path(self, new_path: Path):
         """Update the system path with a new path object"""
