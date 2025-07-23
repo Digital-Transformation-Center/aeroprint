@@ -64,7 +64,7 @@ class FlaskWebApp:
         @self.socketio.on('disconnect')
         def handle_disconnect():
             self.node.get_logger().info('Client disconnected.')
-            self.request_land_flight()  # Request landing on disconnect
+            self.node.request_land_flight()  # Request landing on disconnect
             
         @self.socketio.on('shutdown_test_node')
         def handle_shutdown_test_node():
