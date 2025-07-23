@@ -30,6 +30,7 @@ class HelixNode(FlightNode):
             qos_profile_system_default
         )
         self.set_external_engage_callback(self.publish_scan_start)
+        self.set_external_land_callback(self.publish_scan_end)
         self.init_heartbeat()
 
     def publish_scan_start(self):
