@@ -90,7 +90,10 @@ class Mesher(Node):
         self.get_logger().info("Export complete callback: " + str(msg.data))
         if msg.data:
             self.get_logger().info("Meshing...")
-            self.save()
+            try:
+                self.save()
+            except Exception as e:
+                self.get_logger().error(f"Unable to complete mesh: {e}")
 
     def process(self):
         """
