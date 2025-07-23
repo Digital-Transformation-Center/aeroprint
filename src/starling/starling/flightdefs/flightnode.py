@@ -520,9 +520,8 @@ class ServerHeartBeatManager():
 
     def dead(self):
         self.node.get_logger().warn("Heartbeat lost! Calling dead() handler.")
-        if hasattr(self, "dead_callback"):
+        if hasattr(self, "dead_callback") and self.dead_callback is not None:
             self.dead_callback()
-        pass
 
 
 def main(args=None) -> None:
