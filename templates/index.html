@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AeroPrint</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <div class="container">
+
+    <!-- Title Banner -->
+    <div class="title-banner">
+      <img src="{{ url_for('static', filename='images/aeroprint_title.png') }}" alt="AeroPrint Logo">
+    </div>
+
+    <!-- Top Row: Camera (left) & Flight Path (right) -->
+    <div class="data-row">
+
+      <div class="camera-view">
+          <h3>Starling Camera View</h3>
+          <div class="camera-box">[Live Feed Placeholder]</div>
+          <!-- Move camera-details below camera-box -->
+          <div class="camera-details">
+              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas a justo sodales, aliquet nunc in, feugiat nisl. Proin molestie dui sem, id dapibus erat porttitor eget. Mauris sit amet metus placerat, feugiat sem ac, aliquam purus. Nulla facilisi. Mauris convallis, libero eget accumsan feugiat, lacus massa dapibus orci, at commodo odio nibh in mi. </p>
+              <div class="controls">
+                  <button id="action-btn" class="start-btn" onclick="toggleAction()">START</button>
+              </div>
+          </div>
+      </div>
+
+      <!-- Flight Path Section (Right) -->
+      <div class="flight-path">
+        <h3>Flight Path Graphic</h3>
+        <div class="path-box">[Overlay Placeholder]</div>
+
+        <!-- Print Size Selector -->
+        <div class="size-selector">
+          {% for size in ["SM", "MED", "LG"] %}
+            <button class="size-btn {% if size == selected_size %}active{% endif %}">{{ size }}</button>
+          {% endfor %}
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Phase Status Bar -->
+    <div class="status-bar">
+      {% for phase in ["Preflight", "Scanning", "Processing", "Meshing", "Slicing", "Printing"] %}
+        <div class="status {% if phase == stage %}active{% endif %}">{{ phase }}</div>
+      {% endfor %}
+    </div>
+
+  </div>
+</body>
+</html>
