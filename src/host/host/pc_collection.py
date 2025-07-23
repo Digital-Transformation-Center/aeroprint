@@ -72,6 +72,8 @@ class PCNode(Node):
       self.get_logger().info("Scan start received.")
       self.scan_start = msg.data
       self.scan_end = not self.scan_start
+      if not msg.data:
+         self.scan_end_callback(Bool(data=True))  # Ensure scan end is called if scan start is false
 
    def scan_end_callback(self, msg):
       """Stop scanning"""
@@ -106,8 +108,8 @@ class PCNode(Node):
                # self.get_logger().info("Pointcloud with points: " + str(num_points))
 
                # # Write point clouds to files
-               # o3d.io.write_point_cloud(self.pcd_dir + "/pointcloud" + str(data.header.stamp.nanosec) + ".pcd", o3dpc)
-               # self.last_pc = now # Update time
+               o3d.io.write_point_cloud(self.pcd_dir + "/pointcloud" + str(data.header.stamp.nanosec) + ".pcd", o3dpc)
+               self.last_pc = now # Update time
             except Exception as e:
                self.get_logger().warn("Error in pcd processing...")
                self.get_logger().info(e)
