@@ -433,7 +433,6 @@ class FlightNode(Node):
     def _land_vehicle(self) -> None:
         """Send a land command to the vehicle."""
         self._publish_vehicle_command(VehicleCommand.VEHICLE_CMD_NAV_LAND, param1=0.0, param2=0.0, param3=0.0, param4=0.0)
-        self.get_logger().info("Land command sent.")
 
     def _update_home_position(self) -> None:
         if self.current_vehicle_position_timestamp is None:
