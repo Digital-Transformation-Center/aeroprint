@@ -147,6 +147,9 @@ class FlaskServerNode(Node):
         self.pcd_directory_publisher = self.create_publisher(
             String, '/web/pcd_directory', qos_profile_system_default
         )
+        self.log_directory_publisher = self.create_publisher(
+            String, '/web/log_directory', qos_profile_system_default
+        )
 
         self.flask_status_callback = None
 
@@ -265,6 +268,9 @@ class FlaskServerNode(Node):
         self.fm.create_new_folder()
         self.pcd_directory_publisher.publish(
             String(data=self.fm.get_pcd_folder(self.fm.get_id()))
+        )
+        self.log_directory_publisher.publish(
+            String(data=self.fm.get_logs_folder(self.fm.get_id()))
         )
         msg = std_msgs.msg.Bool()
         msg.data = True
