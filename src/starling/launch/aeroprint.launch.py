@@ -25,6 +25,8 @@ def generate_launch_description():
         # tf_manager is now integrated into the flight node
         # --- Node(package="starling", executable="static-world-to-odom-tf-publisher", name="static_world_to_odom_tf_publisher"),
 
-        Node(package="host", executable="pc-collection", name="point_cloud_collection_node")
+        Node(package="host", executable="pc-collection", name="point_cloud_collection_node"),
+        Node(package="host", executable="pc-post-processor", name="pc_post_processor_node"),
+        Node(package="host", executable="mesher", name="mesher_node"),
         
     ])
