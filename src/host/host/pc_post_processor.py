@@ -95,11 +95,11 @@ class PCPostProcessor(Node):
     def pcd_directory_callback(self, msg):
         """Callback for receiving the PCD directory from the web interface."""
         self.get_logger().info(f"Received PCD directory: {msg.data}")
-        self.dump_dir = msg.data
-        if not os.path.exists(self.dump_dir):
-            os.makedirs(self.dump_dir)
-            self.get_logger().info(f"Created directory: {self.pcd_dir}")
-        
+        self.dump_directory = msg.data
+        if not os.path.exists(self.dump_directory):
+            os.makedirs(self.dump_directory)
+            self.get_logger().info(f"Created directory: {self.dump_directory}")
+
     def helix_params_callback(self, data):
         """Callback for helix parameters."""
         self.get_logger().info(f"Received helix parameters: {data.data}")
@@ -118,7 +118,10 @@ class PCPostProcessor(Node):
         """Callback for dump complete."""
         self.get_logger().info("Dump finished. Combining Pointclouds.")
         if msg.data:
-            self.save()
+            try:
+                self.save()
+            except Exception as e:
+                self.get_logger().error(f"Error during pcd save: {e}")
             ec = Bool()
             ec.data = True
             self.export_complete_pub.publish(ec)
