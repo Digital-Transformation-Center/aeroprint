@@ -13,7 +13,7 @@ import os
 import numpy as np
 from rclpy.node import Node
 from rclpy.qos import qos_profile_system_default
-from std_msgs.msg import Float32, Bool, String
+from std_msgs.msg import Float32, Bool, String, Float32MultiArray
 import rclpy
 
 class PCPostProcessor(Node):
@@ -24,24 +24,24 @@ class PCPostProcessor(Node):
         self.get_logger().info("Point cloud post processor alive")
 
         # Create subscribers
-        self.radius_sub = self.create_subscription(
-             Float32,
-             "/host/gui/out/radius", 
-             self.radius_callback, 
-             qos_profile_system_default
-        )
-        self.object_height_sub = self.create_subscription(
-             Float32,
-             "/host/gui/out/object_height", 
-             self.object_height_callback, 
-             qos_profile_system_default
-        )
-        self.start_height_sub = self.create_subscription(
-             Float32,
-             "/host/gui/out/start_height", 
-             self.start_height_callback, 
-             qos_profile_system_default
-        )
+        # self.radius_sub = self.create_subscription(
+        #      Float32,
+        #      "/host/gui/out/radius", 
+        #      self.radius_callback, 
+        #      qos_profile_system_default
+        # )
+        # self.object_height_sub = self.create_subscription(
+        #      Float32,
+        #      "/host/gui/out/object_height", 
+        #      self.object_height_callback, 
+        #      qos_profile_system_default
+        # )
+        # self.start_height_sub = self.create_subscription(
+        #      Float32,
+        #      "/host/gui/out/start_height", 
+        #      self.start_height_callback, 
+        #      qos_profile_system_default
+        # )
         self.dump_complete_sub = self.create_subscription(
              Bool,
              "/host/out/pcc/dump_complete", 
@@ -59,6 +59,20 @@ class PCPostProcessor(Node):
             "/host/out/pcpp/export_complete",
             qos_profile_system_default
         )
+        self.helix_param_sub = self.create_subscription(
+            Float32MultiArray,
+            "/helix_params",
+            self.helix_params_callback,
+            10
+        )
+
+        self.pcd_directory_subscriber = self.create_subscription(
+            String,
+            "/web/pcd_directory",
+            self.pcd_directory_callback,
+            qos_profile_system_default
+        )
+        
 
         # Variables for subscribers to update
         self.radius = 0.0
@@ -77,22 +91,28 @@ class PCPostProcessor(Node):
         # Load all PCD files from the directory
         self.pcd_list = []
         self.combined_pcd = None 
+
+    def pcd_directory_callback(self, msg):
+        """Callback for receiving the PCD directory from the web interface."""
+        self.get_logger().info(f"Received PCD directory: {msg.data}")
+        self.dump_dir = msg.data
+        if not os.path.exists(self.dump_dir):
+            os.makedirs(self.dump_dir)
+            self.get_logger().info(f"Created directory: {self.pcd_dir}")
         
-    
-    def radius_callback(self, msg):
-        self.get_logger().info("Radius set to " + str(msg.data))
-        """Callback for radius."""
-        self.radius = msg.data
-
-    def object_height_callback(self, msg):
-        self.get_logger().info("Object height set to " + str(msg.data))
-        """Callback for object height."""
-        self.object_height = msg.data
-
-    def start_height_callback(self, msg):
-        self.get_logger().info("Start height set to " + str(msg.data))
-        """Callback for starting height."""
-        self.start_height = msg.data
+    def helix_params_callback(self, data):
+        """Callback for helix parameters."""
+        self.get_logger().info(f"Received helix parameters: {data.data}")
+        self.radius = data.data[0]
+        self.object_height = data.data[1]
+        self.start_height = data.data[3]
+        # self.flight_params = {
+        #     "helix_height": data.data[1],
+        #     "helix_radius": data.data[0],
+        #     "helix_num_passes": data.data[2],
+        #     "helix_start_height": data.data[3],
+        #     "helix_rate": 15.0 # Default rate, can be adjusted
+        # }
 
     def dump_complete_callback(self, msg):
         """Callback for dump complete."""
