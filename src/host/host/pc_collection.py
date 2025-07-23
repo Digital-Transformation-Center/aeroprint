@@ -97,10 +97,10 @@ class PCNode(Node):
                self.get_logger().info("Saving pointcloud data...")
                # Convert ROS PointCloud2 to Open 3D point cloud
                points = np.frombuffer(data.data, dtype=np.float32).reshape(-1, 3)
-               self.get_logger().info("Converted PointCloud2 to Open3D format.")
+               # self.get_logger().info("Converted PointCloud2 to Open3D format.")
                size = points.size
                shape = points.shape
-               self.get_logger().info(f"Array created with size: {size} and shape: {shape}")
+               # self.get_logger().info(f"Array created with size: {size} and shape: {shape}")
                o3dpc = o3d.geometry.PointCloud()
                o3dpc.points = o3d.utility.Vector3dVector(points)
                # self.get_logger().info("Created Open3D point cloud.")
@@ -109,6 +109,7 @@ class PCNode(Node):
 
                # # Write point clouds to files
                o3d.io.write_point_cloud(self.pcd_dir + "/pointcloud" + str(data.header.stamp.nanosec) + ".pcd", o3dpc)
+               self.get_logger().info("Pointcloud saved in directory: " + self.pcd_dir)
                self.last_pc = now # Update time
             except Exception as e:
                self.get_logger().warn("Error in pcd processing...")
