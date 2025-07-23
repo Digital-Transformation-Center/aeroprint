@@ -3,3 +3,5 @@ flask-socketio
 numpy
 transforms3d
 scipy
+open3d
+ros2-numpy

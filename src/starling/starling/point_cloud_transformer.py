@@ -32,10 +32,10 @@ class PointCloudTransformer(Node):
         # Publisher for the transformed point cloud data
         self.publisher = self.create_publisher(
             PointCloud2,
-            '/starling/out/world_posed_pc', # New topic for transformed point cloud
+            '/starling/out/relative_posed_pc', # New topic for transformed point cloud
             rclpy.qos.qos_profile_sensor_data
         )
-        self.get_logger().info('Publishing to /starling/out/world_posed_pc')
+        self.get_logger().info('Publishing to /starling/out/relative_posed_pc')
 
         self.get_logger().info('Point Cloud Transformer Node Started.')
 
@@ -46,7 +46,7 @@ class PointCloudTransformer(Node):
         """
         # Define the source and target frames for the transformation
         source_frame = msg.header.frame_id # The frame in which the incoming point cloud is defined (e.g., 'tof_sensor_frame')
-        target_frame = 'world'             # The desired output frame (the fixed world frame)
+        target_frame = 'odom'             # The desired output frame (the fixed world frame)
 
         # If the incoming message doesn't have a frame_id set, assume 'tof_sensor_frame'
         # if not source_frame:

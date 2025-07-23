@@ -39,7 +39,7 @@ class FlightNode(Node):
         self.get_logger().info("Flight Node Alive!")
 
         self.tm = TransformManager() # Transform manager for managing coordinates
-
+        self.tm.set_home([0.0, 0.0, 0.0], math.pi / 4)  # Set home position and orientation
         # Configure QoS profile for publishing
         # For control messages, RELIABLE might be preferred, but BEST_EFFORT is used
         # in the reference helical_flight_node.py for PX4 publishers.
@@ -177,7 +177,7 @@ class FlightNode(Node):
             velocity = state.get_velocity()
             acceleration = state.get_acceleration()
             yawspeed = state.get_yaw_rate()
-            self.get_logger().info(f"yaw rate : {yawspeed}")
+            # self.get_logger().info(f"yaw rate : {yawspeed}")
             self._publish_trajectory_setpoint(
                 position, yaw, velocity=velocity, acceleration=acceleration, yawspeed=yawspeed
             )   

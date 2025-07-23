@@ -6,10 +6,12 @@ from flask import Flask, render_template
 import std_msgs.msg
 from std_msgs.msg import String, Float32MultiArray
 import json
+from rclpy.qos import qos_profile_system_default
 
 from flask_socketio import SocketIO
 
 from starling.flightdefs.flight_status_codes import *
+from host.web.file_manager import FileManager
 
 class FlaskWebApp:
     def __init__(self, node):
@@ -122,9 +124,11 @@ class FlaskWebApp:
 class FlaskServerNode(Node):
     def __init__(self):
         super().__init__('flask_server_node')
+        self.fm = FileManager()
         self.get_logger().info('FlaskServerNode initialized.')
         self.radius_publisher = self.create_publisher(
-            std_msgs.msg.Float32, 'radius', 10)
+            std_msgs.msg.Float32, 'radius', 10
+        )
 
         self.param_publisher = self.create_publisher(
             Float32MultiArray, 'helix_params', 10 
@@ -136,6 +140,12 @@ class FlaskServerNode(Node):
 
         self.status_subscriber = self.create_subscription(
             std_msgs.msg.Int8, '/fcu/out/status', self.flight_status_callback, 10
+        )
+        self.scan_id_publisher = self.create_publisher(
+            std_msgs.msg.Int32, '/web/scan_id', qos_profile_system_default
+        )
+        self.pcd_directory_publisher = self.create_publisher(
+            String, '/web/pcd_directory', qos_profile_system_default
         )
 
         self.flask_status_callback = None
@@ -219,14 +229,11 @@ class FlaskServerNode(Node):
 
 
     def flight_status_callback(self, msg):
-        self.get_logger().info(f"Flight status received: {msg.data}")
         status = msg.data
         if status == FLIGHT_DISARMED:
-            self.get_logger().info("Flight is idle.")
             if hasattr(self, 'flask_web_app'):
                 self.flask_web_app.emit_status('idle')
         elif status == FLIGHT_PATH_LOADED:
-            self.get_logger().info("Flight received parameters.")
             if hasattr(self, 'flask_web_app'):
                 self.flask_web_app.emit_status('param_receive')
         elif status == FLIGHT_ENGAGED:
@@ -234,15 +241,12 @@ class FlaskServerNode(Node):
             if hasattr(self, 'flask_web_app'):
                 self.flask_web_app.emit_status('flight_engaged')
         elif status == FLIGHT_ARMED:
-            self.get_logger().info("Flight armed.")
             if hasattr(self, 'flask_web_app'):
                 self.flask_web_app.emit_status('flight_armed')
         elif status == FLIGHT_LANDING:
-            self.get_logger().info("Flight landing.")
             if hasattr(self, 'flask_web_app'):
                 self.flask_web_app.emit_status('flight_landing')
         elif status == FLIGHT_ERROR:
-            self.get_logger().error("Flight error occurred.")
             if hasattr(self, 'flask_web_app'):
                 self.flask_web_app.emit_status('flight_error')
 
@@ -258,6 +262,10 @@ class FlaskServerNode(Node):
         self.flask_status_callback = fn
 
     def start_flight(self):
+        self.fm.create_new_folder()
+        self.pcd_directory_publisher.publish(
+            String(data=self.fm.get_pcd_folder(self.fm.get_id()))
+        )
         msg = std_msgs.msg.Bool()
         msg.data = True
         self.start_flight_publisher.publish(msg)
