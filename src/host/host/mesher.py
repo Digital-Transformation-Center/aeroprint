@@ -44,12 +44,12 @@ class Mesher(Node):
             "/host/out/mesher/file_directory", 
             qos_profile_system_default
         )
-        self.log_directory_subscriber = self.create_subscription(
-            String,
-            "/web/log_directory",
-            self.log_directory_callback,
-            qos_profile_system_default
-        )
+        # self.log_directory_subscriber = self.create_subscription(
+        #     String,
+        #     "/web/log_directory",
+        #     self.log_directory_callback,
+        #     qos_profile_system_default
+        # )
         self.pcd_directory_subscriber = self.create_subscription(
          String,
          "/web/pcd_directory",
