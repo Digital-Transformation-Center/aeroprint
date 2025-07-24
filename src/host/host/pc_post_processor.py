@@ -152,8 +152,11 @@ class PCPostProcessor(Node):
 
     def filter_pcs(self):
         """Filter combined point cloud."""
+
         points = np.asarray(self.combined_pcd.points)
-        points = self.confine_to_circle(points, self.radius)
+        self.get_logger().info(f"Number of points before filtering: {len(points)}")
+        # points = self.confine_to_circle(points, self.radius)
+        # self.get_logger().info(f"Number of points after confining to circle: {len(points)}")
         max_z = self.start_height + self.object_height + 0.3
         # points = self.confine_to_z(points, self.start_height, max_z)
         self.combined_pcd = o3d.geometry.PointCloud()
@@ -163,6 +166,7 @@ class PCPostProcessor(Node):
 
     def confine_to_circle(self, points, r):
         """Confine points to a circle."""
+        self.get_logger().info(f"Confine to circle with radius: {r}")
         center_x = r
         center_y = 0.0
         distances = np.sqrt((points[:, 0] - center_x) ** 2 + (points[:, 1] - center_y) ** 2)
@@ -171,6 +175,7 @@ class PCPostProcessor(Node):
 
     def confine_to_z(self, points, min_z, max_z):
         """Confine points within certain Z boundaries."""
+        self.get_logger().info(f"Confine to Z, bottom: {min_z}, top: {max_z}")
         z_height = points[:, 2]
         mask = points[:, 2] < -min_z # and points[:, 2] > -max_z
         # mask = z_height < -min_z and z_height > -max_z
