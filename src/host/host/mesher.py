@@ -151,7 +151,7 @@ class Mesher(Node):
         # Convert the voxel grid to a point cloud
         self.get_logger().info("Exporting mesh")
         mesh.compute_vertex_normals()
-        o3d.io.write_triangle_mesh(self.directory + "-output.stl", mesh)
+        o3d.io.write_triangle_mesh(self.directory + "-mesh-output.stl", mesh)
     def save(self):
         """
         Processes the mesh and saves the output to a file.
@@ -162,7 +162,7 @@ class Mesher(Node):
 
         self.process()
         output_path = String()
-        output_path.data = self.directory + "-output.stl"
+        output_path.data = self.directory + "-mesh-output.stl"
         self.get_logger().info("Output mesh: " + output_path.data)
         self.file_directory_pub.publish(output_path)
         self.get_logger().info("Mesh complete.")
