@@ -30,14 +30,14 @@ const height_slider = document.getElementById('height');
 const turns_slider = document.getElementById('turns');
 
 const metric_slider_limits = {
-    radius: { min: 0.3, max: 3, steps: 0.1, currentValue: 1 },
-    height: { min: 0.1, max: 3, steps: 0.1, currentValue: 1 },
+    radius: { min: 0.1, max: 1, steps: 0.05, currentValue: 0.2 },
+    height: { min: 0.1, max: 2, steps: 0.05, currentValue: 0.3 },
     turns: { min: 1, max: 10, steps: 1, currentValue: 2 }
 };
 
 const imperial_slider_limits = {
-    radius: { min: 1, max: 10, steps: 0.1, currentValue: 3 },
-    height: { min: 0.3, max: 10, steps: 0.1, currentValue: 3 },
+    radius: { min: 0.3, max: 3.5, steps: 0.1, currentValue: 2 },
+    height: { min: 0.3, max: 6.5, steps: 0.1, currentValue: 2 },
     turns: { min: 1, max: 10, steps: 1, currentValue: 2 }
 };
 
@@ -135,7 +135,7 @@ export function updateScene() {
     const height = parseFloat(document.getElementById('height').value);
     const turns = parseInt(document.getElementById('turns').value);
     const startHeight = parseFloat(document.getElementById('startHeight').value);
-    const helixRadius = radius + 0.4;
+    const helixRadius = radius + 0.3;
     let points = 300;
     const minHelixY = 0.2;
     // Compute helix length and adjust number of points
