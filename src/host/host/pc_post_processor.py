@@ -158,7 +158,7 @@ class PCPostProcessor(Node):
         points = self.confine_to_circle(points, self.radius)
         self.get_logger().info(f"Number of points after confining to circle: {len(points)}")
         max_z = self.start_height + self.object_height + 0.3
-        # points = self.confine_to_z(points, self.start_height, max_z)
+        points = self.confine_to_z(points, self.start_height, max_z)
         self.combined_pcd = o3d.geometry.PointCloud()
         self.combined_pcd.points = o3d.utility.Vector3dVector(points)
         self.combined_pcd, ind = self.combined_pcd.remove_statistical_outlier(nb_neighbors=10,
