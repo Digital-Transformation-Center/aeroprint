@@ -6,4 +6,5 @@ scipy
 open3d
 ros2-numpy
 trimesh
+scikit-image
 prusalinkpy
