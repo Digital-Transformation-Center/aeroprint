@@ -65,6 +65,7 @@ RUN sudo apt-get update && \
     libsm6 \
     libxext6 \
     ffmpeg \
+    slic3r \
     iputils-ping && \
     pip3 install --no-cache-dir -r /tmp/requirements.txt && \
     rm -rf /var/lib/apt/lists/* /tmp/requirements.txt
