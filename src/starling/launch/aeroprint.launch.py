@@ -28,5 +28,7 @@ def generate_launch_description():
         Node(package="host", executable="pc-collection", name="point_cloud_collection_node"),
         Node(package="host", executable="pc-post-processor", name="pc_post_processor_node"),
         Node(package="host", executable="mesher", name="mesher_node"),
+
+        Node(package="printer", executable="printer-control", name="printer_node"),
         
     ])
