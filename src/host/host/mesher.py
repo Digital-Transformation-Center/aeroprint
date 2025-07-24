@@ -89,6 +89,68 @@ class Mesher(Node):
             except Exception as e:
                 self.get_logger().error(f"Unable to complete mesh: {e}")
 
+    def voxel_repair(self, mesh, pitch=None):
+        """
+        Reconstructs a watertight mesh by voxelizing the input mesh and
+        extracting the surface with marching cubes.
+        """
+        try:
+            print("\nAttempting voxel-based repair...")
+
+            if pitch is None:
+                bounds = mesh.bounds
+                scale = bounds[1] - bounds[0]
+                pitch = min(scale) / 100  # dynamic pitch based on model size
+
+            voxelized = mesh.voxelized(pitch)
+            filled = voxelized.fill()
+
+            watertight_mesh = filled.marching_cubes
+
+            # Clean and return
+            watertight_mesh.update_faces(watertight_mesh.unique_faces())
+            watertight_mesh.remove_unreferenced_vertices()
+            watertight_mesh.merge_vertices()
+
+            print("Voxel repair succeeded.")
+            return watertight_mesh
+
+        except Exception as e:
+            print(f"Voxel repair failed: {e}")
+            return None
+
+    def check_and_fix_watertightness(self, mesh):
+        """
+        Loads an STL mesh, checks and attempts to fix watertightness,
+        and saves the repaired mesh if possible.
+        """
+
+        print(f"Initial watertight: {mesh.is_watertight}")
+
+        # Initial cleaning
+        mesh.update_faces(mesh.unique_faces())
+        mesh.remove_unreferenced_vertices()
+        mesh.merge_vertices()
+        tm.repair.fill_holes(mesh)
+
+        print(f"Watertight after basic cleanup: {mesh.is_watertight}")
+
+        # Try voxel repair if still not watertight
+        if not mesh.is_watertight:
+            voxel_mesh = self.voxel_repair(mesh)
+            if voxel_mesh and voxel_mesh.is_watertight:
+                mesh = voxel_mesh
+            else:
+                print("Mesh remains non-watertight after all attempts.")
+                return
+
+        # Final cleanup
+        mesh.remove_degenerate_faces()
+        mesh.fix_normals()
+        mesh.remove_infinite_values()
+
+        return mesh  
+    
     def process(self):
         """
         Processes a point cloud file to generate a smoothed and filtered 3D mesh.
@@ -154,64 +216,17 @@ class Mesher(Node):
                              faces=np.asarray(mesh.triangles),
                              vertex_normals=np.asarray(mesh.vertex_normals))
 
-        self.get_logger().info("Checking mesh properties before repair:")
-        self.get_logger().info(f"Is watertight (trimesh): {tm_mesh.is_watertight}")
-        self.get_logger().info(f"Is manifold (trimesh): {tm_mesh.is_manifold}")
-        self.get_logger().info(f"Has faces (trimesh): {tm_mesh.has_faces}")
-        self.get_logger().info(f"Is self-intersecting (trimesh): {tm_mesh.is_self_intersecting}")
+        self.get_logger().info("Performing mesh repair using Trimesh...")
 
-        if not tm_mesh.is_watertight:
-            self.get_logger().warning("Mesh is not watertight. Attempting repair with Trimesh.")
-            # Fill holes and make it watertight
-            tm_mesh.fill_holes()
-            # If still not watertight, try `repair.make_watertight` (more aggressive)
-            if not tm_mesh.is_watertight:
-                self.get_logger().info("Mesh still not watertight after fill_holes. Trying `repair.make_watertight`.")
-                # This function tries to make the mesh watertight by attempting to fill holes and ensuring consistent orientation
-                tm_mesh = tm.repair.make_watertight(tm_mesh)
-
-        if not tm_mesh.is_manifold:
-            self.get_logger().warning("Mesh is not manifold. Attempting to repair non-manifold edges with Trimesh.")
-            # Remove non-manifold edges. This can sometimes remove valid geometry if the initial mesh is very broken.
-            tm_mesh.remove_nonmanifold_edges()
-            # Also try to fix non-manifold vertices
-            tm_mesh.remove_nonmanifold_vertices()
-
-
-        if tm_mesh.is_self_intersecting:
-            self.get_logger().warning("Mesh is self-intersecting. Attempting to fix intersections with Trimesh.")
-            # This can be computationally expensive and might alter the geometry significantly
-            tm_mesh.process_intersections() # This attempts to resolve self-intersections
-
-        # Re-check properties after trimesh repair
-        self.get_logger().info("Checking mesh properties after Trimesh repair:")
-        self.get_logger().info(f"Is watertight (trimesh): {tm_mesh.is_watertight}")
-        self.get_logger().info(f"Is manifold (trimesh): {tm_mesh.is_manifold}")
-        self.get_logger().info(f"Is self-intersecting (trimesh): {tm_mesh.is_self_intersecting}")
-
-        # Convert back to Open3D mesh if needed, or work with trimesh directly for export
-        # For exporting, trimesh can export directly to STL
-        mesh_final = o3d.geometry.TriangleMesh(
-            o3d.utility.Vector3dVector(tm_mesh.vertices),
-            o3d.utility.Vector3iVector(tm_mesh.faces)
-        )
-        mesh_final.compute_vertex_normals() # Recompute normals after any changes
-
-        # Open3D's own checks (good for sanity check and logging)
-        self.get_logger().info("Open3D mesh validation after repair:")
-        self.get_logger().info(f"Open3D is_edge_manifold (allow_boundary_edges=True): {mesh_final.is_edge_manifold(allow_boundary_edges=True)}")
-        self.get_logger().info(f"Open3D is_edge_manifold (allow_boundary_edges=False): {mesh_final.is_edge_manifold(allow_boundary_edges=False)}")
-        self.get_logger().info(f"Open3D is_vertex_manifold: {mesh_final.is_vertex_manifold()}")
-        self.get_logger().info(f"Open3D is_self_intersecting: {mesh_final.is_self_intersecting()}")
-        self.get_logger().info(f"Open3D is_watertight: {mesh_final.is_watertight()}")
-        self.get_logger().info(f"Open3D is_orientable: {mesh_final.is_orientable()}")
-
+        
+        repaired_mesh = self.check_and_fix_watertightness(tm_mesh)
 
         self.get_logger().info("Exporting mesh")
+        repaired_mesh.export(self.directory + "-mesh-output.stl")
         # Use trimesh's export to STL, as it's often more robust for repaired meshes
         # tm_mesh.export(self.directory + "-mesh-output.stl")
         # Or if you want to stick with Open3D for final export, use the converted mesh_final
-        o3d.io.write_triangle_mesh(self.directory + "-mesh-output.stl", mesh_final)
+        # o3d.io.write_triangle_mesh(self.directory + "-mesh-output.stl", mesh_final)
         self.get_logger().info(f"Mesh saved to: {self.directory}-mesh-output.stl")
 
     def save(self):
