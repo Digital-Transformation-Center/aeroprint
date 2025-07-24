@@ -95,7 +95,7 @@ class Mesher(Node):
         extracting the surface with marching cubes.
         """
         try:
-            print("\nAttempting voxel-based repair...")
+            self.get_logger().info("Attempting voxel-based repair...")
 
             if pitch is None:
                 bounds = mesh.bounds
@@ -112,11 +112,11 @@ class Mesher(Node):
             watertight_mesh.remove_unreferenced_vertices()
             watertight_mesh.merge_vertices()
 
-            print("Voxel repair succeeded.")
+            self.get_logger().info("Voxel repair succeeded.")
             return watertight_mesh
 
         except Exception as e:
-            print(f"Voxel repair failed: {e}")
+            self.get_logger().error(f"Voxel repair failed: {e}")
             return None
 
     def check_and_fix_watertightness(self, mesh):
@@ -124,8 +124,10 @@ class Mesher(Node):
         Loads an STL mesh, checks and attempts to fix watertightness,
         and saves the repaired mesh if possible.
         """
-
-        print(f"Initial watertight: {mesh.is_watertight}")
+        if mesh.is_watertight:
+            self.get_logger().info(f"Initial watertight: {mesh.is_watertight}")
+        else:
+            self.get_logger().warn(f"Initial watertight: {mesh.is_watertight}")
 
         # Initial cleaning
         mesh.update_faces(mesh.unique_faces())
@@ -133,7 +135,7 @@ class Mesher(Node):
         mesh.merge_vertices()
         tm.repair.fill_holes(mesh)
 
-        print(f"Watertight after basic cleanup: {mesh.is_watertight}")
+        self.get_logger().info(f"Watertight after basic cleanup: {mesh.is_watertight}")
 
         # Try voxel repair if still not watertight
         if not mesh.is_watertight:
@@ -141,7 +143,7 @@ class Mesher(Node):
             if voxel_mesh and voxel_mesh.is_watertight:
                 mesh = voxel_mesh
             else:
-                print("Mesh remains non-watertight after all attempts.")
+                self.get_logger().error("Mesh remains non-watertight after all attempts.")
                 return
 
         # Final cleanup
