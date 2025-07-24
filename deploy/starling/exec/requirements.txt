@@ -6,3 +6,4 @@ scipy
 open3d
 ros2-numpy
 trimesh
+prusalinkpy
