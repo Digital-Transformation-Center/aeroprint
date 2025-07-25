@@ -8,27 +8,52 @@
 <body>
   <div class="container">
 
+    <!-- Starling Status Top Right -->
+    <div class="starling-status-top">
+      <div style="font-size: 1.3em; font-weight: bold; position: absolute; top: 20px; right: 30px;"></div>
+      Starling: {% if starling %}Connected{% else %}Disconnected{% endif %}
+    </div>
+
     <!-- Title Banner -->
     <div class="title-banner">
       <img src="{{ url_for('static', filename='images/aeroprint_title.png') }}" alt="AeroPrint Logo">
     </div>
 
+    <!-- Dev Phase Preview Menu (hidden by default, toggled with Ctrl+Q) -->
+    <div id="dev-phase-menu" style="display:none; position:fixed; bottom:60px; right:24px; z-index:200; background:#222; padding:8px 16px; border-radius:8px; box-shadow:0 2px 8px #00eaff;">
+      <label for="dev-phase" style="color:#b0eaff; font-weight:bold;">Dev Phase Preview:</label>
+      <select id="dev-phase" onchange="simulatePhase(this.value)">
+        {% for phase in ["Preflight", "Scanning", "Processing", "Meshing", "Slicing", "Printing"] %}
+          <option value="{{ phase }}">{{ phase }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+      {% for phase in ["Preflight", "Scanning", "Processing", "Meshing", "Slicing", "Printing"] %}
+        <div class="status {% if phase == stage %}active{% endif %}">{{ phase }}</div>
+      {% endfor %}
+    </div>
+
     <!-- Top Row: Camera (left) & Flight Path (right) -->
     <div class="data-row">
 
+      <!-- Camera Section -->
       <div class="camera-view">
-          <h3>Starling Camera View</h3>
-          <div class="camera-box">[Live Feed Placeholder]</div>
-          <!-- Move camera-details below camera-box -->
-          <div class="camera-details">
-              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas a justo sodales, aliquet nunc in, feugiat nisl. Proin molestie dui sem, id dapibus erat porttitor eget. Mauris sit amet metus placerat, feugiat sem ac, aliquam purus. Nulla facilisi. Mauris convallis, libero eget accumsan feugiat, lacus massa dapibus orci, at commodo odio nibh in mi. </p>
-              <div class="controls">
-                  <button id="action-btn" class="start-btn" onclick="toggleAction()">START</button>
-              </div>
-          </div>
+        <h3>Starling Camera View</h3>
+        <div class="camera-box">[Live Feed Placeholder]</div>
+        <div class="camera-details">
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas a justo sodales, aliquet nunc in, feugiat nisl...</p>
+          <button id="action-btn"
+                  class="{{ 'start-btn' if command != 'START' else 'stop-btn' }}"
+                  onclick="toggleAction()">
+            {{ 'START' if command != 'START' else 'STOP' }}
+          </button>
+        </div>
       </div>
 
-      <!-- Flight Path Section (Right) -->
+      <!-- Flight Path Section -->
       <div class="flight-path">
         <h3>Flight Path Graphic</h3>
         <div class="path-box">[Overlay Placeholder]</div>
@@ -36,20 +61,96 @@
         <!-- Print Size Selector -->
         <div class="size-selector">
           {% for size in ["SM", "MED", "LG"] %}
-            <button class="size-btn {% if size == selected_size %}active{% endif %}">{{ size }}</button>
+            <button id="btn-{{ size }}"
+                    class="size-btn {% if size == selected_size %}active{% endif %}"
+                    onclick="selectSize('{{ size }}')">
+              {{ size }}
+            </button>
           {% endfor %}
         </div>
       </div>
 
     </div>
-
-    <!-- Phase Status Bar -->
-    <div class="status-bar">
-      {% for phase in ["Preflight", "Scanning", "Processing", "Meshing", "Slicing", "Printing"] %}
-        <div class="status {% if phase == stage %}active{% endif %}">{{ phase }}</div>
-      {% endfor %}
-    </div>
-
   </div>
+
+  <!-- Dynamic Command Logic -->
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+  <script>
+    const socket = io();
+    let selectedSize = "{{ selected_size }}";  // store size for use during START
+
+    function toggleAction() {
+      const btn = document.getElementById('action-btn');
+      const isStart = btn.classList.contains('start-btn');
+
+      if (isStart) {
+        // Going from START to STOP
+        btn.textContent = "STOP";
+        btn.classList.remove("start-btn");
+        btn.classList.add("stop-btn");
+        socket.emit('send_command', {
+          command: "START",
+          size: selectedSize
+        });
+      } else {
+        // Going from STOP to START
+        btn.textContent = "START";
+        btn.classList.remove("stop-btn");
+        btn.classList.add("start-btn");
+        socket.emit('send_command', {
+          command: "STOP",
+          size: selectedSize
+        });
+      }
+    }
+
+    function selectSize(size) {
+      selectedSize = size;  // just update the client-side tracker
+
+      // Update button highlighting
+      ["SM", "MED", "LG"].forEach(s => {
+        const btn = document.getElementById('btn-' + s);
+        btn.classList.remove("active");
+      });
+      const selectedBtn = document.getElementById('btn-' + size);
+      selectedBtn.classList.add("active");
+    }
+
+    function simulatePhase(phase) {
+      document.querySelectorAll('.status-bar .status').forEach(elem => {
+        elem.classList.remove('active');
+        if (elem.textContent.trim() === phase) {
+          elem.classList.add('active', 'slide-in');
+          setTimeout(() => elem.classList.remove('slide-in'), 600);
+        }
+      });
+    }
+
+    socket.on('command_response', data => {
+      console.log("Server response:", data);
+    });
+
+    socket.on('status_update', function(data) {
+      const allStatuses = document.querySelectorAll('.status-bar .status');
+      allStatuses.forEach(div => {
+        if (div.textContent.trim() === data.phase) {
+          div.classList.add('active', 'slide-in');
+          // Remove slide-in after animation completes so it can be retriggered
+          setTimeout(() => div.classList.remove('slide-in'), 600);
+        } else {
+          div.classList.remove('active');
+        }
+      });
+    });
+
+    // Toggle dev menu with Ctrl+Q
+    document.addEventListener('keydown', function(e) {
+      if (e.ctrlKey && (e.key === 'q' || e.key === 'Q')) {
+        const menu = document.getElementById('dev-phase-menu');
+        menu.style.display = (menu.style.display === 'none' || menu.style.display === '') ? 'block' : 'none';
+        e.preventDefault();
+      }
+    });
+  </script>
 </body>
 </html>

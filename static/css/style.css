@@ -1,3 +1,9 @@
+body, html {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
 body {
   font-family: 'Segoe UI', sans-serif;
   background-color: #f5f5f5;
@@ -10,12 +16,10 @@ body {
 }
 
 .container {
-  max-width: 100vw;
-  margin: 0 auto;
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  padding-bottom: 56px; /* Reserve space for the status bar */
 }
 
 .title-banner {
@@ -30,25 +34,82 @@ body {
 }
 
 .status-bar {
-  margin: 8px 0;
   display: flex;
   justify-content: space-between;
+  gap: 8px;
+  margin: 18px 0;
+  background: rgba(20, 30, 60, 0.7);
+  border-radius: 16px;
+  padding: 8px 10px;
+  overflow: hidden;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100vw;
+  z-index: 100;
 }
 
 .status {
-  background-color: #ddd;
-  padding: 4px 8px;
-  border-radius: 8px;
-  font-weight: bold;
   flex: 1;
   margin: 0 2px;
   text-align: center;
-  font-size: 0.9rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #b0eaff;
+  background: linear-gradient(90deg, #1a223a 60%, #223a5e 100%);
+  border-radius: 10px;
+  box-shadow: 0 2px 8px #0ff2, 0 0 0 #00aaff;
+  position: relative;
+  transition: 
+    background 0.5s cubic-bezier(.4,2,.6,1),
+    color 0.3s,
+    box-shadow 0.5s cubic-bezier(.4,2,.6,1),
+    transform 0.4s cubic-bezier(.4,2,.6,1);
+  overflow: hidden;
+  z-index: 1;
 }
 
 .status.active {
-  background-color: #0078D4;
-  color: white;
+  background: linear-gradient(90deg, #00cfff 60%, #0078d4 100%);
+  color: #fff;
+  animation: pulseGlow 1.8s infinite, flipIn 0.7s;
+  box-shadow: 0 0 18px 4px #00eaff, 0 0 40px 0 #00aaff inset;
+  transform: perspective(400px) rotateY(0deg) scale(1.08);
+}
+
+.status.active::after {
+  content: "";
+  position: absolute;
+  top: 0; left: -60%;
+  width: 60%; height: 100%;
+  background: linear-gradient(120deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 60%, transparent 100%);
+  animation: shimmer 2.2s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes flipIn {
+  0% { transform: perspective(400px) rotateY(90deg) scale(0.8);}
+  60% { transform: perspective(400px) rotateY(-10deg) scale(1.1);}
+  80% { transform: perspective(400px) rotateY(10deg) scale(1.05);}
+  100% { transform: perspective(400px) rotateY(0deg) scale(1.08);}
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 18px 4px #00eaff, 0 0 40px 0 #00aaff inset; }
+  50% { box-shadow: 0 0 32px 10px #00eaff, 0 0 60px 0 #00aaff inset; }
+}
+
+@keyframes shimmer {
+  0% { left: -60%; }
+  100% { left: 120%; }
+}
+
+.status.slide-in {
+  animation: slideIn 0.5s cubic-bezier(.4,2,.6,1);
+}
+@keyframes slideIn {
+  0% { transform: translateX(-40%) scale(0.9); opacity: 0.2;}
+  100% { transform: translateX(0) scale(1.08); opacity: 1;}
 }
 
 .data-row {
@@ -87,20 +148,21 @@ body {
   color: #222;
   background: none;
   font-size: 0.95rem;
+  text-align: center;
 }
 
 .controls {
   text-align: center;
-  margin-top: 4px;
+  margin-top: 8px;
 }
 
-.start-btn, .stop-btn {
-  padding: 6px 14px;
-  margin: 0 4px;
+#action-btn {
+  padding: 8px 18px;
   font-size: 0.95rem;
   border: none;
   border-radius: 8px;
   cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .start-btn {
@@ -123,12 +185,13 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  height: 100%; /* Take full height of parent */
+  height: 100%;
   box-sizing: border-box;
 }
 
 .path-box {
-  height: calc(100vh - 120px); /* Adjust 120px if you have a bigger header/status bar */
+  height: 350px;
+  overflow: auto;
   background-color: #222;
   border-radius: 4px;
   margin-top: 4px;
