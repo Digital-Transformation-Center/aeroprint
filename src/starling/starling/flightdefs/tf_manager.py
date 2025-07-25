@@ -44,6 +44,10 @@ class TransformManager(Node):
             t.transform.rotation.z = orientation_quat_wxyz[3]
             t.transform.rotation.w = orientation_quat_wxyz[0]
 
+            # Reset the tf_buffer and tf_listener to ensure they are fresh
+            self.tf_buffer = tf2_ros.Buffer()
+            self.tf_listener = tf2_ros.TransformListener(self.tf_buffer, self)
+
             self.static_broadcaster.sendTransform(t)
 
     def wait_for_home_transform(self):
