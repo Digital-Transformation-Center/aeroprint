@@ -39,7 +39,7 @@ class FlightNode(Node):
         self.get_logger().info("Flight Node Alive!")
 
         self.tm = TransformManager() # Transform manager for managing coordinates
-        self.tm.set_home([0.0, 0.0, 0.0], math.pi / 4)  # Set home position and orientation
+
         # Configure QoS profile for publishing
         # For control messages, RELIABLE might be preferred, but BEST_EFFORT is used
         # in the reference helical_flight_node.py for PX4 publishers.
@@ -117,7 +117,6 @@ class FlightNode(Node):
 
     def init_heartbeat(self, period: float = 0.5):
         self.heartbeat_manager = ServerHeartBeatManager(node = self, acceptable_loss = period)
-        # Land the drone if the heartbeat is lost
         self.heartbeat_manager.set_dead_callback(self._land_vehicle())
 
     def update_path(self, new_path: Path):
@@ -166,6 +165,7 @@ class FlightNode(Node):
             self.get_logger().info("Entering landing sequence.")
             self.current_system_state = "LANDING"
             self.is_landing = True
+            self._land_vehicle()
             if hasattr(self, "external_land_callback") and self.external_land_callback:
                 self.external_land_callback()
                 
@@ -177,7 +177,6 @@ class FlightNode(Node):
             velocity = state.get_velocity()
             acceleration = state.get_acceleration()
             yawspeed = state.get_yaw_rate()
-            # self.get_logger().info(f"yaw rate : {yawspeed}")
             self._publish_trajectory_setpoint(
                 position, yaw, velocity=velocity, acceleration=acceleration, yawspeed=yawspeed
             )   
@@ -283,6 +282,7 @@ class FlightNode(Node):
                     
 
         elif self.current_system_state == "LANDING":
+            self._engage_offboard_mode()
             self._land_vehicle()
             if self.figure8_timer is not None:
                 self.figure8_timer.cancel()
@@ -418,7 +418,6 @@ class FlightNode(Node):
         # In PX4 v1.14+ VEHICLE_CMD_DO_SET_MODE param1 is MAV_MODE, param2 is sub_mode
         # MAV_MODE_OFFBOARD = 6 (for PX4 custom modes this is usually set in param2 or param6)
         self._publish_vehicle_command(VehicleCommand.VEHICLE_CMD_DO_SET_MODE, param1=1.0, param2=6.0)
-        self.get_logger().info("Engage Offboard mode command sent.")
 
     def _arm_vehicle(self) -> None:
         """Send an arm command to the vehicle."""
@@ -522,6 +521,7 @@ class ServerHeartBeatManager():
         self.node.get_logger().warn("Heartbeat lost! Calling dead() handler.")
         if hasattr(self, "dead_callback") and self.dead_callback is not None:
             self.dead_callback()
+        pass
 
 
 def main(args=None) -> None:
