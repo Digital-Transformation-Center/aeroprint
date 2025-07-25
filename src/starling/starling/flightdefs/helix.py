@@ -89,6 +89,9 @@ class Helix(Path):
     def _yaw_rate(self, step):
         if step == 0:
             return 0
+        # Based on how px4 deals with yaw: we may get a jump at pi.
+        if self._yaw(step) - self._yaw(step - 1) > pi/2:
+            return (self._yaw(step + 1) - self._yaw(step)) * self.rate
         return (self._yaw(step) - self._yaw(step - 1)) * self.rate
 
     def get_duration(self):
@@ -119,4 +122,3 @@ class Helix(Path):
             elif invert_axis == 'z':
                 return Position(self.helix_ending_position.x, self.helix_ending_position.y, -self.helix_ending_position.z)
         return self.helix_ending_position
-
