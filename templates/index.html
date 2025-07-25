@@ -10,7 +10,6 @@
 
     <!-- Starling Status Top Right -->
     <div class="starling-status-top">
-      <div style="font-size: 1.3em; font-weight: bold; position: absolute; top: 20px; right: 30px;"></div>
       Starling: {% if starling %}Connected{% else %}Disconnected{% endif %}
     </div>
 
@@ -108,11 +107,7 @@
         btn.classList.remove("active");
       });
       document.getElementById('btn-' + size).classList.add("active");
-      // Emit to backend
-      socket.emit('send_command', {
-        command: document.getElementById('action-btn').textContent === "STOP" ? "START" : "STOP",
-        size: size
-      });
+      // Do NOT emit any command here!
     }
 
     function simulatePhase(phase) {
@@ -126,16 +121,30 @@
       updatePhaseDescription(phase);
     }
 
-    function updatePhaseDescription(phase) {
+    function typePhaseDescription(text) {
       const descDiv = document.querySelector('.phase-description');
-      if (descDiv) {
-        let p = descDiv.querySelector('p');
-        if (!p) {
-          p = document.createElement('p');
-          descDiv.prepend(p);
-        }
-        p.textContent = phaseDescriptions[phase] || "";
+      if (!descDiv) return;
+      let p = descDiv.querySelector('p');
+      if (!p) {
+        p = document.createElement('p');
+        descDiv.prepend(p);
       }
+      p.textContent = ""; // Clear previous text
+
+      let i = 0;
+      function type() {
+        if (i < text.length) {
+          p.textContent += text.charAt(i);
+          i++;
+          setTimeout(type, 18); // Adjust speed here (ms per character)
+        }
+      }
+      type();
+    }
+
+    function updatePhaseDescription(phase) {
+      const text = phaseDescriptions[phase] || "";
+      typePhaseDescription(text);
     }
 
     socket.on('command_response', data => {
@@ -165,7 +174,7 @@
     });
 
     const phaseDescriptions = {
-      "Preflight": "📍A FLIGHT PATH IS BEING CALCULATED AND LOADED INTO THE DRONE. SELECT A SIZE AND PRESS START TO BEGIN THE SCAN PROCESS ➡️.",
+      "Preflight": "📍SELECT A SIZE AND PRESS START TO BEGIN THE SCAN PROCESS. A FLIGHT PATH WILL THEN BE CALCULATED AND LOADED INTO THE DRONE.",
       "Scanning": "📡 STARLING IS ACTIVELY FLYING THE SET PATH AND COLLECTING 3D SURFACE DATA USING ONBOARD DEPTH SENSORS.",
       "Processing": "🧹 CAPTURED POINT CLOUDS ARE BEING CLEANED AND ALIGNED. NOISE REDUCTION AND FILTERING ARE APPLIED FOR PRECISION GEOMETRY.",
       "Meshing": "🧠 POINT CLOUD DATA IS BEING TRANSFORMED INTO A FULL 3D MESH—BUILDING SURFACE TOPOLOGY FROM FLIGHT SCANS.",

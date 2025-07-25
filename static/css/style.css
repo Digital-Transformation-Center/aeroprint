@@ -5,11 +5,11 @@ body, html {
 }
 
 body {
-  font-family: 'Segoe UI', sans-serif;
-  background-color: #f5f5f5;
+  font-family: 'Orbitron', sans-serif;
+  background-color: rgb(63, 59, 59); /* darkish grey */
   margin: 0;
   padding: 10px;
-  color: #333;
+  color: #e0e0e0;
   box-sizing: border-box;
   height: 100vh;
   overflow: hidden;
@@ -24,7 +24,7 @@ body {
 
 .title-banner {
   text-align: center;
-  margin-bottom: 10px;
+  margin-bottom: 1px;
 }
 
 .title-banner img {
@@ -37,7 +37,7 @@ body {
   display: flex;
   justify-content: space-between;
   gap: 7px;
-  margin: 18px 0;
+  margin: 0;
   background: rgba(20, 30, 60, 0.7);
   border-radius: 16px;
   padding: 8px 10px;
@@ -115,9 +115,8 @@ body {
 
 .data-row {
   display: flex;
-  gap: 10px;
   align-items: flex-start;
-  margin-top: 0;
+  margin-top: -25px;
   flex: 1;
   min-height: 0;
 }
@@ -132,7 +131,7 @@ body {
 
 .camera-box {
   height: 300px;
-  background-color: #222;
+  background-color: #000000;
   border-radius: 4px;
   margin-top: 4px;
   display: flex;
@@ -151,13 +150,36 @@ body {
   text-align: center;
 }
 
+.phase-description p {
+  font-family: 'Orbitron', 'Share Tech Mono', 'Consolas', monospace;
+  font-size: 1.23rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #fff; /* Changed from #00eaff to white for better icon visibility */
+  background: none; /* Remove gradient so icons and text are clear */
+  -webkit-background-clip: initial;
+  -webkit-text-fill-color: initial;
+  background-clip: initial;
+  filter: drop-shadow(0 0 6px #00eaff) drop-shadow(0 0 2px #0078d4);
+  padding: 10px 0 8px 0;
+  margin: 2 0 8px 0;
+  text-align: center;
+  animation: phaseGlow 2.2s infinite alternate;
+  transition: background 0.5s, color 0.5s;
+}
+
+@keyframes phaseGlow {
+  0% { filter: drop-shadow(0 0 6px #00eaff) drop-shadow(0 0 2px #0078d4);}
+  100% { filter: drop-shadow(0 0 16px #00eaff) drop-shadow(0 0 8px #0078d4);}
+}
+
 .controls {
   text-align: center;
   margin-top: 8px;
 }
 
 #action-btn {
-  padding: 8px 18px;
+  padding: 10px 22px;
   font-size: 0.95rem;
   border: none;
   border-radius: 8px;
@@ -177,7 +199,6 @@ body {
 
 .flight-path {
   width: 50%;
-  background-color: #222;
   color: white;
   padding: 8px;
   border-radius: 6px;
@@ -190,11 +211,11 @@ body {
 }
 
 .path-box {
-  height: 350px;
+  height: 450px;
   overflow: auto;
-  background-color: #222;
+  background-color: #000000;
   border-radius: 4px;
-  margin-top: 4px;
+  margin-top: 1px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -210,8 +231,7 @@ body {
 }
 
 .size-btn {
-  margin: 4px;
-  padding: 8px 16px;
+  padding: 12px 24px;
   border: none;
   border-radius: 8px;
   font-size: 0.95rem;
@@ -222,4 +242,19 @@ body {
 .size-btn.active {
   background-color: #0078D4;
   color: white;
+}
+
+.starling-status-top {
+  position: fixed;
+  top: 20px;
+  right: 30px;
+  font-size: 1em;
+  font-weight: normal;
+  color: #222;
+  background: #f5f5f5;
+  padding: 6px 14px;
+  border-radius: 6px;
+  box-shadow: none;
+  z-index: 300;
+  letter-spacing: normal;
 }
