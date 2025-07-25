@@ -17,6 +17,11 @@
     <div class="title-banner">
       <img src="{{ url_for('static', filename='images/aeroprint_title.png') }}" alt="AeroPrint Logo">
     </div>
+    {% if stage != "Preflight" %}
+      <div class="top-left-stop">
+        <button id="emergency-stop" onclick="sendStopCommand()">🛑</button>
+      </div>
+    {% endif %}
 
     <!-- Dev Phase Preview Menu (hidden by default, toggled with Ctrl+Q) -->
     <div id="dev-phase-menu" style="display:none; position:fixed; bottom:60px; right:24px; z-index:200; background:#222; padding:8px 16px; border-radius:8px; box-shadow:0 2px 8px #00eaff;">
@@ -43,12 +48,19 @@
         <h3>Starling Camera View</h3>
         <div class="camera-box">[Live Feed Placeholder]</div>
         <div class="phase-description">
-          <p></p>
-          <button id="action-btn"
-                  class="{{ 'start-btn' if command != 'START' else 'stop-btn' }}"
-                  onclick="toggleAction()">
-            {{ 'START' if command != 'START' else 'STOP' }}
-          </button>
+          {% if stage == "Preflight" %}
+            <p></p>
+            <button id="action-btn"
+                    class="{{ 'start-btn' if command != 'START' else 'stop-btn' }}"
+                    onclick="toggleAction()">
+              {{ 'START' if command != 'START' else 'STOP' }}
+            </button>
+          {% else %}
+            <p></p>
+            <div class="progress-container">
+              <div id="progress-bar" class="progress-bar"></div>
+            </div>
+          {% endif %}
         </div>
       </div>
 
@@ -111,6 +123,7 @@
     }
 
     function simulatePhase(phase) {
+      // Update status bar visuals
       document.querySelectorAll('.status-bar .status').forEach(elem => {
         elem.classList.remove('active');
         if (elem.textContent.trim() === phase) {
@@ -118,7 +131,42 @@
           setTimeout(() => elem.classList.remove('slide-in'), 600);
         }
       });
+
+      // Update phase description text
       updatePhaseDescription(phase);
+
+      // Update layout: Stop button & progress bar
+      const stopBtn = document.querySelector('.top-left-stop');
+      const progressBarContainer = document.querySelector('.progress-container');
+      const actionBtn = document.getElementById('action-btn');
+
+      if (phase === "Preflight") {
+        if (stopBtn) stopBtn.style.display = "none";
+        if (progressBarContainer) progressBarContainer.style.display = "none";
+        if (actionBtn) actionBtn.style.display = "inline-block";
+      } else {
+        if (actionBtn) actionBtn.style.display = "none";
+        
+        // Show Stop button
+        if (stopBtn) {
+          stopBtn.style.display = "block";
+        } else {
+          const stopDiv = document.createElement("div");
+          stopDiv.className = "top-left-stop";
+          stopDiv.innerHTML = `<button id="emergency-stop" onclick="sendStopCommand()">🛑</button>`;
+          document.body.appendChild(stopDiv);
+        }
+
+        // Show Progress Bar
+        if (!progressBarContainer) {
+          const container = document.createElement("div");
+          container.className = "progress-container";
+          container.innerHTML = `<div id="progress-bar" class="progress-bar"></div>`;
+          document.querySelector('.phase-description').appendChild(container);
+        } else {
+          progressBarContainer.style.display = "block";
+        }
+      }
     }
 
     function typePhaseDescription(text) {
@@ -163,6 +211,18 @@
       });
       updatePhaseDescription(data.phase);
     });
+
+    socket.on('progress_update', function(data) {
+      const bar = document.getElementById('progress-bar');
+      if (bar) bar.style.width = data.percent + '%';
+    });
+
+    function sendStopCommand() {
+      socket.emit('send_command', {
+        command: "STOP",
+        size: selectedSize
+      });
+    }
 
     // Toggle dev menu with Ctrl+Q
     document.addEventListener('keydown', function(e) {
