@@ -12,20 +12,23 @@ SIZE_TO_RADIUS = {
     "LG": 3.5
 }
 
+import platform
+
 def is_starling_reachable():
     try:
+        param = "-n" if platform.system().lower() == "windows" else "-c"
         result = subprocess.run(
-            ["ping", "-n", "1", "m0054"],  # Change to "-c" for Linux/macOS
+            ["ping", param, "1", "m0054"],
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL
         )
         return result.returncode == 0
     except:
         return False
-
-def launch_starling_via_ssh():
-    print("Launching Starling via SSH...")  # Add this line
     host = "m0054"
+    username = "root"
+    password = os.environ.get("STARLING_SSH_PASSWORD")
+    launch_command = "source ~/aeroprint/install/setup.bash && ros2 launch starling starling_launch.py"
     username = "root"
     password = "oelinux123"
     launch_command = "source ~/aeroprint/install/setup.bash && ros2 launch starling starling_launch.py"

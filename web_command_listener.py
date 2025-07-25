@@ -37,10 +37,14 @@ class WebCommandPublisher(Node):
                             self.get_logger().info(f"📦 Sent size: {size}")
                             self.last_sent["size"] = size
 
-                except Exception as e:
-                    self.get_logger().error(f"Error reading command.json: {e}")
+                except FileNotFoundError as e:
+                    self.get_logger().error(f"command.json not found: {e}")
+                except json.JSONDecodeError as e:
+                    self.get_logger().error(f"Error decoding JSON from command.json: {e}")
+                except IOError as e:
+                    self.get_logger().error(f"I/O error reading command.json: {e}")
 
-            time.sleep(1)
+            time.sleep(0.1)
 
 def main(args=None):
     rclpy.init(args=args)

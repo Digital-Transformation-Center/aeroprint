@@ -14,8 +14,15 @@ class StageListener(Node):
         self.create_subscription(String, "/host/out/mesher/file_directory", self.handle_meshing, 10)
 
     def save_stage(self, stage):
+        # Read existing status if file exists
+        try:
+            with open("status.json", "r") as f:
+                status = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            status = {}
+        status["stage"] = stage
         with open("status.json", "w") as f:
-            json.dump({"stage": stage}, f)
+            json.dump(status, f)
         self.get_logger().info(f"📁 Updated stage: {stage}")
 
     def handle_scanning(self, msg):
