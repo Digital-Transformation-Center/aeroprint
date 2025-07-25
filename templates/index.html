@@ -44,19 +44,7 @@
         <h3>Starling Camera View</h3>
         <div class="camera-box">[Live Feed Placeholder]</div>
         <div class="phase-description">
-            {% if stage == "Preflight" %}
-                <p>📍A FLIGHT PATH IS BEING CALCULATED AND LOADED INTO THE DRONE. SELECT A SIZE AND PRESS START TO BEGIN THE SCAN PROCESS ➡️.</p>
-            {% elif stage == "Scanning" %}
-                <p>📡 STARLING IS ACTIVELY FLYING THE SET PATH AND COLLECTING 3D SURFACE DATA USING ONBOARD DEPTH SENSORS.</p>
-            {% elif stage == "Processing" %}
-                <p>🧹 CAPTURED POINT CLOUDS ARE BEING CLEANED AND ALIGNED. NOISE REDUCTION AND FILTERING ARE APPLIED FOR PRECISION GEOMETRY.</p>
-            {% elif stage == "Meshing" %}
-                <p>🧠 POINT CLOUD DATA IS BEING TRANSFORMED INTO A FULL 3D MESH—BUILDING SURFACE TOPOLOGY FROM FLIGHT SCANS.</p>
-            {% elif stage == "Slicing" %}
-                <p>✂️ THE MESH MODEL IS SLICED INTO PRINTABLE LAYERS. G-CODE IS GENERATED TO PREPARE FOR PRINTING.</p>
-            {% elif stage == "Printing" %}
-                <p>🖨️ PRINT OPERATION IS UNDERWAY. LAYERS ARE BEING DEPOSITED IN SEQUENCE USING THE GENERATED TOOLPATH.</p>
-            {% endif %}
+          <p></p>
           <button id="action-btn"
                   class="{{ 'start-btn' if command != 'START' else 'stop-btn' }}"
                   onclick="toggleAction()">
@@ -135,6 +123,19 @@
           setTimeout(() => elem.classList.remove('slide-in'), 600);
         }
       });
+      updatePhaseDescription(phase);
+    }
+
+    function updatePhaseDescription(phase) {
+      const descDiv = document.querySelector('.phase-description');
+      if (descDiv) {
+        let p = descDiv.querySelector('p');
+        if (!p) {
+          p = document.createElement('p');
+          descDiv.prepend(p);
+        }
+        p.textContent = phaseDescriptions[phase] || "";
+      }
     }
 
     socket.on('command_response', data => {
@@ -146,12 +147,12 @@
       allStatuses.forEach(div => {
         if (div.textContent.trim() === data.phase) {
           div.classList.add('active', 'slide-in');
-          // Remove slide-in after animation completes so it can be retriggered
           setTimeout(() => div.classList.remove('slide-in'), 600);
         } else {
           div.classList.remove('active');
         }
       });
+      updatePhaseDescription(data.phase);
     });
 
     // Toggle dev menu with Ctrl+Q
@@ -163,10 +164,23 @@
       }
     });
 
-    // Get the first phase description div
-    const phaseDesc = document.querySelector('.phase-description');
-    // Or get all if you have more than one
-    const allPhaseDescs = document.querySelectorAll('.phase-description');
+    const phaseDescriptions = {
+      "Preflight": "📍A FLIGHT PATH IS BEING CALCULATED AND LOADED INTO THE DRONE. SELECT A SIZE AND PRESS START TO BEGIN THE SCAN PROCESS ➡️.",
+      "Scanning": "📡 STARLING IS ACTIVELY FLYING THE SET PATH AND COLLECTING 3D SURFACE DATA USING ONBOARD DEPTH SENSORS.",
+      "Processing": "🧹 CAPTURED POINT CLOUDS ARE BEING CLEANED AND ALIGNED. NOISE REDUCTION AND FILTERING ARE APPLIED FOR PRECISION GEOMETRY.",
+      "Meshing": "🧠 POINT CLOUD DATA IS BEING TRANSFORMED INTO A FULL 3D MESH—BUILDING SURFACE TOPOLOGY FROM FLIGHT SCANS.",
+      "Slicing": "✂️ THE MESH MODEL IS SLICED INTO PRINTABLE LAYERS. G-CODE IS GENERATED TO PREPARE FOR PRINTING.",
+      "Printing": "🖨️ PRINT OPERATION IS UNDERWAY. LAYERS ARE BEING DEPOSITED IN SEQUENCE USING THE GENERATED TOOLPATH."
+    };
+
+    // Update phase description on load
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.phase-description p').forEach(p => {
+        const phase = p.closest('.phase-description').getAttribute('data-phase');
+        p.textContent = phaseDescriptions[phase] || '';
+      });
+      updatePhaseDescription("{{ stage }}"); // On page load
+    });
   </script>
 </body>
 </html>
