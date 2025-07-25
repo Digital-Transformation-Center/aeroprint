@@ -2,6 +2,7 @@
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import PointCloud2
+from std_msgs.msg import Bool
 import tf2_ros
 from tf2_sensor_msgs import do_transform_cloud
 # import tf2_sensor_msgs  # This module provides do_transform_cloud
@@ -35,9 +36,21 @@ class PointCloudTransformer(Node):
             '/starling/out/relative_posed_pc', # New topic for transformed point cloud
             rclpy.qos.qos_profile_sensor_data
         )
+
+        self.start_flight_subscriber = self.create_subscription(
+            Bool, 
+            "/start_flight",
+            self.start_flight,
+            10
+        )
         self.get_logger().info('Publishing to /starling/out/relative_posed_pc')
 
         self.get_logger().info('Point Cloud Transformer Node Started.')
+
+    def start_flight(self, msg: Bool):
+        # Refresh the TF buffer and listener when flight starts
+        self.tf_buffer = tf2_ros.Buffer()
+        self.tf_listener = tf2_ros.TransformListener(self.tf_buffer, self)
 
     def point_cloud_callback(self, msg: PointCloud2):
         """
