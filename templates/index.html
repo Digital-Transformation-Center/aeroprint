@@ -218,10 +218,9 @@
     });
 
     function sendStopCommand() {
-      socket.emit('send_command', {
-        command: "STOP",
-        size: selectedSize
-      });
+      socket.emit('emergency_stop');
+      // Optionally show a message to the user
+      alert("Emergency stop sent. Drone landing...");
     }
 
     // Toggle dev menu with Ctrl+Q
