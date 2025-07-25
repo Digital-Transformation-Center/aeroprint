@@ -43,8 +43,20 @@
       <div class="camera-view">
         <h3>Starling Camera View</h3>
         <div class="camera-box">[Live Feed Placeholder]</div>
-        <div class="camera-details">
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas a justo sodales, aliquet nunc in, feugiat nisl...</p>
+        <div class="phase-description">
+            {% if stage == "Preflight" %}
+                <p>📍A FLIGHT PATH IS BEING CALCULATED AND LOADED INTO THE DRONE. SELECT A SIZE AND PRESS START TO BEGIN THE SCAN PROCESS ➡️.</p>
+            {% elif stage == "Scanning" %}
+                <p>📡 STARLING IS ACTIVELY FLYING THE SET PATH AND COLLECTING 3D SURFACE DATA USING ONBOARD DEPTH SENSORS.</p>
+            {% elif stage == "Processing" %}
+                <p>🧹 CAPTURED POINT CLOUDS ARE BEING CLEANED AND ALIGNED. NOISE REDUCTION AND FILTERING ARE APPLIED FOR PRECISION GEOMETRY.</p>
+            {% elif stage == "Meshing" %}
+                <p>🧠 POINT CLOUD DATA IS BEING TRANSFORMED INTO A FULL 3D MESH—BUILDING SURFACE TOPOLOGY FROM FLIGHT SCANS.</p>
+            {% elif stage == "Slicing" %}
+                <p>✂️ THE MESH MODEL IS SLICED INTO PRINTABLE LAYERS. G-CODE IS GENERATED TO PREPARE FOR PRINTING.</p>
+            {% elif stage == "Printing" %}
+                <p>🖨️ PRINT OPERATION IS UNDERWAY. LAYERS ARE BEING DEPOSITED IN SEQUENCE USING THE GENERATED TOOLPATH.</p>
+            {% endif %}
           <button id="action-btn"
                   class="{{ 'start-btn' if command != 'START' else 'stop-btn' }}"
                   onclick="toggleAction()">
@@ -150,6 +162,11 @@
         e.preventDefault();
       }
     });
+
+    // Get the first phase description div
+    const phaseDesc = document.querySelector('.phase-description');
+    // Or get all if you have more than one
+    const allPhaseDescs = document.querySelectorAll('.phase-description');
   </script>
 </body>
 </html>

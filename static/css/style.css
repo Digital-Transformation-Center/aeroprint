@@ -36,7 +36,7 @@ body {
 .status-bar {
   display: flex;
   justify-content: space-between;
-  gap: 8px;
+  gap: 7px;
   margin: 18px 0;
   background: rgba(20, 30, 60, 0.7);
   border-radius: 16px;
@@ -45,7 +45,7 @@ body {
   position: fixed;
   left: 0;
   bottom: 0;
-  width: 100vw;
+  width: 98.5vw;
   z-index: 100;
 }
 
@@ -72,7 +72,7 @@ body {
 .status.active {
   background: linear-gradient(90deg, #00cfff 60%, #0078d4 100%);
   color: #fff;
-  animation: pulseGlow 1.8s infinite, flipIn 0.7s;
+  animation: pulseGlow 1.8s infinite, flipIn 0.3s;
   box-shadow: 0 0 18px 4px #00eaff, 0 0 40px 0 #00aaff inset;
   transform: perspective(400px) rotateY(0deg) scale(1.08);
 }
@@ -88,9 +88,10 @@ body {
 }
 
 @keyframes flipIn {
-  0% { transform: perspective(400px) rotateY(90deg) scale(0.8);}
-  60% { transform: perspective(400px) rotateY(-10deg) scale(1.1);}
-  80% { transform: perspective(400px) rotateY(10deg) scale(1.05);}
+  0%   { transform: perspective(400px) rotateY(120deg) scale(0.7);}
+  30%  { transform: perspective(400px) rotateY(-30deg) scale(1.2);}
+  50%  { transform: perspective(400px) rotateY(20deg) scale(1.15);}
+  70%  { transform: perspective(400px) rotateY(-10deg) scale(1.1);}
   100% { transform: perspective(400px) rotateY(0deg) scale(1.08);}
 }
 
@@ -143,11 +144,10 @@ body {
   max-width: 350px;
 }
 
-.camera-details {
-  margin-top: 8px;
-  color: #222;
-  background: none;
-  font-size: 0.95rem;
+.phase-description {
+  font-size: 0.9rem;
+  color: #666;
+  margin-top: 4px;
   text-align: center;
 }
 
