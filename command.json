@@ -1,1 +1,1 @@
-{"command": "STOP", "size": "SM"}
+{"command": "START", "size": "MED", "radius": 2.0}

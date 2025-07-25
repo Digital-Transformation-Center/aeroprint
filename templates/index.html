@@ -60,13 +60,9 @@
 
         <!-- Print Size Selector -->
         <div class="size-selector">
-          {% for size in ["SM", "MED", "LG"] %}
-            <button id="btn-{{ size }}"
-                    class="size-btn {% if size == selected_size %}active{% endif %}"
-                    onclick="selectSize('{{ size }}')">
-              {{ size }}
-            </button>
-          {% endfor %}
+          <button id="btn-SM" class="size-btn" onclick="selectSize('SM')">SM</button>
+          <button id="btn-MED" class="size-btn" onclick="selectSize('MED')">MED</button>
+          <button id="btn-LG" class="size-btn" onclick="selectSize('LG')">LG</button>
         </div>
       </div>
 
@@ -74,9 +70,7 @@
   </div>
 
   <!-- Dynamic Command Logic -->
-  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"
-          integrity="sha384-+2QZy6pQ0v1pQw1rQn6l0e6QF6UVx/FuWRzE6QvQwzQw1rQn6l0e6QF6UVx/FuWR"
-          crossorigin="anonymous"></script>
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js" crossorigin="anonymous"></script>
   <script>
     const socket = io();
     let selectedSize = "{{ selected_size }}";  // store size for use during START
@@ -107,15 +101,18 @@
     }
 
     function selectSize(size) {
-      selectedSize = size;  // just update the client-side tracker
-
+      selectedSize = size;
       // Update button highlighting
       ["SM", "MED", "LG"].forEach(s => {
         const btn = document.getElementById('btn-' + s);
         btn.classList.remove("active");
       });
-      const selectedBtn = document.getElementById('btn-' + size);
-      selectedBtn.classList.add("active");
+      document.getElementById('btn-' + size).classList.add("active");
+      // Emit to backend
+      socket.emit('send_command', {
+        command: document.getElementById('action-btn').textContent === "STOP" ? "START" : "STOP",
+        size: size
+      });
     }
 
     function simulatePhase(phase) {
