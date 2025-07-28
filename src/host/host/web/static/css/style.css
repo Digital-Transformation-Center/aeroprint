@@ -290,20 +290,27 @@ body {
 }
 
 .progress-container {
-  width: 400px;
-  height: 18px;
-  /* Center the progress bar with the text above it */
-  margin: 20px auto;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
+  width: 100%;
+  max-width: 470px;
+  height: 40px;
+  margin: 12px auto 0 auto;
+  background: transparent;
+  border-radius: 20px;
   overflow: hidden;
-  margin-top: 6px;
+  box-shadow: none;
+  display: flex;
+  align-items: center;
 }
 
 .progress-bar {
   height: 100%;
   width: 0%;
-  background: linear-gradient(to right, #ff5858, #0078D4);
-  border-radius: 12px;
-  transition: width 0.4s ease-in-out;
+  background: linear-gradient(to right, #d7261e 0%, #2e2eff 100%);
+  border-radius: 20px;
+  transition: width 0.4s cubic-bezier(.4,2,.6,1);
+  box-shadow: 0 0 0 0 transparent;
+}
+
+#flight_time_progress {
+  transition: width 0.25s ease-in-out;
 }
