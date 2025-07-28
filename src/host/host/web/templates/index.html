@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AeroPrint</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <div class="container">
+
+    <!-- Starling Status Top Right -->
+    <div class="starling-status-top" id="starling-status">
+      Starling: {% if starling %}Connected{% else %}Disconnected{% endif %}
+    </div>
+
+    <!-- Title Banner -->
+    <div class="title-banner">
+      <img src="{{ url_for('static', filename='images/aeroprint_title.png') }}" alt="AeroPrint Logo">
+    </div>
+      <!-- Always present in DOM -->
+      <div class="top-left-stop" id="emergency-stop-container" style="display: none;">
+        <button id="emergency-stop" onclick="sendStopCommand()" aria-label="Emergency Stop">
+          <!-- SVG Red Octagon -->
+          <svg width="48" height="48" viewBox="0 0 48 48">
+            <polygon points="12,4 36,4 44,12 44,36 36,44 12,44 4,36 4,12" fill="#f44336" stroke="#900" stroke-width="2"/>
+            <text x="24" y="30" text-anchor="middle" font-size="18" fill="#fff" font-family="Arial" font-weight="bold">STOP</text>
+          </svg>
+        </button>
+      </div>
+
+    <!-- Dev Phase Preview Menu (hidden by default, toggled with Ctrl+Q) -->
+    <div id="dev-phase-menu" style="display:none; position:fixed; bottom:60px; right:24px; z-index:200; background:#222; padding:8px 16px; border-radius:8px; box-shadow:0 2px 8px #00eaff;">
+      <label for="dev-phase" style="color:#b0eaff; font-weight:bold;">Dev Phase Preview:</label>
+      <select id="dev-phase" onchange="simulatePhase(this.value)">
+        {% for phase in ["Preflight", "Scanning", "Processing", "Meshing", "Slicing", "Printing"] %}
+          <option value="{{ phase }}">{{ phase }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+      {% for phase in ["Preflight", "Scanning", "Processing", "Meshing", "Slicing", "Printing"] %}
+        <div class="status {% if phase == stage %}active{% endif %}">{{ phase }}</div>
+      {% endfor %}
+    </div>
+
+    <!-- Top Row: Camera (left) & Flight Path (right) -->
+    <div class="data-row">
+
+      <!-- Camera Section -->
+      <div class="camera-view">
+        <h3>Starling Camera View</h3>
+        <div class="camera-box"><img src="http://192.168.8.191/video_raw/hires_small_color"></video></div>
+        <div class="phase-description">
+          <p></p>
+          <button id="action-btn"
+                  class="{{ 'start-btn' if command != 'START' else 'stop-btn' }}"
+                  onclick="toggleAction()">
+            {{ 'START' if command != 'START' else 'STOP' }}
+          </button>
+          <div class="progress-container"
+               id="progress-container" 
+               style="display: {{ 'none' if stage == 'Preflight' else 'flex' }};">
+               <div id="progress-bar" class="progress-bar"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Flight Path Section -->
+      <div class="flight-path">
+        <h3>Flight Path Graphic</h3>
+        <div class="path-box">
+          <iframe src="/widgets/flight_config" title="Helix Path Visualizer" scrolling="no" aria-placeholder="Helix Path Visualizer"></iframe>
+        </div>
+
+        <!-- Print Size Selector -->
+        <div class="size-selector">
+          <button id="btn-SM" class="size-btn" onclick="selectSize('SM')">SM</button>
+          <button id="btn-MED" class="size-btn" onclick="selectSize('MED')">MED</button>
+          <button id="btn-LG" class="size-btn" onclick="selectSize('LG')">LG</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Flight Time Status -->
+    <div id="flight_time_status" style="width: 100%; background: #eee; border-radius: 8px; overflow: hidden; margin: 12px 0;">
+      <div id="flight_time_progress" style="width: 0%; height: 12px; background: #4caf50;"></div>
+    </div>
+    <span id="flight_time"></span>
+
+  </div>
+
+  <!-- Dynamic Command Logic -->
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js" crossorigin="anonymous"></script>
+  <script>
+    const socket = io();
+    let selectedSize = "{{ selected_size }}";  // store size for use during START
+    let devProgressInterval = null;
+    const connection_indicator = document.getElementById('starling-status');
+
+    // updatePhaseDescription('Preflight');
+
+    socket.on('connect', data => {
+      console.log("Connected to server.");
+      updatePhaseDescription("Preflight");
+    });
+
+    socket.on('update_phase', data => {
+      phase = data.phase;
+      simulatePhase(phase);
+    });
+
+    socket.on('heartbeat', data => {
+    if (data.ok) {
+      connection_indicator.textContent = "Starling: Connected";
+      // connection_indicator.style.color = "#4CAF50"; // Green
+    } else {
+      connection_indicator.textContent = "Starling: Disconnected";
+      // connection_indicator.style.color = "#f44336"; // Red
+    }
+  });
+
+    function toggleAction() {
+      const btn = document.getElementById('action-btn');
+      const isStart = btn.classList.contains('start-btn');
+
+      if (isStart) {
+        // Going from START to STOP
+        btn.textContent = "STOP";
+        btn.classList.remove("start-btn");
+        btn.classList.add("stop-btn");
+        socket.emit('send_command', {
+          command: "START",
+          size: selectedSize
+        });
+        socket.emit('start_flight')
+      } else {
+        // Going from STOP to START
+        socket.emit('land_flight');
+        btn.textContent = "START";
+        btn.classList.remove("stop-btn");
+        btn.classList.add("start-btn");
+        socket.emit('send_command', {
+          command: "STOP",
+          size: selectedSize
+        });
+      }
+    }
+
+    function selectSize(size) {
+      selectedSize = size;
+      // Update button highlighting
+      ["SM", "MED", "LG"].forEach(s => {
+        const btn = document.getElementById('btn-' + s);
+        
+        btn.classList.remove("active");
+      });
+      document.getElementById('btn-' + size).classList.add("active");
+      console.log("Selected size:", selectedSize);
+      socket.emit('select_size', { size: selectedSize });
+      // Do NOT emit any command here!
+    }
+
+    function simulatePhase(phase) {
+      // Update status bar visuals
+      document.querySelectorAll('.status-bar .status').forEach(elem => {
+        elem.classList.remove('active');
+        if (elem.textContent.trim() === phase) {
+          elem.classList.add('active', 'slide-in');
+          setTimeout(() => elem.classList.remove('slide-in'), 600);
+        }
+      });
+
+      updatePhaseDescription(phase);
+
+      // Progress bar and button logic
+      const progressContainer = document.getElementById("progress-container");
+      const progressBar = document.getElementById("progress-bar");
+      const actionBtn = document.getElementById("action-btn");
+
+      if (phase === "Preflight") {
+        actionBtn.style.display = "inline-block";
+        progressContainer.style.display = "none";
+        progressBar.style.width = "0%";
+      } else {
+        actionBtn.style.display = "none";
+        progressContainer.style.display = "flex"; // override Jinja's value
+        // let progress = 0;
+        // clearInterval(devProgressInterval);
+        // devProgressInterval = setInterval(() => {
+        //   progress = Math.min(progress + 5, 100);
+        //   progressBar.style.width = progress + "%";
+        //   if (progress === 100) clearInterval(devProgressInterval);
+        // }, 300);
+      }
+    }
+
+    function typePhaseDescription(text) {
+      const descDiv = document.querySelector('.phase-description');
+      if (!descDiv) return;
+      let p = descDiv.querySelector('p');
+      if (!p) {
+        p = document.createElement('p');
+        descDiv.prepend(p);
+      }
+      p.textContent = ""; // Clear previous text
+
+      let i = 0;
+      function type() {
+        if (i < text.length) {
+          p.textContent += text.charAt(i);
+          i++;
+          setTimeout(type, 18); // Adjust speed here (ms per character)
+        }
+      }
+      type();
+    }
+
+    function updatePhaseDescription(phase) {
+      const text = phaseDescriptions[phase] || "";
+      typePhaseDescription(text);
+    }
+
+    function updatePhaseUI(phase) {
+      const actionBtn = document.getElementById('action-btn');
+      const progressContainer = document.querySelector('.progress-container');
+      const stopBtn = document.querySelector('.top-left-stop');
+
+      if (phase === "Preflight") {
+        if (actionBtn) actionBtn.style.display = "inline-block";
+        if (progressContainer) progressContainer.style.display = "none";
+        if (stopBtn) stopBtn.style.display = "none";
+      } else {
+        if (actionBtn) actionBtn.style.display = "none";
+        if (progressContainer) progressContainer.style.display = "block";
+        if (stopBtn) stopBtn.style.display = "block";
+      }
+    }
+
+    socket.on('command_response', data => {
+      console.log("Server response:", data);
+    });
+
+    socket.on('status_update', function(data) {
+      const allStatuses = document.querySelectorAll('.status-bar .status');
+      allStatuses.forEach(div => {
+        if (div.textContent.trim() === data.phase) {
+          div.classList.add('active', 'slide-in');
+          setTimeout(() => div.classList.remove('slide-in'), 600);
+        } else {
+          div.classList.remove('active');
+        }
+      });
+      updatePhaseDescription(data.phase);
+      updatePhaseUI(data.phase);
+
+      // Simulate progress bar for non-Preflight phases
+      if (devProgressInterval) clearInterval(devProgressInterval);
+      const progressBar = document.getElementById('progress-bar');
+      if (data.phase === "Preflight") {
+        if (progressBar) progressBar.style.width = "0%";
+      } else {
+        let progress = 0;
+        if (progressBar) {
+          progressBar.style.width = "0%";
+          devProgressInterval = setInterval(() => {
+            progress = Math.min(progress + 5, 100);
+            progressBar.style.width = progress + "%";
+            if (progress === 100) clearInterval(devProgressInterval);
+          }, 400);
+        }
+      }
+    });
+
+    socket.on('progress_update', function(data) {
+      const bar = document.getElementById('progress-bar');
+      if (bar) bar.style.width = data.percent + '%';
+    });
+
+<<<<<<< HEAD:templates/index.html
+=======
+    socket.on('flight_time_remaining', function(data) {
+      console.log("Flight time remaining data:", data);
+      const flight_time_status_indicator = document.getElementById('progress-bar');
+      const flight_time_label = document.getElementById('flight_time');
+      const time_remaining = data.time; // seconds remaining
+      const flight_time_est = window.flight_time_est || 1; // set this to your total flight time in seconds
+
+      // Calculate percent complete
+      const percent = Math.round((1 - time_remaining / flight_time_est) * 100);
+      flight_time_status_indicator.style.width = `${percent}%`;
+      flight_time_status_indicator.setAttribute('title', `${percent}% complete`);
+
+      // Optional: Show time remaining
+      flight_time_label.textContent = `Time left: ${Math.ceil(time_remaining)}s`;
+    });
+
+    socket.on('flight_time_estimate', function(data) {
+      window.flight_time_est = data.time; // seconds
+      const flight_time_label = document.getElementById('flight_time');
+      flight_time_label.textContent = `Estimated Flight Time: ${Math.ceil(window.flight_time_est)}s`;
+    });
+
+>>>>>>> 678a663a7a774dc6d89e2d0698f55a443ed83d03:src/host/host/web/templates/index.html
+    function sendStopCommand() {
+      socket.emit('emergency_stop');
+      // Optionally show a message to the user
+      alert("Emergency stop sent. Drone landing...");
+    }
+
+    // Toggle dev menu with Ctrl+Q
+    document.addEventListener('keydown', function(e) {
+      if (e.ctrlKey && (e.key === 'q' || e.key === 'Q')) {
+        const menu = document.getElementById('dev-phase-menu');
+        menu.style.display = (menu.style.display === 'none' || menu.style.display === '') ? 'block' : 'none';
+        e.preventDefault();
+      }
+    });
+
+    const phaseDescriptions = {
+      "Preflight": "📍SELECT A SIZE AND PRESS START TO BEGIN THE SCAN PROCESS. A FLIGHT PATH WILL THEN BE CALCULATED AND LOADED INTO THE DRONE.",
+      "Scanning": "📡 STARLING IS ACTIVELY FLYING THE SET PATH AND COLLECTING 3D SURFACE DATA USING ONBOARD DEPTH SENSORS.",
+      "Processing": "🧹 CAPTURED POINT CLOUDS ARE BEING CLEANED AND ALIGNED. NOISE REDUCTION AND FILTERING ARE APPLIED FOR PRECISION GEOMETRY.",
+      "Meshing": "🧠 POINT CLOUD DATA IS BEING TRANSFORMED INTO A FULL 3D MESH—BUILDING SURFACE TOPOLOGY FROM FLIGHT SCANS.",
+      "Slicing": "✂️ THE MESH MODEL IS SLICED INTO PRINTABLE LAYERS. G-CODE IS GENERATED TO PREPARE FOR PRINTING.",
+      "Printing": "🖨️ PRINT OPERATION IS UNDERWAY. LAYERS ARE BEING DEPOSITED IN SEQUENCE USING THE GENERATED TOOLPATH."
+    };
+
+    // Update phase description on load
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.phase-description p').forEach(p => {
+        const phase = p.closest('.phase-description').getAttribute('data-phase');
+        p.textContent = phaseDescriptions[phase] || '';z
+      });
+      updatePhaseDescription("{{ stage }}"); // On page load
+    });
+  </script>
+</body>
+</html>

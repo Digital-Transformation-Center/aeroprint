@@ -1,0 +1,190 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AeroPrint documentation &mdash; AeroPrint 1.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=292eb321"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Host Package documentation" href="host.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="#" class="icon icon-home">
+            AeroPrint
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Code Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="host.html">Host Package documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="starling.html">Starling Package documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">AeroPrint</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">AeroPrint documentation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="aeroprint-documentation">
+<h1>AeroPrint documentation<a class="headerlink" href="#aeroprint-documentation" title="Link to this heading"></a></h1>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading"></a></h2>
+<p>AeroPrint is a student-led research project designed to explore real-world application of the <a class="reference external" href="https://en.wikipedia.org/wiki/Digital_thread">digital thread</a>. AeroPrint employs a small <a class="reference external" href="https://www.faa.gov/uas">UAS</a> to perform automated 3D digital scanning of objects. Using a <a class="reference external" href="https://en.wikipedia.org/wiki/Time-of-flight_camera">ToF (Time of Flight) sensor</a>, the AeroPrint drone performs a systematic scan of a given object by flying an automatically generated flight plan.</p>
+<p>AeroPrint currently acts as a proof of concept for the idea of automating the process of digitization using UAS.</p>
+</section>
+<section id="capabilities">
+<h2>Capabilities<a class="headerlink" href="#capabilities" title="Link to this heading"></a></h2>
+<p>Currently, AeroPrint implements rudimentary path planning and 3D localization techniques to achieve basic functionality. The product does not limit scans based on volume, but has certain limitations due to hardware and software implementation.</p>
+</section>
+<section id="path-planning">
+<h2>Path Planning<a class="headerlink" href="#path-planning" title="Link to this heading"></a></h2>
+<p>In the current AeroPrint software release, the flight path is defined by a set of user-defined parameters such as the height of the object, the height of the base of the object (for objects propped above the ground), and the drone’s starting radius from the center of the object.</p>
+<p>The drone will begin flight slightly higher than the object based on the input parameters which allows data to be captured of the top surface of the object and the sides. After revolving around the object and capturing incremental ToF data, the drone will drop to a level adjacent to the middle of the object and do the same. Finally, the drone will drop to a low level to capture the base of the object.</p>
+<a class="reference internal image-reference" href="_images/flight-path.png"><img alt="Flight Path Diagram" class="align-center" src="_images/flight-path.png" style="width: 600px;" />
+</a>
+</section>
+<section id="data-collection">
+<h2>Data Collection<a class="headerlink" href="#data-collection" title="Link to this heading"></a></h2>
+<p>AeroPrint captures several types of data that can either be used as-is, or further processed for more detailed modeling or texturing. Raw <a class="reference external" href="https://en.wikipedia.org/wiki/Point_cloud">pointcloud</a> files are captured incrementally, which AeroPrint uses to process a combined and filtered set of points that represent the model. Then, as a final file output, AeroPrint processes a solid triangle mesh which can be used in CAD software, 3d printing, or other means of analysis.</p>
+<table class="docutils align-default" id="id1">
+<caption><span class="caption-text">Example Objects and Meshes</span><a class="headerlink" href="#id1" title="Link to this table"></a></caption>
+<colgroup>
+<col style="width: 50.0%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Object</p></th>
+<th class="head"><p>Mesh</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><a class="reference internal image-reference" href="_images/arrow.png"><img alt="_images/arrow.png" src="_images/arrow.png" style="width: 200px;" />
+</a>
+</td>
+<td><a class="reference internal image-reference" href="_images/arrow-mesh.jpeg"><img alt="_images/arrow-mesh.jpeg" src="_images/arrow-mesh.jpeg" style="width: 200px;" />
+</a>
+</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal image-reference" href="_images/chair.png"><img alt="_images/chair.png" src="_images/chair.png" style="width: 200px;" />
+</a>
+</td>
+<td><a class="reference internal image-reference" href="_images/chair-mesh.jpeg"><img alt="_images/chair-mesh.jpeg" src="_images/chair-mesh.jpeg" style="width: 200px;" />
+</a>
+</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="d-printing">
+<h2>3D Printing<a class="headerlink" href="#d-printing" title="Link to this heading"></a></h2>
+<p>AeroPrint takes seversl steps towards completing the ‘digital thread’ by automating the process not only of collecting and processing data, but by automatically slicing and 3D printing replica objects. The current version of AeroPrint utilizes the <a class="reference external" href="https://slic3r.org">Slic3r</a> library to automate the processing of meshes into code for a 3d printer.</p>
+<p>The printer chosen for integration with AeroPrint is the <a class="reference external" href="https://www.prusa3d.com">Prusa Mk4</a> due to its open-source compatibility and reliability. Using Prusa’s API, AeroPrint is able to automatically establish a connection to a networked printer and initiate prints.</p>
+</section>
+<section id="hardware">
+<h2>Hardware<a class="headerlink" href="#hardware" title="Link to this heading"></a></h2>
+<p>The most crucial hardware element for AeroPrint is the drone, which is the <a class="reference external" href="https://docs.modalai.com/starling/">ModalAI Starling</a>. The Starling is chosen due to its open-source compatibility, with <a class="reference external" href="https://ubuntu.com">Ubuntu</a> as its standard OS, its built-in ToF sensor, and its commercial availability.</p>
+<p>Starling boasts an 8-core Qualcomm processor with 8GB memory and built-in hardware-accelerated neural processing capabilities. The advanced technical capabilities of the <a class="reference external" href="https://www.modalai.com/products/voxl-2">VOXL 2</a> which powers Starling, it is capable of much more advanced flight and data optimization than AeroPrint currently takes advantage of.</p>
+<a class="reference internal image-reference" href="_images/starling-v2-hero-2.png"><img alt="Starling Drone" class="align-center" src="_images/starling-v2-hero-2.png" style="width: 600px;" />
+</a>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Code Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="host.html">Host Package documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="host.html#aeroprint-gui">AeroPrint GUI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="host.html#settings-wdget">Settings Wdget</a></li>
+<li class="toctree-l2"><a class="reference internal" href="host.html#flight-widget">Flight Widget</a></li>
+<li class="toctree-l2"><a class="reference internal" href="host.html#tensorflow-widget">TensorFlow Widget</a></li>
+<li class="toctree-l2"><a class="reference internal" href="host.html#mesher">Mesher</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="starling.html">Starling Package documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="starling.html#starling.circle_flight.OffboardStarlingNode"><code class="docutils literal notranslate"><span class="pre">OffboardStarlingNode</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="starling.html#starling.circle_flight.VOXLQVIOController"><code class="docutils literal notranslate"><span class="pre">VOXLQVIOController</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="starling.html#starling.circle_flight.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="starling.html#starling.custom_pc_publisher.PCNode"><code class="docutils literal notranslate"><span class="pre">PCNode</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="starling.html#starling.custom_pc_publisher.PoseNode"><code class="docutils literal notranslate"><span class="pre">PoseNode</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="starling.html#starling.custom_pc_publisher.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="host.html" class="btn btn-neutral float-right" title="Host Package documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Digital Transformation Center.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

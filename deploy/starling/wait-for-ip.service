@@ -1,0 +1,13 @@
+[Unit]
+Description=Exit after network connection
+After=network-online.target
+Requires=network-online.target
+
+[Service]
+RemainAfterExit=false
+
+ExecStart=/bin/bash -c 'until ip -4 addr show wlan0 | grep "inet "; do echo "Waiting for wlan0 IP..." >> /tmp/wait-for-wlan.log; sleep 1; done'
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

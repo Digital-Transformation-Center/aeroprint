@@ -1,0 +1,11 @@
+flask
+flask-socketio
+numpy
+transforms3d
+scipy
+open3d
+ros2-numpy
+trimesh
+scikit-image
+networkx
+prusalinkpy

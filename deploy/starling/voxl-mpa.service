@@ -1,0 +1,12 @@
+[Unit]
+Description=VOXL MPA to ROS2 Node
+After=network.target
+
+[Service]
+User=root
+Environment="HOME=root"
+ExecStart=/bin/bash /usr/local/bin/voxl_mpa.sh
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
