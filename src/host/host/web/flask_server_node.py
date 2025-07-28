@@ -48,8 +48,48 @@ class FlaskWebApp:
     def setup_routes(self):
         @self.app.route('/')
         def home():
-            # Pass units to the template
-            return render_template('index.html', units=self.units)
+            selected_size = "MED"
+            command = "STOP"
+            stage = "Preflight"
+            # starling_status = is_starling_reachable()
+
+            # Change this to check the heartbeat status
+            starling_status = True  # Assume Starling is reachable for now
+
+            # Load last command/size if available
+            if os.path.exists("command.json") and os.path.getsize("command.json") > 0:
+                try:
+                    with open("command.json") as f:
+                        data = json.load(f)
+                        selected_size = data.get("size", selected_size)
+                        command = data.get("command", command)
+                except Exception:
+                    pass
+
+            # Load last stage if available
+            if os.path.exists("status.json") and os.path.getsize("status.json") > 0:
+                try:
+                    with open("status.json") as f:
+                        data = json.load(f)
+                        stage = data.get("stage", stage)
+                except Exception:
+                    pass
+
+            return render_template("index.html",
+                selected_size=selected_size,
+                command=command,
+                stage=stage,
+                starling=starling_status
+            )
+        # def home():
+        #     # Pass units to the template
+        #     return render_template('index.html', units=self.units)
+        
+
+
+        @self.app.route('/dev')
+        def dev():
+            return render_template('dev.html', units=self.units)
 
         # @self.app.route('/widgets/helix')
         # def helix_widget():
@@ -105,12 +145,55 @@ class FlaskWebApp:
         def handle_path_values_changed(data):
             self.emit_status('params_changed')
 
+        @self.socketio.on('select_size')
+        def handle_select_size(data):
+            self.node.get_logger().info(f"Size selected: {data.get('size', 'MED')}")
+            size = data.get('size', 'MED')
+            flight_config = {}
+            if size == 'SM':
+                flight_config = {
+                    'radius': 0.2,
+                    'height': 0.3,
+                    'turns': 2,
+                    'startHeight': 0.47
+                }
+            elif size == 'MED':
+                flight_config = {
+                    'radius': 0.3,
+                    'height': 0.5,
+                    'turns': 3,
+                    'startHeight': 0.47
+                }
+            elif size == 'LG':
+                flight_config = {
+                    'radius': 0.4,
+                    'height': 0.6,
+                    'turns': 4,
+                    'startHeight': 0.47
+                }
+            self.node.publish_params(flight_config)
+            self.socketio.emit('path_values_changed', {'radius': flight_config['radius'],
+                                                       'height': flight_config['height'],
+                                                       'turns': flight_config['turns'],
+                                                       'startHeight': flight_config['startHeight']})
+
     def status_callback(self, data):
         self.emit_notification('ROS Callback functions.')
         if data == 3:
             self.emit_notification("Loaded Flight Parameters.")
         elif data == 4:
             self.emit_notification("Failed to Load Flight Parameters", warning='bad')
+
+        if data == 1:
+            self.emit_status('DISARMED')
+        elif data == 2:
+            self.emit_status('ENGAGED')
+        elif data == 3:
+            self.emit_status('ARMED')
+        elif data == 4:
+            self.emit_status('LANDING')
+        elif data == 5:
+            self.emit_status('PATH_LOADED') 
 
     def emit_status(self, status):
         self.socketio.emit('flight_status', {'status': status})

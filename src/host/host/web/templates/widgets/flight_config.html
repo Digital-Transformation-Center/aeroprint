@@ -26,27 +26,29 @@
         </label>
         <br>
     </div>
-    <div style="display: flex; flex-direction: row; align-items: flex-start;">
-        <!-- Vertical slider for Starting Height -->
-        <div style="display: flex; flex-direction: column; align-items: center; margin-right: 1em;">
-            <input
-                type="range"
-                id="startHeightSlider"
-                min="0"
-                max="5"
-                step="0.1"
-                value="0"
-                style="writing-mode: bt-lr; -webkit-appearance: slider-vertical; width: 32px; height: 400px; margin-bottom: 0.5em;"
-            >
-            <input
-                class="decimal-input"
-                type="number"
-                id="startHeight"
-                value="0"
-                min="0"
-                max="5"
-                step="0.01"
-            >
+    <div class="vis-container">
+        <div id="startingHeightContainer" style="display: flex; flex-direction: row; align-items: flex-start;">
+            <!-- Vertical slider for Starting Height -->
+            <div style="display: flex; flex-direction: column; align-items: center; margin-right: 1em;">
+                <input
+                    type="range"
+                    id="startHeightSlider"
+                    min="0"
+                    max="5"
+                    step="0.1"
+                    value="0"
+                    style="writing-mode: bt-lr; -webkit-appearance: slider-vertical; width: 32px; height: 400px; margin-bottom: 0.5em;"
+                >
+                <input
+                    class="decimal-input"
+                    type="number"
+                    id="startHeight"
+                    value="0"
+                    min="0"
+                    max="5"
+                    step="0.01"
+                >
+            </div>
         </div>
         <div id="container" class="visualizer"></div>
     </div>

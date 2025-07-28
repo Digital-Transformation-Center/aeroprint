@@ -34,6 +34,14 @@ setup(
             os.path.join("share", package_name, "web", "static", "flight_config"),
             glob(os.path.join("host", "web", "static","flight_config","*.*")),
         ),
+        (
+            os.path.join("share", package_name, "web", "static", "css"),
+            glob(os.path.join("host", "web", "static","css","*.*")),
+        ),
+        (
+            os.path.join("share", package_name, "web", "static", "images"),
+            glob(os.path.join("host", "web", "static","images","*.*")),
+        ),
     ],
     install_requires=["setuptools"],
     zip_safe=True,

@@ -1,5 +1,43 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.176.0/build/three.module.js';
 import { io } from 'https://cdn.jsdelivr.net/npm/socket.io-client@4.7.5/dist/socket.io.esm.min.js';
+
+const show_controls = false;
+
+const controls = document.getElementById('controls');
+const startingHeightContainer = document.getElementById('startingHeightContainer');
+const radius_slider = document.getElementById('radius');
+const height_slider = document.getElementById('height');
+const turns_slider = document.getElementById('turns');
+const startHeightSlider = document.getElementById('startHeightSlider');
+const startHeightInput = document.getElementById('startHeight');
+const saveButton = document.getElementById('save-button');
+
+if (show_controls) {
+    // Show controls
+    if (controls) controls.style.display = '';
+    if (startingHeightContainer) startingHeightContainer.style.display = 'flex';
+    if (radius_slider) radius_slider.disabled = false;
+    if (height_slider) height_slider.disabled = false;
+    if (turns_slider) turns_slider.disabled = false;
+    if (startHeightSlider) startHeightSlider.disabled = false;
+    if (startHeightInput) startHeightInput.disabled = false;
+    if (saveButton) saveButton.style.display = '';
+    console.log('Controls are enabled');
+} else {
+    // Hide controls and disable inputs
+    if (controls) controls.style.display = 'none';
+    else console.warn('Controls element not found');
+    if (startingHeightContainer) startingHeightContainer.style.display = 'none';
+    else console.warn('Starting height container not found');
+    if (radius_slider) radius_slider.disabled = true;
+    if (height_slider) height_slider.disabled = true;
+    if (turns_slider) turns_slider.disabled = true;
+    if (startHeightSlider) startHeightSlider.disabled = true;
+    if (startHeightInput) startHeightInput.disabled = true;
+    if (saveButton) saveButton.style.display = 'none';
+    console.log('Controls are disabled');
+}
+
 console.log('scene.js loaded');
 window.socket = io();
 // Listen for notifications from the server specific to flight_config
@@ -24,10 +62,6 @@ let path_did_change = false;
 let max_axis_length = 15; // Maximum length for axes markers
 let danger_radius = 0;
 let danger_height = 0;
-
-const radius_slider = document.getElementById('radius');
-const height_slider = document.getElementById('height');
-const turns_slider = document.getElementById('turns');
 
 const metric_slider_limits = {
     radius: { min: 0.1, max: 1, steps: 0.05, currentValue: 0.2 },
@@ -205,6 +239,7 @@ export function updateScene() {
 
 
 export function addInputListeners() {
+    if (!show_controls) return; // Only add listeners if controls are enabled
     ["radius", "height", "turns"].forEach(id => {
         // document.getElementById(id).addEventListener("input", updateScene);
         // document.getElementById(id + 'Value').textContent = document.getElementById(id).value;
@@ -240,6 +275,31 @@ export function addInputListeners() {
         } else {
             console.error('Socket not initialized or emit function not available');
         }
+    });
+}
+
+if (!show_controls) {
+    // Listen for socket data to update scene when controls are hidden
+    window.socket.on('path_values_changed', (data) => {
+        console.log('Received path_values_changed:', data);
+        // Update sliders and scene from socket data
+        if (typeof data.radius !== 'undefined') {
+            radius_slider.value = data.radius;
+            document.getElementById('radiusValue').textContent = data.radius;
+        }
+        if (typeof data.height !== 'undefined') {
+            height_slider.value = data.height;
+            document.getElementById('heightValue').textContent = data.height;
+        }
+        if (typeof data.turns !== 'undefined') {
+            turns_slider.value = data.turns;
+            document.getElementById('turnsValue').textContent = data.turns;
+        }
+        if (typeof data.startHeight !== 'undefined') {
+            startHeightInput.value = data.startHeight;
+            startHeightSlider.value = data.startHeight;
+        }
+        updateScene();
     });
 }
 
@@ -316,7 +376,7 @@ export function init() {
     scene.background = new THREE.Color(0x222222);
     const width = Math.min(window.innerWidth * 0.9, 800);
     const heightPx = 500;
-    camera = new THREE.PerspectiveCamera(60, width / heightPx, 0.1, 100);
+    camera = new THREE.PerspectiveCamera(20, width / heightPx, 0.1, 100);
     let cameraDistance = 10;
     let theta = Math.PI/4, phi = Math.PI/6;
     function updateCameraPosition() {
