@@ -17,7 +17,7 @@
     <div class="title-banner">
       <img src="{{ url_for('static', filename='images/aeroprint_title.png') }}" alt="AeroPrint Logo">
     </div>
-    {% if stage != "Preflight" %}
+      <!-- Always present in DOM -->
       <div class="top-left-stop" id="emergency-stop-container" style="display: none;">
         <button id="emergency-stop" onclick="sendStopCommand()" aria-label="Emergency Stop">
           <!-- SVG Red Octagon -->
@@ -27,7 +27,6 @@
           </svg>
         </button>
       </div>
-    {% endif %}
 
     <!-- Dev Phase Preview Menu (hidden by default, toggled with Ctrl+Q) -->
     <div id="dev-phase-menu" style="display:none; position:fixed; bottom:60px; right:24px; z-index:200; background:#222; padding:8px 16px; border-radius:8px; box-shadow:0 2px 8px #00eaff;">
@@ -248,21 +247,6 @@
     socket.on('progress_update', function(data) {
       const bar = document.getElementById('progress-bar');
       if (bar) bar.style.width = data.percent + '%';
-    });
-
-    socket.on('flight_time_remaining', function(data) {
-      const flight_time_status_indicator = document.getElementById('flight_time_progress');
-      const flight_time_label = document.getElementById('flight_time');
-      const time_remaining = data.time; // seconds remaining
-      const flight_time_est = window.flight_time_est || 1; // set this to your total flight time in seconds
-
-      // Calculate percent complete
-      const percent = Math.round((1 - time_remaining / flight_time_est) * 100);
-      flight_time_status_indicator.style.width = `${percent}%`;
-      flight_time_status_indicator.setAttribute('title', `${percent}% complete`);
-
-      // Optional: Show time remaining
-      flight_time_label.textContent = `Time left: ${Math.ceil(time_remaining)}s`;
     });
 
     function sendStopCommand() {
