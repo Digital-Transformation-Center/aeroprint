@@ -312,5 +312,6 @@ body {
 }
 
 #flight_time_progress {
-  transition: width 0.25s ease-in-out;
+  width: 0%;
+  /* transition: width 0.25s ease-in-out; */
 }

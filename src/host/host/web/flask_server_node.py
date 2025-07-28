@@ -195,6 +195,9 @@ class FlaskWebApp:
         elif data == 5:
             self.emit_status('PATH_LOADED') 
 
+    def emit_ui_phase(self, phase):
+        self.socketio.emit('update_phase', {'phase': phase})
+    
     def emit_status(self, status):
         self.socketio.emit('flight_status', {'status': status})
 
@@ -326,6 +329,7 @@ class FlaskServerNode(Node):
             self.get_logger().info("Flight engaged.")
             if hasattr(self, 'flask_web_app'):
                 self.flask_web_app.emit_status('flight_engaged')
+                self.flask_web_app.emit_ui_phase('Scanning')
         elif status == FLIGHT_ARMED:
             if hasattr(self, 'flask_web_app'):
                 self.flask_web_app.emit_status('flight_armed')
