@@ -74,5 +74,7 @@ def update_phase(new_phase):
     # Emit to all connected clients
     socketio.emit('status_update', {'phase': new_phase})
 
+
+
 if __name__ == "__main__":
     socketio.run(app, debug=True)

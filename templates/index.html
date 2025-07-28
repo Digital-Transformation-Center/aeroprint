@@ -18,8 +18,14 @@
       <img src="{{ url_for('static', filename='images/aeroprint_title.png') }}" alt="AeroPrint Logo">
     </div>
     {% if stage != "Preflight" %}
-      <div class="top-left-stop">
-        <button id="emergency-stop" onclick="sendStopCommand()">🛑</button>
+      <div class="top-left-stop" id="emergency-stop-container" style="display: none;">
+        <button id="emergency-stop" onclick="sendStopCommand()" aria-label="Emergency Stop">
+          <!-- SVG Red Octagon -->
+          <svg width="48" height="48" viewBox="0 0 48 48">
+            <polygon points="12,4 36,4 44,12 44,36 36,44 12,44 4,36 4,12" fill="#f44336" stroke="#900" stroke-width="2"/>
+            <text x="24" y="30" text-anchor="middle" font-size="18" fill="#fff" font-family="Arial" font-weight="bold">STOP</text>
+          </svg>
+        </button>
       </div>
     {% endif %}
 
@@ -48,19 +54,15 @@
         <h3>Starling Camera View</h3>
         <div class="camera-box">[Live Feed Placeholder]</div>
         <div class="phase-description">
-          {% if stage == "Preflight" %}
-            <p></p>
-            <button id="action-btn"
-                    class="{{ 'start-btn' if command != 'START' else 'stop-btn' }}"
-                    onclick="toggleAction()">
-              {{ 'START' if command != 'START' else 'STOP' }}
-            </button>
-          {% else %}
-            <p></p>
-            <div class="progress-container">
-              <div id="progress-bar" class="progress-bar"></div>
-            </div>
-          {% endif %}
+          <p></p>
+          <button id="action-btn"
+                  class="{{ 'start-btn' if command != 'START' else 'stop-btn' }}"
+                  onclick="toggleAction()">
+            {{ 'START' if command != 'START' else 'STOP' }}
+          </button>
+          <div class="progress-container" style="display:none;">
+            <div id="progress-bar" class="progress-bar"></div>
+          </div>
         </div>
       </div>
 
@@ -85,6 +87,7 @@
   <script>
     const socket = io();
     let selectedSize = "{{ selected_size }}";  // store size for use during START
+    let devProgressInterval = null;
 
     function toggleAction() {
       const btn = document.getElementById('action-btn');
@@ -132,39 +135,31 @@
         }
       });
 
-      // Update phase description text
       updatePhaseDescription(phase);
 
-      // Update layout: Stop button & progress bar
-      const stopBtn = document.querySelector('.top-left-stop');
-      const progressBarContainer = document.querySelector('.progress-container');
+      // Reset previous simulated progress
+      if (devProgressInterval) clearInterval(devProgressInterval);
+
       const actionBtn = document.getElementById('action-btn');
+      const stopBtn = document.querySelector('.top-left-stop');
+      const progressBar = document.getElementById('progress-bar');
 
       if (phase === "Preflight") {
-        if (stopBtn) stopBtn.style.display = "none";
-        if (progressBarContainer) progressBarContainer.style.display = "none";
         if (actionBtn) actionBtn.style.display = "inline-block";
+        if (stopBtn) stopBtn.style.display = "none";
+        if (progressBar) progressBar.style.width = "0%";
       } else {
         if (actionBtn) actionBtn.style.display = "none";
-        
-        // Show Stop button
-        if (stopBtn) {
-          stopBtn.style.display = "block";
-        } else {
-          const stopDiv = document.createElement("div");
-          stopDiv.className = "top-left-stop";
-          stopDiv.innerHTML = `<button id="emergency-stop" onclick="sendStopCommand()">🛑</button>`;
-          document.body.appendChild(stopDiv);
-        }
+        if (stopBtn) stopBtn.style.display = "block";
 
-        // Show Progress Bar
-        if (!progressBarContainer) {
-          const container = document.createElement("div");
-          container.className = "progress-container";
-          container.innerHTML = `<div id="progress-bar" class="progress-bar"></div>`;
-          document.querySelector('.phase-description').appendChild(container);
-        } else {
-          progressBarContainer.style.display = "block";
+        let progress = 0;
+        if (progressBar) {
+          progressBar.style.width = "0%";
+          devProgressInterval = setInterval(() => {
+            progress = Math.min(progress + 5, 100);
+            progressBar.style.width = progress + "%";
+            if (progress === 100) clearInterval(devProgressInterval);
+          }, 400); // Adjust speed as needed
         }
       }
     }
@@ -195,6 +190,15 @@
       typePhaseDescription(text);
     }
 
+    function updatePhaseUI(phase) {
+      const stopBtnContainer = document.getElementById('emergency-stop-container');
+      if (phase === "Preflight") {
+        if (stopBtnContainer) stopBtnContainer.style.display = "none";
+      } else {
+        if (stopBtnContainer) stopBtnContainer.style.display = "block";
+      }
+    }
+
     socket.on('command_response', data => {
       console.log("Server response:", data);
     });
@@ -210,6 +214,24 @@
         }
       });
       updatePhaseDescription(data.phase);
+      updatePhaseUI(data.phase);
+
+      // Simulate progress bar for non-Preflight phases
+      if (devProgressInterval) clearInterval(devProgressInterval);
+      const progressBar = document.getElementById('progress-bar');
+      if (data.phase === "Preflight") {
+        if (progressBar) progressBar.style.width = "0%";
+      } else {
+        let progress = 0;
+        if (progressBar) {
+          progressBar.style.width = "0%";
+          devProgressInterval = setInterval(() => {
+            progress = Math.min(progress + 5, 100);
+            progressBar.style.width = progress + "%";
+            if (progress === 100) clearInterval(devProgressInterval);
+          }, 400);
+        }
+      }
     });
 
     socket.on('progress_update', function(data) {

@@ -72,7 +72,7 @@ body {
 .status.active {
   background: linear-gradient(90deg, #00cfff 60%, #0078d4 100%);
   color: #fff;
-  animation: pulseGlow 1.8s infinite, flipIn 0.3s;
+  animation: pulseGlow 1.8s infinite, flipIn 0.8s;
   box-shadow: 0 0 18px 4px #00eaff, 0 0 40px 0 #00aaff inset;
   transform: perspective(400px) rotateY(0deg) scale(1.08);
 }
@@ -152,7 +152,7 @@ body {
 
 .phase-description p {
   font-family: 'Orbitron', 'Share Tech Mono', 'Consolas', monospace;
-  font-size: 1.23rem;
+  font-size: 1.15rem;
   text-transform: uppercase;
   letter-spacing: 0.07em;
   color: #fff; /* Changed from #00eaff to white for better icon visibility */
@@ -162,7 +162,7 @@ body {
   background-clip: initial;
   filter: drop-shadow(0 0 6px #00eaff) drop-shadow(0 0 2px #0078d4);
   padding: 10px 0 8px 0;
-  margin: 2 0 8px 0;
+  margin: 1px 0 0 0;
   text-align: center;
   animation: phaseGlow 2.2s infinite alternate;
   transition: background 0.5s, color 0.5s;
@@ -211,7 +211,7 @@ body {
 }
 
 .path-box {
-  height: 450px;
+  height: 380px;
   overflow: auto;
   background-color: #000000;
   border-radius: 4px;
@@ -267,14 +267,11 @@ body {
 }
 
 #emergency-stop {
-  background: red;
+  background: none;
   border: none;
-  border-radius: 50%;
-  padding: 10px 14px;
-  font-size: 1.4rem;
-  color: white;
-  box-shadow: 0 0 10px #ff6666;
+  padding: 0;
   cursor: pointer;
+  outline: none;
 }
 
 .progress-container {
