@@ -74,6 +74,15 @@ def update_phase(new_phase):
     # Emit to all connected clients
     socketio.emit('status_update', {'phase': new_phase})
 
+def send_ready():
+    subprocess.run([
+        "ros2", "topic", "pub", "-1", "/host/gui/out/ready", "std_msgs/msg/Bool", '{"data": true}'
+    ])
+
+def send_radius(radius):
+    subprocess.run([
+        "ros2", "topic", "pub", "-1", "/host/gui/out/radius", "std_msgs/msg/Float32", f'{{"data": {radius}}}'
+    ])
 
 
 if __name__ == "__main__":
