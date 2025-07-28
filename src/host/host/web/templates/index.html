@@ -279,8 +279,6 @@
       if (bar) bar.style.width = data.percent + '%';
     });
 
-<<<<<<< HEAD:templates/index.html
-=======
     socket.on('flight_time_remaining', function(data) {
       console.log("Flight time remaining data:", data);
       const flight_time_status_indicator = document.getElementById('progress-bar');
@@ -303,7 +301,6 @@
       flight_time_label.textContent = `Estimated Flight Time: ${Math.ceil(window.flight_time_est)}s`;
     });
 
->>>>>>> 678a663a7a774dc6d89e2d0698f55a443ed83d03:src/host/host/web/templates/index.html
     function sendStopCommand() {
       socket.emit('emergency_stop');
       // Optionally show a message to the user
