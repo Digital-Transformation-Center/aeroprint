@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <title>AeroPrint</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+  </style>
 </head>
 <body>
   <div class="container">
@@ -69,10 +71,26 @@
 
       <!-- Flight Path Section -->
       <div class="flight-path">
-        <h3>Flight Path Graphic</h3>
-        <div class="path-box">
+        <h3>Flight Visualization</h3>
+        <div class="path-box" style="position:relative;">
+          <div id="pointcloud-viewer" style="width:100%; height: 380px; display:none; position:absolute; top:0; left:0; background:#111;"></div>
+          <div id="mesh-viewer" style="width:100%; height: 380px; display:none; position:absolute; top:0; left:0; background:#111;"></div>
+          <div id="slicing-viewer" style="width:100%; height: 380px; display:none; position:absolute; top:0; left:0; pointer-events:none;"></div>
           <iframe src="/widgets/flight_config" title="Helix Path Visualizer" scrolling="no" aria-placeholder="Helix Path Visualizer"></iframe>
+          <!-- Download Slicing Button: Only visible in Slicing phase -->
+          <button id="download-slicing-btn"
+                  onclick="window.location='/download_slicing'"
+                  style="margin: 12px 0; display: none; position: absolute; top: 12px; left: 12px; z-index: 20;">
+            Download Slices
+          </button>
         </div>
+
+        <!-- Place the download button here -->
+        <button id="download-pointcloud-btn"
+                onclick="window.location='/download_pointcloud'"
+                style="margin: 12px 0; display: none;">
+          Download Point Cloud
+        </button>
 
         <!-- Print Size Selector -->
         <div class="size-selector">
@@ -94,6 +112,7 @@
 
   <!-- Dynamic Command Logic -->
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.153.0/build/three.min.js"></script>
   <script>
     const socket = io();
     let selectedSize = "{{ selected_size }}";  // store size for use during START
@@ -195,6 +214,66 @@
         //   if (progress === 100) clearInterval(devProgressInterval);
         // }, 300);
       }
+
+      const pcViewer = document.getElementById('pointcloud-viewer');
+      const meshViewer = document.getElementById('mesh-viewer');
+      const slicingViewer = document.getElementById('slicing-viewer');
+      const pathIframe = document.querySelector('.path-box iframe');
+
+      if (phase === "Processing") {
+        if (pcViewer) pcViewer.style.display = "block";
+        if (meshViewer) meshViewer.style.display = "none";
+        if (slicingViewer) slicingViewer.style.display = "none";
+        if (pathIframe) pathIframe.style.visibility = "visible";
+      } else if (phase === "Meshing") {
+        if (pcViewer) pcViewer.style.display = "none";
+        if (meshViewer) {
+          meshViewer.style.display = "block";
+          showMesh();
+        }
+        if (slicingViewer) slicingViewer.style.display = "none";
+        if (pathIframe) pathIframe.style.visibility = "hidden";
+      } else if (phase === "Slicing") {
+        if (pcViewer) pcViewer.style.display = "none";
+        if (meshViewer) {
+          meshViewer.style.display = "block";
+          showMesh();
+        }
+        if (slicingViewer) {
+          slicingViewer.style.display = "block";
+          showSlicing(); // function to render slicing visualization
+        }
+        if (pathIframe) pathIframe.style.visibility = "hidden";
+      } else {
+        if (pcViewer) pcViewer.style.display = "none";
+        if (meshViewer) meshViewer.style.display = "none";
+        if (slicingViewer) slicingViewer.style.display = "none";
+        if (pathIframe) pathIframe.style.visibility = "visible";
+      }
+
+      // Show/hide the download button based on phase
+      const downloadBtn = document.getElementById('download-pointcloud-btn');
+      if (phase === "Processing") {
+        if (downloadBtn) downloadBtn.style.display = "inline-block";
+      } else {
+        if (downloadBtn) downloadBtn.style.display = "none";
+      }
+
+      // Show/hide the download mesh button based on phase
+      const downloadMeshBtn = document.getElementById('download-mesh-btn');
+      if (phase === "Meshing") {
+        if (downloadMeshBtn) downloadMeshBtn.style.display = "inline-block";
+      } else {
+        if (downloadMeshBtn) downloadMeshBtn.style.display = "none";
+      }
+
+      // Show/hide the download slicing button based on phase
+      const downloadSlicingBtn = document.getElementById('download-slicing-btn');
+      if (phase === "Slicing") {
+        if (downloadSlicingBtn) downloadSlicingBtn.style.display = "inline-block";
+      } else {
+        if (downloadSlicingBtn) downloadSlicingBtn.style.display = "none";
+      }
     }
 
     function typePhaseDescription(text) {
@@ -272,6 +351,68 @@
           }, 400);
         }
       }
+
+      const pcViewer = document.getElementById('pointcloud-viewer');
+      const meshViewer = document.getElementById('mesh-viewer');
+      const slicingViewer = document.getElementById('slicing-viewer');
+      const pathIframe = document.querySelector('.path-box iframe');
+      if (data.phase === "Processing") {
+        if (pcViewer) {
+          pcViewer.style.display = "block";
+          initPointCloudViewer();
+        }
+        if (meshViewer) meshViewer.style.display = "none";
+        if (slicingViewer) slicingViewer.style.display = "none";
+        if (pathIframe) pathIframe.style.visibility = "visible";
+      } else if (data.phase === "Meshing") {
+        if (pcViewer) pcViewer.style.display = "none";
+        if (meshViewer) {
+          meshViewer.style.display = "block";
+          showMesh();
+        }
+        if (slicingViewer) slicingViewer.style.display = "none";
+        if (pathIframe) pathIframe.style.visibility = "hidden";
+      } else if (data.phase === "Slicing") {
+        if (pcViewer) pcViewer.style.display = "none";
+        if (meshViewer) {
+          meshViewer.style.display = "block";
+          showMesh();
+        }
+        if (slicingViewer) {
+          slicingViewer.style.display = "block";
+          showSlicing(); // function to render slicing visualization
+        }
+        if (pathIframe) pathIframe.style.visibility = "hidden";
+      } else {
+        if (pcViewer) pcViewer.style.display = "none";
+        if (meshViewer) meshViewer.style.display = "none";
+        if (slicingViewer) slicingViewer.style.display = "none";
+        if (pathIframe) pathIframe.style.visibility = "visible";
+      }
+
+      // Show/hide the download button based on phase
+      const downloadBtn = document.getElementById('download-pointcloud-btn');
+      if (data.phase === "Processing") {
+        if (downloadBtn) downloadBtn.style.display = "inline-block";
+      } else {
+        if (downloadBtn) downloadBtn.style.display = "none";
+      }
+
+      // Show/hide the download mesh button based on phase
+      const downloadMeshBtn = document.getElementById('download-mesh-btn');
+      if (data.phase === "Meshing") {
+        if (downloadMeshBtn) downloadMeshBtn.style.display = "inline-block";
+      } else {
+        if (downloadMeshBtn) downloadMeshBtn.style.display = "none";
+      }
+
+      // Show/hide the download slicing button based on phase
+      const downloadSlicingBtn = document.getElementById('download-slicing-btn');
+      if (data.phase === "Slicing") {
+        if (downloadSlicingBtn) downloadSlicingBtn.style.display = "inline-block";
+      } else {
+        if (downloadSlicingBtn) downloadSlicingBtn.style.display = "none";
+      }
     });
 
     socket.on('progress_update', function(data) {
@@ -333,6 +474,157 @@
       });
       updatePhaseDescription("{{ stage }}"); // On page load
     });
+
+    let pcViewerInitialized = false;
+function initPointCloudViewer() {
+  if (pcViewerInitialized) return;
+  pcViewerInitialized = true;
+
+  const container = document.getElementById('pointcloud-viewer');
+  const width = container.clientWidth;
+  const height = container.clientHeight;
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+  camera.position.z = 5;
+
+  const renderer = new THREE.WebGLRenderer({antialias:true});
+  renderer.setSize(width, height);
+  container.appendChild(renderer.domElement);
+
+  // Example: Add random points (replace with your real point cloud data)
+  const geometry = new THREE.BufferGeometry();
+  const numPoints = 2000;
+  const positions = new Float32Array(numPoints * 3);
+  for (let i = 0; i < numPoints * 3; i++) {
+    positions[i] = (Math.random() - 0.5) * 10;
+  }
+  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  const material = new THREE.PointsMaterial({ color: 0x00aaff, size: 0.05 });
+  const points = new THREE.Points(geometry, material);
+  scene.add(points);
+
+  function animate() {
+    requestAnimationFrame(animate);
+    points.rotation.y += 0.002;
+    renderer.render(scene, camera);
+  }
+  animate();
+}
+
+let pcViewerScene, pcViewerCamera, pcViewerRenderer, pcViewerPoints;
+
+function showPointCloud(pointsArray) {
+  const container = document.getElementById('pointcloud-viewer');
+  const width = container.clientWidth;
+  const height = container.clientHeight;
+
+  // If not already initialized, set up Three.js scene
+  if (!pcViewerScene) {
+    pcViewerScene = new THREE.Scene();
+    pcViewerCamera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+    pcViewerCamera.position.z = 5;
+    pcViewerRenderer = new THREE.WebGLRenderer({antialias:true});
+    pcViewerRenderer.setSize(width, height);
+    container.innerHTML = ""; // Clear previous
+    container.appendChild(pcViewerRenderer.domElement);
+  }
+
+  // Remove previous points if any
+  if (pcViewerPoints) {
+    pcViewerScene.remove(pcViewerPoints);
+  }
+
+  // Create geometry from real data
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pointsArray), 3));
+  const material = new THREE.PointsMaterial({ color: 0x00aaff, size: 0.05 });
+  pcViewerPoints = new THREE.Points(geometry, material);
+  pcViewerScene.add(pcViewerPoints);
+
+  // Animate
+  function animate() {
+    requestAnimationFrame(animate);
+    if (pcViewerPoints) pcViewerPoints.rotation.y += 0.002;
+    pcViewerRenderer.render(pcViewerScene, pcViewerCamera);
+  }
+  animate();
+}
+
+// Listen for point cloud data from backend
+socket.on('pointcloud_data', function(data) {
+  window.latestPointCloud = data.points; // Cache for dev mode
+  const pcViewer = document.getElementById('pointcloud-viewer');
+  if (pcViewer) {
+    pcViewer.style.display = "block";
+    showPointCloud(data.points);
+  }
+});
+
+function showMesh() {
+  const container = document.getElementById('mesh-viewer');
+  const width = container.clientWidth;
+  const height = container.clientHeight;
+
+  // Clear previous
+  container.innerHTML = "";
+
+  // Three.js setup
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+  camera.position.z = 5;
+
+  const renderer = new THREE.WebGLRenderer({antialias:true});
+  renderer.setSize(width, height);
+  container.appendChild(renderer.domElement);
+
+  // Example: Add a demo mesh (replace with your real mesh)
+  const geometry = new THREE.BoxGeometry(2, 2, 2);
+  const material = new THREE.MeshNormalMaterial({wireframe: false});
+  const mesh = new THREE.Mesh(geometry, material);
+  scene.add(mesh);
+
+  function animate() {
+    requestAnimationFrame(animate);
+    mesh.rotation.y += 0.01;
+    mesh.rotation.x += 0.005;
+    renderer.render(scene, camera);
+  }
+  animate();
+}
+
+function showSlicing() {
+  const container = document.getElementById('slicing-viewer');
+  const width = container.clientWidth;
+  const height = container.clientHeight;
+
+  // Clear previous
+  container.innerHTML = "";
+
+  // Three.js setup
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+  camera.position.z = 5;
+
+  const renderer = new THREE.WebGLRenderer({alpha:true});
+  renderer.setSize(width, height);
+  container.appendChild(renderer.domElement);
+
+  // Example: Add slicing planes (replace with your real slicing data)
+  for (let i = -1; i <= 1; i += 0.2) {
+    const geometry = new THREE.PlaneGeometry(2, 2);
+    const material = new THREE.MeshBasicMaterial({color: 0xff0000, side: THREE.DoubleSide, transparent: true, opacity: 0.2});
+    const plane = new THREE.Mesh(geometry, material);
+    plane.position.z = i;
+    scene.add(plane);
+  }
+
+  function animate() {
+    requestAnimationFrame(animate);
+    renderer.render(scene, camera);
+  }
+  animate();
+}
   </script>
 </body>
 </html>

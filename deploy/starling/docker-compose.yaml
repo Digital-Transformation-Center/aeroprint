@@ -43,8 +43,12 @@ services:
     # *** CHANGED: Use host networking mode ***
     # This allows the container to share the host's network namespace,
     # making ROS 2 discovery easier across containers or with host processes.
-    network_mode: host
-    ipc: host
+    network_mode: default
+
+    ports:
+      - "8080:8080"
+      - "5000:5000"
+   # ipc: host
 
     command: tail -f /dev/null
 
