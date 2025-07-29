@@ -84,6 +84,10 @@ function renderFiles(files, path) {
         }, 0);
       });
       row.appendChild(left);
+      delBtn.className = 'btn btn-danger btn-sm';
+      delBtn.textContent = 'Delete';
+      delBtn.onclick = () => deleteFile(item.path);
+      row.appendChild(delBtn);
     } else {
       const left = document.createElement('span');
       left.innerHTML = `📄 <a href="${item.path}" target="_blank">${item.name}</a>`;
