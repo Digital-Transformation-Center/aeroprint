@@ -49,6 +49,10 @@ class FlaskWebApp:
         self.socketio.emit('heartbeat', {'ok': ok})
 
     def setup_routes(self):
+        @self.app.route('/files')
+        def files():
+            return render_template('files.html')
+        
         @self.app.route('/')
         def home():
             selected_size = "MED"

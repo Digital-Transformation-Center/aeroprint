@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>File Browser</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-4">
+  <h2>File Browser</h2>
+  <div id="file-browser-controls" class="mb-3">
+    <button id="refresh-btn" class="btn btn-secondary btn-sm">Refresh</button>
+    <button id="delete-all-btn" class="btn btn-danger btn-sm float-end">Delete All</button>
+  </div>
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb" id="breadcrumb-list"></ol>
+  </nav>
+  <ul class="list-group" id="file-list"></ul>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="/static/file_browser.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
