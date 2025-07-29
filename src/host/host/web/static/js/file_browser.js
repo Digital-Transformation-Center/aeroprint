@@ -41,7 +41,7 @@ function renderFiles(files, path) {
         navigateTo(item.path.replace('/api/list_assets/', ''));
       };
       // Add right-click context menu for delete
-      left.oncontextmenu = (e) => {
+      left.addEventListener('contextmenu', function(e) {
         e.preventDefault();
         // Remove any existing context menu
         const oldMenu = document.getElementById('dir-context-menu');
@@ -64,22 +64,25 @@ function renderFiles(files, path) {
         delOpt.style.cursor = 'pointer';
         delOpt.onmouseover = () => delOpt.style.background = '#eee';
         delOpt.onmouseout = () => delOpt.style.background = '';
-        delOpt.onclick = () => {
+        delOpt.onclick = (ev) => {
           menu.remove();
           if (/^\d+$/.test(item.name)) {
             deleteFile(`/assets/${item.name}`);
           } else {
             alert('Only numbered asset folders can be deleted via this interface.');
           }
+          ev.stopPropagation();
         };
         menu.appendChild(delOpt);
         document.body.appendChild(menu);
-        // Remove menu on click elsewhere
-        document.addEventListener('click', function handler() {
-          menu.remove();
-          document.removeEventListener('click', handler);
-        });
-      };
+        // Remove menu on click elsewhere, with a small delay to avoid immediate removal
+        setTimeout(() => {
+          document.addEventListener('mousedown', function handler() {
+            menu.remove();
+            document.removeEventListener('mousedown', handler);
+          });
+        }, 0);
+      });
       row.appendChild(left);
     } else {
       const left = document.createElement('span');
