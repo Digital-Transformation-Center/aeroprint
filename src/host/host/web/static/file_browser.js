@@ -30,22 +30,75 @@ function renderFiles(files, path) {
   }
   files.forEach(item => {
     const li = document.createElement('li');
-    li.className = 'list-group-item d-flex justify-content-between align-items-center';
+    li.className = 'list-group-item';
+    const row = document.createElement('div');
+    row.className = 'd-flex justify-content-between align-items-center';
     if (item.type === 'directory') {
-      li.innerHTML = `<span>📁 <a href="#">${item.name}</a></span>`;
-      li.querySelector('a').onclick = (e) => {
+      const left = document.createElement('span');
+      left.innerHTML = `📁 <a href="#">${item.name}</a>`;
+      left.querySelector('a').onclick = (e) => {
         e.preventDefault();
         navigateTo(item.path.replace('/api/list_assets/', ''));
       };
+      // Add right-click context menu for delete
+      left.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+        // Remove any existing context menu
+        const oldMenu = document.getElementById('dir-context-menu');
+        if (oldMenu) oldMenu.remove();
+        // Create menu
+        const menu = document.createElement('div');
+        menu.id = 'dir-context-menu';
+        menu.style.position = 'absolute';
+        menu.style.zIndex = 10000;
+        menu.style.left = e.pageX + 'px';
+        menu.style.top = e.pageY + 'px';
+        menu.style.background = '#fff';
+        menu.style.border = '1px solid #ccc';
+        menu.style.padding = '4px 0';
+        menu.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)';
+        menu.style.minWidth = '120px';
+        const delOpt = document.createElement('div');
+        delOpt.textContent = 'Delete';
+        delOpt.style.padding = '4px 16px';
+        delOpt.style.cursor = 'pointer';
+        delOpt.onmouseover = () => delOpt.style.background = '#eee';
+        delOpt.onmouseout = () => delOpt.style.background = '';
+        delOpt.onclick = (ev) => {
+          menu.remove();
+          if (/^\d+$/.test(item.name)) {
+            deleteFile(`/assets/${item.name}`);
+          } else {
+            alert('Only numbered asset folders can be deleted via this interface.');
+          }
+          ev.stopPropagation();
+        };
+        menu.appendChild(delOpt);
+        document.body.appendChild(menu);
+        // Remove menu on click elsewhere, with a small delay to avoid immediate removal
+        setTimeout(() => {
+          document.addEventListener('mousedown', function handler() {
+            menu.remove();
+            document.removeEventListener('mousedown', handler);
+          });
+        }, 0);
+      });
+      row.appendChild(left);
+      delBtn.className = 'btn btn-danger btn-sm';
+      delBtn.textContent = 'Delete';
+      delBtn.onclick = () => deleteFile(item.path);
+      row.appendChild(delBtn);
     } else {
-      li.innerHTML = `<span>📄 <a href="${item.path}" target="_blank">${item.name}</a></span>`;
-      
+      const left = document.createElement('span');
+      left.innerHTML = `📄 <a href="${item.path}" target="_blank">${item.name}</a>`;
+      row.appendChild(left);
+      const delBtn = document.createElement('button');
+      delBtn.className = 'btn btn-danger btn-sm';
+      delBtn.textContent = 'Delete';
+      delBtn.onclick = () => deleteFile(item.path);
+      row.appendChild(delBtn);
     }
-    const delBtn = document.createElement('button');
-    delBtn.className = 'btn btn-danger btn-sm';
-    delBtn.textContent = 'Delete';
-    delBtn.onclick = () => deleteFile(item.path);
-    li.appendChild(delBtn);
+    li.appendChild(row);
     fileList.appendChild(li);
   });
 }
