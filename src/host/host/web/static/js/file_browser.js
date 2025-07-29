@@ -41,10 +41,12 @@ function renderFiles(files, path) {
         navigateTo(item.path.replace('/api/list_assets/', ''));
       };
       row.appendChild(left);
+      // Show delete button for the directory in the parent listing
       const delBtn = document.createElement('button');
       delBtn.className = 'btn btn-danger btn-sm';
       delBtn.textContent = 'Delete';
-      delBtn.onclick = () => {
+      delBtn.onclick = (e) => {
+        e.stopPropagation();
         if (/^\d+$/.test(item.name)) {
           deleteFile(`/assets/${item.name}`);
         } else {
