@@ -100,7 +100,15 @@ class PCPostProcessor(Node):
         self.get_logger().info("Dump finished. Combining Pointclouds.")
         if msg.data:
             try:
-                self.save()
+                self.get_logger().info("Waiting 10 seconds before processing...")
+                timer = self.create_timer(
+                    10.0, 
+                    lambda: self.save(), 
+                    callback_group=None, 
+                    clock=None
+                )
+                # return  # Exit callback to avoid blocking
+                # self.save()
             except Exception as e:
                 self.get_logger().error(f"Error during pcd save: {e}")
             ec = Bool()
