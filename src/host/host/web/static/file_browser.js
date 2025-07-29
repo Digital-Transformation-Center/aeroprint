@@ -39,12 +39,13 @@ function renderFiles(files, path) {
       };
     } else {
       li.innerHTML = `<span>📄 <a href="${item.path}" target="_blank">${item.name}</a></span>`;
-      const delBtn = document.createElement('button');
-      delBtn.className = 'btn btn-danger btn-sm';
-      delBtn.textContent = 'Delete';
-      delBtn.onclick = () => deleteFile(item.path);
-      li.appendChild(delBtn);
+      
     }
+    const delBtn = document.createElement('button');
+    delBtn.className = 'btn btn-danger btn-sm';
+    delBtn.textContent = 'Delete';
+    delBtn.onclick = () => deleteFile(item.path);
+    li.appendChild(delBtn);
     fileList.appendChild(li);
   });
 }
