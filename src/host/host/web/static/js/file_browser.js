@@ -40,20 +40,47 @@ function renderFiles(files, path) {
         e.preventDefault();
         navigateTo(item.path.replace('/api/list_assets/', ''));
       };
-      row.appendChild(left);
-      // Show delete button for the directory in the parent listing
-      const delBtn = document.createElement('button');
-      delBtn.className = 'btn btn-danger btn-sm';
-      delBtn.textContent = 'Delete';
-      delBtn.onclick = (e) => {
-        e.stopPropagation();
-        if (/^\d+$/.test(item.name)) {
-          deleteFile(`/assets/${item.name}`);
-        } else {
-          alert('Only numbered asset folders can be deleted via this interface.');
-        }
+      // Add right-click context menu for delete
+      left.oncontextmenu = (e) => {
+        e.preventDefault();
+        // Remove any existing context menu
+        const oldMenu = document.getElementById('dir-context-menu');
+        if (oldMenu) oldMenu.remove();
+        // Create menu
+        const menu = document.createElement('div');
+        menu.id = 'dir-context-menu';
+        menu.style.position = 'absolute';
+        menu.style.zIndex = 10000;
+        menu.style.left = e.pageX + 'px';
+        menu.style.top = e.pageY + 'px';
+        menu.style.background = '#fff';
+        menu.style.border = '1px solid #ccc';
+        menu.style.padding = '4px 0';
+        menu.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)';
+        menu.style.minWidth = '120px';
+        const delOpt = document.createElement('div');
+        delOpt.textContent = 'Delete';
+        delOpt.style.padding = '4px 16px';
+        delOpt.style.cursor = 'pointer';
+        delOpt.onmouseover = () => delOpt.style.background = '#eee';
+        delOpt.onmouseout = () => delOpt.style.background = '';
+        delOpt.onclick = () => {
+          menu.remove();
+          if (/^\d+$/.test(item.name)) {
+            deleteFile(`/assets/${item.name}`);
+          } else {
+            alert('Only numbered asset folders can be deleted via this interface.');
+          }
+        };
+        menu.appendChild(delOpt);
+        document.body.appendChild(menu);
+        // Remove menu on click elsewhere
+        document.addEventListener('click', function handler() {
+          menu.remove();
+          document.removeEventListener('click', handler);
+        });
       };
-      row.appendChild(delBtn);
+      row.appendChild(left);
     } else {
       const left = document.createElement('span');
       left.innerHTML = `📄 <a href="${item.path}" target="_blank">${item.name}</a>`;
