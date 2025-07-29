@@ -150,7 +150,7 @@ class FlaskWebApp:
             scan_num = self.node.fm.get_id()
             return jsonify({"scan_num": scan_num})
         
-        @self.app.route('/api/delete_asset/<int:n>', methods=['DELETE'])
+        @self.app.route('/api/delete_asset/<int:n>')
         def delete_asset(n):
             target_dir = os.path.join(ASSETS_DIR, str(n))
             # Security: ensure target_dir is within ASSETS_DIR
@@ -164,7 +164,7 @@ class FlaskWebApp:
             except Exception as e:
                 return jsonify({"error": str(e)}), 500
 
-        @self.app.route('/api/delete_asset/all', methods=['DELETE'])
+        @self.app.route('/api/delete_asset/all')
         def delete_all_assets():
             deleted = []
             errors = []
