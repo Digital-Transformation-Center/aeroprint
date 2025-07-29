@@ -6,7 +6,7 @@ colcon build
 source install/setup.bash
 # ros2 run host flask_server_node
 # ros2 launch starling aeroprint.launch.py
-ros2 launch starling web.launch.py
+ros2 launch starling aeroprint.launch.py
 
 echo "Starting the host entrypoint script..."
 # ros2 run host test_node

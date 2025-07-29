@@ -313,7 +313,7 @@ class FlaskServerNode(Node):
             std_msgs.msg.Bool, '/host/out/mesher/mesh_complete', self.mesh_complete_callback, 10
         )
         self.slicing_complete_subscriber = self.create_subscription(
-            std_msgs.msg.Bool, '/host/out/slicer/slicing_complete', self.mesh_complete_callback, 10
+            std_msgs.msg.Bool, '/host/out/slicer/slicing_complete', self.slicing_complete_callback, 10
         )
 
         import threading
@@ -402,6 +402,10 @@ class FlaskServerNode(Node):
             if hasattr(self, 'flask_web_app'):
                 self.flask_web_app.emit_status('flight_error')
 
+    def slicing_complete_callback(self, msg):
+        if hasattr(self, 'flask_web_app'):
+            self.flask_web_app.emit_ui_phase('Printing')
+    
     def mesh_complete_callback(self, msg):
         if hasattr(self, 'flask_web_app'):
             self.flask_web_app.emit_ui_phase('Slicing')
