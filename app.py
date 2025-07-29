@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, send_file
 from flask_socketio import SocketIO, emit
 import os, json, subprocess, platform
 
@@ -86,6 +86,39 @@ def send_radius(radius):
 
 def emit_progress(percent):
     socketio.emit('progress_update', {'percent': percent})
+
+# Example function to emit point cloud data
+def emit_pointcloud(points_array):
+    # points_array should be a flat list: [x1, y1, z1, x2, y2, z2, ...]
+    socketio.emit('pointcloud_data', {'points': points_array})
+
+def on_new_pointcloud(points):
+    # points: a list of [x, y, z] lists or tuples
+    # Flatten to [x1, y1, z1, x2, y2, z2, ...]
+    flat_points = [coord for point in points for coord in point]
+    emit_pointcloud(flat_points)
+
+def save_pointcloud(points, filename="latest_pointcloud.ply"):
+    # points: list of [x, y, z]
+    with open(filename, "w") as f:
+        f.write("ply\nformat ascii 1.0\nelement vertex {}\nproperty float x\nproperty float y\nproperty float z\nend_header\n".format(len(points)))
+        for pt in points:
+            f.write(f"{pt[0]} {pt[1]} {pt[2]}\n")
+
+@app.route("/download_pointcloud")
+def download_pointcloud():
+    file_path = os.path.join(os.getcwd(), "latest_pointcloud.ply")
+    return send_file(file_path, as_attachment=True)
+
+@app.route("/download_mesh")
+def download_mesh():
+    file_path = os.path.join(os.getcwd(), "latest_mesh.ply")
+    return send_file(file_path, as_attachment=True)
+
+@app.route("/download_slicing")
+def download_slicing():
+    file_path = os.path.join(os.getcwd(), "latest_slices.gcode")
+    return send_file(file_path, as_attachment=True)
 
 
 if __name__ == "__main__":

@@ -219,6 +219,7 @@ body {
 }
 
 .path-box {
+  position: relative;
   height: 380px;
   overflow: auto;
   background-color: #000000;
@@ -233,7 +234,19 @@ body {
   max-width: 350px;
 }
 
+#pointcloud-viewer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 400px;
+  z-index: 10;
+  background: #111;
+}
+
 .path-box iframe {
+  position: relative;
+  z-index: 1;
   width: 100%;
   height: 100%;
   border: none;
