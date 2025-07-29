@@ -2,7 +2,7 @@ import os
 import rclpy
 from rclpy.node import Node
 from threading import Thread
-from flask import Flask, render_template
+from flask import Flask, render_template, send_from_directory, jsonify
 import std_msgs.msg
 from std_msgs.msg import String, Float32MultiArray
 import json
@@ -12,6 +12,8 @@ from flask_socketio import SocketIO
 
 from starling.flightdefs.flight_status_codes import *
 from host.web.file_manager import FileManager
+
+ASSETS_DIR = '/var/lib/aeroprint/'
 
 class FlaskWebApp:
     def __init__(self, node):
@@ -98,6 +100,54 @@ class FlaskWebApp:
         @self.app.route('/widgets/flight_config')
         def flight_config_widget():
             return render_template('widgets/flight_config.html', units=self.units)
+        
+        @self.app.route('/assets/<path:filename>')
+        def serve_assets(filename):
+            # send_from_directory safely serves files from the specified directory
+            # It handles security concerns like directory traversal
+            try:
+                return send_from_directory('/var/lib/aeroprint', filename)
+            except FileNotFoundError:
+                # Handle cases where the requested file doesn't exist
+                return "File not found", 404
+            
+        @self.app.route('/api/list_assets/<path:subpath>')
+        @self.app.route('/api/list_assets/') # For listing the root of assets/
+        def list_assets(subpath=''):
+            target_dir = os.path.join(ASSETS_DIR, subpath)
+
+            # Basic security check: ensure the target_dir is still within ASSETS_DIR
+            # This prevents directory traversal attacks if someone tries ../../
+            if not os.path.abspath(target_dir).startswith(os.path.abspath(ASSETS_DIR)):
+                return jsonify({"error": "Access denied"}), 403
+
+            if not os.path.isdir(target_dir):
+                return jsonify({"error": "Directory not found"}), 404
+
+            files_and_dirs = []
+            for entry in os.listdir(target_dir):
+                entry_path = os.path.join(target_dir, entry)
+                relative_path = os.path.join(subpath, entry) # Path relative to ASSETS_DIR
+
+                if os.path.isfile(entry_path):
+                    files_and_dirs.append({
+                        "name": entry,
+                        "path": f"/assets/{relative_path.replace(os.sep, '/')}", # Frontend URL
+                        "type": "file"
+                    })
+                elif os.path.isdir(entry_path):
+                    files_and_dirs.append({
+                        "name": entry,
+                        "path": f"/api/list_assets/{relative_path.replace(os.sep, '/')}", # API URL for subdirectory
+                        "type": "directory"
+                    })
+            return jsonify(files_and_dirs)
+        
+        @self.app.route('/api/get_current_scan_num')
+        def get_current_scan_num():
+            """API endpoint to get the current scan number."""
+            scan_num = self.node.fm.get_id()
+            return jsonify({"scan_num": scan_num})
         
 
     def setup_socketio_handlers(self):
@@ -253,6 +303,18 @@ class FlaskServerNode(Node):
         self.time_remaining_subscriber = self.create_subscription(
             std_msgs.msg.Float32, '/fcu/out/time_remaining', self.time_remaining_callback, 10
         )
+        self.scan_end_subscriber = self.create_subscription(
+            std_msgs.msg.Bool, '/fcu/out/scan_end', self.scan_end_callback, 10
+        )
+        self.pcd_end_subscriber = self.create_subscription(
+            std_msgs.msg.Bool, '/host/out/pcpp/export_complete', self.pc_complete_callback, 10
+        )
+        self.mesh_complete_subscriber = self.create_subscription(
+            std_msgs.msg.Bool, '/host/out/mesher/mesh_complete', self.mesh_complete_callback, 10
+        )
+        self.slicing_complete_subscriber = self.create_subscription(
+            std_msgs.msg.Bool, '/host/out/slicer/slicing_complete', self.mesh_complete_callback, 10
+        )
 
         import threading
         self._heartbeat_timeout = 0.5  # seconds
@@ -340,6 +402,18 @@ class FlaskServerNode(Node):
             if hasattr(self, 'flask_web_app'):
                 self.flask_web_app.emit_status('flight_error')
 
+    def mesh_complete_callback(self, msg):
+        if hasattr(self, 'flask_web_app'):
+            self.flask_web_app.emit_ui_phase('Slicing')
+    
+    def pc_complete_callback(self, msg):
+        if hasattr(self, 'flask_web_app'):
+            self.flask_web_app.emit_ui_phase('Meshing')
+    
+    def scan_end_callback(self, msg):
+        if hasattr(self, 'flask_web_app'):
+            self.flask_web_app.emit_ui_phase('Processing')
+
     def est_time_callback(self, msg):
         if hasattr(self, 'flask_web_app'):
             self.flask_web_app.socketio.emit('flight_time_estimate', {'time': msg.data})
@@ -369,6 +443,8 @@ class FlaskServerNode(Node):
         msg.data = False
         self.start_flight_publisher.publish(msg)
         self.get_logger().info('Landing flight requested.')
+
+        
 
 
 def run_flask(flask_app):
