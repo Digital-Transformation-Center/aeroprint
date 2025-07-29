@@ -162,10 +162,12 @@ class FlightNode(Node):
                 self.control_timer_period, self._control_loop_callback
         ) 
         else:
-            self.get_logger().info("Entering landing sequence.")
-            self.current_system_state = "LANDING"
+            if hasattr(self, "control_timer") and self.control_timer is not None:
+                self.get_logger().info("Entering landing sequence.")
+                self.current_system_state = "LANDING"
+            else:
+                self._land_vehicle()
             self.is_landing = True
-            self._land_vehicle()
             if hasattr(self, "external_land_callback") and self.external_land_callback:
                 self.external_land_callback()
                 
