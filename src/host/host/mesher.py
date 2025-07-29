@@ -50,6 +50,11 @@ class Mesher(Node):
          self.pcd_directory_callback,
          qos_profile_system_default
       )
+        self.mesh_complete_pub = self.create_publisher(
+            Bool,
+            "/host/out/mesher/mesh_complete",
+            10
+        )
 
         self.directory = ""
         self.pc_file_location = ""
@@ -244,7 +249,9 @@ class Mesher(Node):
         output_path.data = self.directory + "-mesh-output.stl"
         self.get_logger().info("Output mesh: " + output_path.data)
         self.file_directory_pub.publish(output_path)
+        self.mesh_complete_pub.publish(Bool(data=True))
         self.get_logger().info("Mesh complete.")
+
 
 def main(args=None):
     rclpy.init(args=args)

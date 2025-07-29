@@ -2,7 +2,7 @@ import subprocess
 import PrusaLinkPy
 import os
 from rclpy.node import Node
-from std_msgs.msg import String
+from std_msgs.msg import String, Bool
 from rclpy.qos import qos_profile_system_default
 import rclpy
 
@@ -14,6 +14,11 @@ class PrinterController(Node):
             String, 
             "/host/out/mesher/file_directory",
             self.file_directory_callback, 
+            qos_profile_system_default
+        )
+        self.slicing_complete_pub = self.create_publisher(
+            Bool, 
+            "/host/out/slicer/slicing_complete",
             qos_profile_system_default
         )
         self.get_logger().info("Initializing Printer")
@@ -75,6 +80,7 @@ class PrinterController(Node):
                 self.stl_file_path
             )
         subprocess.run(command, shell=True, executable="/bin/bash")
+        self.slicing_complete_pub.publish(Bool(data=True))
 
     def print_gcode(self):
         printer_gcode_path = "/aeroprint/" + self.filename + ".gcode"

@@ -23,25 +23,6 @@ class PCPostProcessor(Node):
 
         self.get_logger().info("Point cloud post processor alive")
 
-        # Create subscribers
-        # self.radius_sub = self.create_subscription(
-        #      Float32,
-        #      "/host/gui/out/radius", 
-        #      self.radius_callback, 
-        #      qos_profile_system_default
-        # )
-        # self.object_height_sub = self.create_subscription(
-        #      Float32,
-        #      "/host/gui/out/object_height", 
-        #      self.object_height_callback, 
-        #      qos_profile_system_default
-        # )
-        # self.start_height_sub = self.create_subscription(
-        #      Float32,
-        #      "/host/gui/out/start_height", 
-        #      self.start_height_callback, 
-        #      qos_profile_system_default
-        # )
         self.dump_complete_sub = self.create_subscription(
              Bool,
              "/host/out/pcc/dump_complete", 
