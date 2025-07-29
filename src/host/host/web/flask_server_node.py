@@ -187,7 +187,7 @@ class FlaskWebApp:
         @self.socketio.on('disconnect')
         def handle_disconnect():
             self.node.get_logger().info('Client disconnected.')
-            self.node.request_land_flight()  # Request landing on disconnect
+            # self.node.request_land_flight()  # Request landing on disconnect
             
         @self.socketio.on('shutdown_test_node')
         def handle_shutdown_test_node():
@@ -304,7 +304,7 @@ class FlaskServerNode(Node):
         )
 
         self.start_flight_publisher = self.create_publisher(
-            std_msgs.msg.Bool, 'start_flight', 10
+            std_msgs.msg.Bool, '/start_flight', 10
         )
 
         self.status_subscriber = self.create_subscription(
