@@ -1,8 +1,6 @@
 #!/bin/bash
-# install.sh - Script to copy, enable, and start a systemd service file.
 
 # --- Configuration ---
-# IMPORTANT: Replace 'your-service-name.service' with the actual name of your .service file.
 AEROPRINT_CHATTER_SERVICE_FILE="aeroprint-chatter.service" # Example: 'my-web-app.service' or 'ros-talker-app.service'
 VOXL_MPA_SERVICE_FILE="voxl-mpa.service" # Example: 'voxl-mpa.service'
 VOXL_MPA_EXEC_FILE="voxl_mpa.sh" # Example: 'exec/voxl_mpa.sh'
