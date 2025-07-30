@@ -283,7 +283,7 @@ class FlightNode(Node):
                     
 
         elif self.current_system_state == "LANDING":
-            self._engage_offboard_mode()
+            # self._engage_offboard_mode()
             self._land_vehicle()
             if self.figure8_timer is not None:
                 self.figure8_timer.cancel()
