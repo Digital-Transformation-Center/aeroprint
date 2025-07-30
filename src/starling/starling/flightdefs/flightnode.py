@@ -192,7 +192,8 @@ class FlightNode(Node):
 
         # We will hold position so the drone can settle, then land
         if self.offboard_arr_counter == self.steps + 50:
-            self.figure8_timer.cancel()
+            if self.figure8_timer is not None:
+                self.figure8_timer.cancel()
             self.current_system_state = "LANDING"
             self.is_landing = True
             self.get_logger().info("Figure path completed, landing now.")
