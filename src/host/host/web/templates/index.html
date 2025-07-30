@@ -221,7 +221,10 @@
       const pathIframe = document.querySelector('.path-box iframe');
 
       if (phase === "Processing") {
-        if (pcViewer) pcViewer.style.display = "block";
+        if (pcViewer) {
+          pcViewer.style.display = "block";
+          fetchAndShowFullPointCloud();
+        }
         if (meshViewer) meshViewer.style.display = "none";
         if (slicingViewer) slicingViewer.style.display = "none";
         if (pathIframe) pathIframe.style.visibility = "visible";
@@ -229,7 +232,7 @@
         if (pcViewer) pcViewer.style.display = "none";
         if (meshViewer) {
           meshViewer.style.display = "block";
-          showMesh();
+          fetchAndShowCombinedPointCloud();
         }
         if (slicingViewer) slicingViewer.style.display = "none";
         if (pathIframe) pathIframe.style.visibility = "hidden";
@@ -624,6 +627,67 @@ function showSlicing() {
     renderer.render(scene, camera);
   }
   animate();
+}
+
+// --- Fetch and show all individual PCDs (Processing phase) ---
+async function fetchAndShowFullPointCloud() {
+  const response = await fetch('/api/get_current_scan_num');
+  const scanNumberObj = await response.json();
+  const scanNumber = scanNumberObj.scan_num !== undefined ? scanNumberObj.scan_num : scanNumberObj;
+
+  const assetsResponse = await fetch(`/api/list_assets/26/pcd`);
+  const assets = await assetsResponse.json();
+  const pcdFiles = assets.filter(
+    asset =>
+      asset.type === "file" &&
+      asset.name.endsWith('.pcd') &&
+      asset.name !== "combined_filtered.pcd"
+  );
+  let allPoints = [];
+  for (const asset of pcdFiles) {
+    const pcdResponse = await fetch(asset.path);
+    const arrayBuffer = await pcdResponse.arrayBuffer();
+    const textDecoder = new TextDecoder("utf-8");
+    const headerText = textDecoder.decode(arrayBuffer.slice(0, 1024));
+    const headerEnd = headerText.indexOf("DATA binary");
+    const dataStart = headerText.indexOf('\n', headerEnd) + 1;
+    const pointsMatch = headerText.match(/POINTS\s+(\d+)/);
+    const numPoints = parseInt(pointsMatch[1]);
+    const floatData = new Float32Array(arrayBuffer, dataStart, numPoints * 3);
+    allPoints.push(...floatData);
+    console.log(`Parsed ${numPoints} points from ${asset.name}`);
+  }
+  showPointCloud(allPoints);
+}
+
+// --- Fetch and show only the combined_filtered.pcd (Meshing phase) ---
+async function fetchAndShowCombinedPointCloud() {
+  const response = await fetch('/api/get_current_scan_num');
+  const scanNumberObj = await response.json();
+  const scanNumber = scanNumberObj.scan_num !== undefined ? scanNumberObj.scan_num : scanNumberObj;
+
+  const assetsResponse = await fetch(`/api/list_assets/26/pcd`);
+  const assets = await assetsResponse.json();
+  const asset = assets.find(
+    asset =>
+      asset.type === "file" &&
+      asset.name === "combined_filtered.pcd"
+  );
+  if (!asset) {
+    console.warn("No combined_filtered.pcd file found for scan number", scanNumber);
+    return;
+  }
+  const pcdResponse = await fetch(asset.path);
+  const arrayBuffer = await pcdResponse.arrayBuffer();
+  const textDecoder = new TextDecoder("utf-8");
+  const headerText = textDecoder.decode(arrayBuffer.slice(0, 1024));
+  const headerEnd = headerText.indexOf("DATA binary");
+  const dataStart = headerText.indexOf('\n', headerEnd) + 1;
+  const pointsMatch = headerText.match(/POINTS\s+(\d+)/);
+  const numPoints = parseInt(pointsMatch[1]);
+  const floatData = new Float32Array(arrayBuffer, dataStart, numPoints * 3);
+  showPointCloud(floatData);
+  console.log(`Parsed ${numPoints} points from combined_filtered.pcd`);
 }
   </script>
 </body>
