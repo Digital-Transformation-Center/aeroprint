@@ -219,6 +219,7 @@ body {
 }
 
 .path-box {
+  transform: translateZ(0);
   position: relative;
   height: 380px;
   overflow: auto;
@@ -245,6 +246,7 @@ body {
 }
 
 .path-box iframe {
+  transform: translateZ(0);
   position: relative;
   z-index: 1;
   width: 100%;
