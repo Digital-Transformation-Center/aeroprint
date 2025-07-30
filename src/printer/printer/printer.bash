@@ -16,6 +16,6 @@ slic3r --load printer_config_files/prusa_config.ini\
  --start-gcode printer_config_files/start.gcode\
   --end-gcode printer_config_files/end.gcode\
   --before-layer-gcode printer_config_files/before_layer.gcode\
-   --output output.gcode test.stl 
+   --output output.gcode ~/Downloads/pcd-output.stl 
 
 

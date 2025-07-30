@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Flight Start Slider</title>
+  <style>
+    .slider-container {
+      width: 320px;
+      height: 56px;
+      background: #eee;
+      border-radius: 28px;
+      position: relative;
+      user-select: none;
+      box-shadow: 0 2px 8px #0002;
+      margin: 32px auto;
+      display: flex;
+      align-items: center;
+    }
+    .slider-track {
+      width: 100%;
+      height: 100%;
+      border-radius: 28px;
+      background: #222;
+      position: absolute;
+      top: 0; left: 0;
+      z-index: 1;
+    }
+    .slider-knob {
+      width: 96px;
+      height: 48px;
+      background: #4caf50;
+      color: #fff;
+      border-radius: 24px;
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      z-index: 2;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      font-size: 1.3em;
+      font-weight: bold;
+      cursor: pointer;
+      transition: left 0.2s cubic-bezier(.4,2,.6,1), background 0.2s;
+      box-shadow: 0 2px 6px #0003;
+      overflow: hidden;
+    }
+    .slider-knob.active {
+      background: #f44336;
+    }
+    .slider-knob .knob-text {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      transition: transform 0.18s cubic-bezier(.4,2,.6,1);
+      text-align: center;
+      width: 100%;
+      z-index: 1;
+      position: relative;
+    }
+    .slider-knob .arrow {
+      font-size: 1.2em;
+      opacity: 0;
+      transition: opacity 0.15s;
+      z-index: 2;
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-40%);
+      pointer-events: none;
+    }
+    .slider-knob.active .arrow {
+      left: 12px;
+      right: auto;
+    }
+    .slider-knob:hover .arrow,
+    .slider-knob:focus .arrow {
+      opacity: 1;
+    }
+    .slider-knob:hover .knob-text,
+    .slider-knob:focus .knob-text {
+      transform: translateX(-22px);
+    }
+    .slider-knob.active:hover .knob-text,
+    .slider-knob.active:focus .knob-text {
+      transform: translateX(22px);
+    }
+    .slider-label {
+      position: absolute;
+      left: 24px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #888;
+      font-size: 1em;
+      z-index: 0;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="slider-container" id="flightSlider">
+    <div class="slider-track"></div>
+    <div class="slider-knob" id="sliderKnob">
+      <span class="knob-text">Start</span>
+      <span class="arrow" id="sliderArrow">&#8594;</span>
+    </div>
+    <span class="slider-label" id="sliderLabel"></span>
+  </div>
+  <button id="sliderResetBtn" style="display:block;margin:0 auto 16px auto;padding:8px 20px;font-size:1em;border-radius:8px;border:none;background:#2196f3;color:#fff;cursor:pointer;">Reset</button>
+  <script>
+    const slider = document.getElementById('flightSlider');
+    const knob = document.getElementById('sliderKnob');
+    const knobText = knob.querySelector('.knob-text');
+    const arrow = document.getElementById('sliderArrow');
+    const knobWidth = 96;
+    const sliderWidth = 320;
+    const minLeft = 4;
+    const maxLeft = sliderWidth - knobWidth - 4;
+    let dragging = false;
+    let startX = 0;
+    let knobStartLeft = 0;
+    let startCondition = false; // false = not started, true = started
+
+    function setKnobState() {
+      if (!startCondition) {
+        knob.querySelector('.knob-text').textContent = 'Start';
+        knob.classList.remove('active');
+        // Right arrow SVG
+        arrow.innerHTML = `
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5 12h14M13 6l6 6-6 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        `;
+        arrow.style.left = '';
+        arrow.style.right = '12px';
+      } else {
+        knob.querySelector('.knob-text').textContent = 'Land';
+        knob.classList.add('active');
+        // Left arrow SVG
+        arrow.innerHTML = `
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M19 12H5M11 6l-6 6 6 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        `;
+        arrow.style.right = '';
+        arrow.style.left = '12px';
+      }
+    }
+
+    function setKnobPosition(pos, animate = true) {
+      knob.style.transition = animate ? 'left 0.2s cubic-bezier(.4,2,.6,1), background 0.2s' : 'none';
+      knob.style.left = `${pos}px`;
+    }
+
+    function bounceKnob() {
+      if (!startCondition) {
+        setKnobPosition(minLeft);
+      } else {
+        setKnobPosition(maxLeft);
+      }
+    }
+
+    function onDragStart(e) {
+      dragging = true;
+      startX = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
+      knobStartLeft = parseInt(knob.style.left, 10) || minLeft;
+      knob.style.transition = 'none';
+      document.addEventListener('mousemove', onDragMove);
+      document.addEventListener('mouseup', onDragEnd);
+      document.addEventListener('touchmove', onDragMove, {passive: false});
+      document.addEventListener('touchend', onDragEnd);
+    }
+
+    function onDragMove(e) {
+      if (!dragging) return;
+      e.preventDefault();
+      const clientX = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
+      let dx = clientX - startX;
+      let newLeft = knobStartLeft + dx;
+      newLeft = Math.max(minLeft, Math.min(maxLeft, newLeft));
+      setKnobPosition(newLeft, false);
+    }
+
+    function onDragEnd(e) {
+      if (!dragging) return;
+      dragging = false;
+      const left = parseInt(knob.style.left, 10) || minLeft;
+      if (!startCondition) {
+        if (left > maxLeft - 10) {
+          // Dragged all the way right: activate start
+          startCondition = true;
+          setKnobState();
+          setKnobPosition(maxLeft);
+        } else {
+          // Not far enough: bounce back left
+          setKnobPosition(minLeft);
+        }
+      } else {
+        if (left < minLeft + 10) {
+          // Dragged all the way left: deactivate start
+          startCondition = false;
+          setKnobState();
+          setKnobPosition(minLeft);
+        } else {
+          // Not far enough: bounce back right
+          setKnobPosition(maxLeft);
+        }
+      }
+      document.removeEventListener('mousemove', onDragMove);
+      document.removeEventListener('mouseup', onDragEnd);
+      document.removeEventListener('touchmove', onDragMove);
+      document.removeEventListener('touchend', onDragEnd);
+    }
+
+    knob.addEventListener('mousedown', onDragStart);
+    knob.addEventListener('touchstart', onDragStart, {passive: false});
+
+    // On hover, show correct arrow
+    knob.addEventListener('mouseenter', () => {
+      arrow.style.opacity = '1';
+    });
+    knob.addEventListener('mouseleave', () => {
+      arrow.style.opacity = '0';
+    });
+
+    // Initialize
+    setKnobState();
+    setKnobPosition(minLeft);
+
+    // Reset button logic
+    document.getElementById('sliderResetBtn').addEventListener('click', () => {
+      startCondition = false;
+      setKnobState();
+      setKnobPosition(minLeft);
+    });
+
+    // If you want to expose the startCondition to other scripts, you can do so here.
+    // window.getFlightStartCondition = () => startCondition;
+  </script>
+</body>
+</html>

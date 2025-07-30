@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta version="1.0" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        iframe {
+            width: 100%;
+            max-width: 820px;
+            height: 700px;
+            border: none;
+            display: block;
+            margin: 2em auto;
+            border-radius: 24px;
+            box-shadow: 0 0px 16px rgba(125, 125, 125, 0.301);
+            background: #222;
+            overflow: hidden;
+            scale: 0.8;
+        }
+        html, body {
+            overflow: hidden;
+            height: 100%;
+            width: 100%;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0; top: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background: #181818;
+            border-radius: 24px;
+            box-shadow: 0 0px 32px rgba(0,0,0,0.5);
+            padding: 0;
+            position: relative;
+            max-width: 90vw;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .modal-content iframe {
+            margin: 0;
+            width: 80vw;
+            max-width: 820px;
+            height: 70vh;
+            border-radius: 24px 24px 24px 24px;
+            box-shadow: none;
+            scale: 1;
+        }
+        .close-btn {
+            position: absolute;
+            top: 12px;
+            right: 18px;
+            background: #333;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            font-size: 1.5em;
+            cursor: pointer;
+            z-index: 10;
+            transition: background 0.2s;
+        }
+        .close-btn:hover {
+            background: #555;
+        }
+        .inquiry-btn {
+            position: absolute;
+            top: 12px;
+            left: 18px;
+            background: #333;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            font-size: 1.5em;
+            cursor: pointer;
+            z-index: 10;
+            transition: background 0.2s;
+        }
+        .center-btn {
+            display: flex;
+            justify-content: center;
+            margin-top: 2em;
+        }
+        .flight-setup-btn {
+            background: #1976d2;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 1em 2em;
+            font-size: 1.2em;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(25, 118, 210, 0.15);
+            transition: background 0.2s;
+        }
+        .flight-setup-btn:hover {
+            background: #1565c0;
+        }
+        .notification {
+            display: none;
+            position: fixed;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #323232;
+            color: #fff;
+            padding: 18px 32px;
+            border-radius: 12px;
+            box-shadow: 0 2px 16px #0008;
+            font-size: 1.2em;
+            z-index: 2000;
+            min-width: 200px;
+            text-align: center;
+        }
+        .heartbeat-indicator {
+            /* position: fixed;
+            bottom: 18px;
+            right: 32px; */
+            z-index: 3000;
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+            font-size: 1.1em;
+            font-weight: bold;
+            background: #232323;
+            padding: 8px 18px;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px #0005;
+            color: #fff;
+            min-width: 120px;
+            user-select: none;
+    }
+
+    .flight-controller {
+        /* position: fixed;
+        bottom: 18px;
+        right: 32px; */
+        z-index: 3000;
+        display: flex;
+        align-items: center;
+        gap: 0.5em;
+        font-size: 1.1em;
+        font-weight: bold;
+        /* background: #232323; */
+        padding: 0;
+        border-radius: 16px;
+        /* box-shadow: 0 2px 8px #0005; */
+        color: #fff;
+        min-width: 120px;
+        user-select: none;
+    }
+    .shutdown-btn {
+        margin-left: 18px;
+        background: #e53935;
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        padding: 8px 18px;
+        font-size: 1.1em;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 0 2px 8px #0005;
+        transition: background 0.2s;
+    }
+    .shutdown-btn:hover {
+        background: #b71c1c;
+        }
+        .heartbeat-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #888;
+            display: inline-block;
+            margin-right: 6px;
+            border: 2px solid #222;
+            transition: background 0.3s;
+        }
+        .heartbeat-dot.connected {
+            background: #2ecc40;
+        }
+        .heartbeat-dot.disconnected {
+            background: #e53935;
+        }
+        
+    </style>
+      <style>
+    .slider-container {
+      width: 320px;
+      height: 56px;
+      background: red;
+      border-radius: 28px;
+      position: relative;
+      user-select: none;
+      box-shadow: 0 2px 8px #0002;
+      display: flex;
+      align-items: center;
+    }
+    .slider-track {
+      width: 100%;
+      height: 100%;
+      border-radius: 16px;
+      background: #222;
+      /* position: absolute;
+      top: 0; left: 0; */
+      /* z-index: 1; */
+    }
+    .slider-knob {
+      width: 96px;
+      height: 48px;
+      background: #4caf50;
+      color: #fff;
+      border-radius: 12px;
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      z-index: 2;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      font-size: 1.3em;
+      font-weight: bold;
+      cursor: pointer;
+      transition: left 0.2s cubic-bezier(.4,2,.6,1), background 0.2s;
+      box-shadow: 0 2px 6px #0003;
+      overflow: hidden;
+    }
+    .slider-knob.active {
+      background: #f44336;
+    }
+    .slider-knob.warn {
+      background: #9c841a;
+    }
+    .slider-knob .knob-text {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      transition: transform 0.18s cubic-bezier(.4,2,.6,1);
+      text-align: center;
+      width: 100%;
+      z-index: 1;
+      position: relative;
+    }
+    .slider-knob .arrow {
+      font-size: 1.2em;
+      opacity: 0;
+      transition: opacity 0.15s;
+      z-index: 2;
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-40%);
+      pointer-events: none;
+    }
+    .slider-knob.active .arrow {
+      left: 12px;
+      right: auto;
+    }
+    .slider-knob:hover .arrow,
+    .slider-knob:focus .arrow {
+      opacity: 1;
+    }
+    .slider-knob:hover .knob-text,
+    .slider-knob:focus .knob-text {
+      transform: translateX(-22px);
+    }
+    .slider-knob.active:hover .knob-text,
+    .slider-knob.active:focus .knob-text {
+      transform: translateX(22px);
+    }
+    .slider-knob.warn:hover .knob-text,
+    .slider-knob.warn:focus .knob-text {
+      transform: translateX(0);
+    }
+    .slider-label {
+      position: absolute;
+      left: 24px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #888;
+      font-size: 1em;
+      font-weight: bold;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .config-label {
+      text-align: center;
+      color: #fff;
+      font-size: 1.5em;
+      margin: 0.5em 0;
+    }
+    .control_bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      /* gap: 1em; */
+      padding: 1em 1em;
+      /* margin: 1em 1em; */
+      gap: 1em;
+      flex-wrap: wrap;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      box-sizing: border-box;
+      width: 100%;
+    }
+  </style>
+    <title>Document</title>
+</head>
+<body>
+    <!-- Settings icon in top right -->
+    <button id="settingsBtn" title="Settings" style="position: absolute; top: 18px; right: 24px; background: none; border: none; cursor: pointer; z-index: 2001;">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="3" stroke="#fff" stroke-width="2"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.65 1.65 0 0 0 15 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 8.6 15a1.65 1.65 0 0 0-1.82-.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 15.4 9c.14.14.3.26.47.35" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <div class="center-btn">
+        <button class="flight-setup-btn" id="openModalBtn">Flight Setup</button>
+    </div>
+    <div class="control_bar">
+      <div class="flight-controller" id="flightController">
+          <div class="slider-container" id="flightSlider">
+              <div class="slider-track"></div>
+              <div class="slider-knob" id="sliderKnob">
+              <span class="knob-text">Start</span>
+              <span class="arrow" id="sliderArrow">&#8594;</span>
+              </div>
+              <span class="slider-label" id="sliderLabel"></span>
+          </div>
+      </div>
+      <div class="heartbeat-indicator" id="heartbeatIndicator">
+        <span class="heartbeat-dot disconnected" id="heartbeatDot"></span>
+        <span id="heartbeatText">Disconnected</span>
+        <button class="shutdown-btn" id="shutdownBtn">Land</button>
+      </div>
+      
+    </div>
+    
+    <!-- Modal Popup -->
+    <div class="modal" id="flightModal">
+      
+        <div class="modal-content">
+            <button class="inquiry-btn" id="modalInquiryBtn" title="Info">?</button>
+            <h3 class="config-label">Helical Flight Configurator</h3>
+            <button class="close-btn" id="closeModalBtn" title="Close">&times;</button>
+            <iframe src="/widgets/flight_config" title="Helix Path Visualizer" scrolling="no" aria-placeholder="Helix Path Visualizer"></iframe>
+        </div>
+    </div>
+    <!-- Notification box -->
+    <div id="notification" class="notification"></div>
+    <script type="module">
+        // Shutdown button logic
+        const shutdownBtn = document.getElementById('shutdownBtn');
+        shutdownBtn.onclick = () => {
+          land_flight();
+            // window.socket.emit('shutdown_test_node');
+        };
+        const openBtn = document.getElementById('openModalBtn');
+        const closeBtn = document.getElementById('closeModalBtn');
+        const modalInfoBtn = document.getElementById('modalInquiryBtn');
+        modalInfoBtn.onclick = () => {
+            alert('Use this visualizer to configure the flight path and object parameters.\n' +
+                  'The blue cylinder is the area in which objects will be digitized. \n' +
+                  'The red line is the flight path of the drone.\n\n' +
+                  '1. Adjust the radius, height, and number of passes using the sliders.\n' +
+                  '2. The vertical slider sets the starting height of the flight path.\n' +
+                  '3. Click "Save" to apply your settings.\n\n' +
+                  'For more information, refer to the documentation.');
+        };
+        const modal = document.getElementById('flightModal');
+        const notif_bg_default = '#323232';
+        openBtn.onclick = () => { modal.classList.add('active'); };
+        closeBtn.onclick = () => { modal.classList.remove('active'); };
+        window.onclick = (e) => {
+            if (e.target === modal) modal.classList.remove('active');
+        };
+        window.onkeydown = (e) => {
+            if (e.key === "Escape") modal.classList.remove('active');
+        };
+
+        import { io } from 'https://cdn.jsdelivr.net/npm/socket.io-client@4.7.5/dist/socket.io.esm.min.js';
+        window.socket = io();
+        // Heartbeat indicator logic
+        const heartbeatDot = document.getElementById('heartbeatDot');
+        const heartbeatText = document.getElementById('heartbeatText');
+        let heartbeatTimeout = null;
+        function setHeartbeatStatus(connected) {
+            if (connected) {
+                heartbeatDot.classList.remove('disconnected');
+                heartbeatDot.classList.add('connected');
+                heartbeatText.textContent = 'Connected';
+            } else {
+                heartbeatDot.classList.remove('connected');
+                heartbeatDot.classList.add('disconnected');
+                heartbeatText.textContent = 'Disconnected';
+            }
+        }
+        window.socket.on('heartbeat', data => {
+            setHeartbeatStatus(data && data.ok);
+            if (heartbeatTimeout) clearTimeout(heartbeatTimeout);
+            // If no heartbeat in 3s, set to disconnected
+            heartbeatTimeout = setTimeout(() => setHeartbeatStatus(false), 3000);
+        });
+        // --- Notification listener ---
+        window.socket.on('notification', data => {
+            let msg = data && data.message ? data.message : String(data);
+            let stat = data.warning;
+            notify(msg, stat);
+        });
+
+        function notify(message, stat = 'default') {
+            const notif = document.getElementById('notification');
+            notif.textContent = message || 'Notification';
+            if (stat == 'good') {
+                notif.style.backgroundColor = '#2ecc40';
+            } else if (stat == 'bad') {
+                notif.style.backgroundColor = '#e53935';
+            } else {
+                notif.style.backgroundColor = notif_bg_default;
+            }
+            notif.style.display = 'block';
+            notif.style.opacity = '1';
+            // Hide after 3 seconds
+            setTimeout(() => {
+                notif.style.transition = 'opacity 0.5s';
+                notif.style.opacity = '0';
+                setTimeout(() => { notif.style.display = 'none'; notif.style.transition = ''; }, 500);
+            }, 3000);
+        }
+        
+    const slider = document.getElementById('flightSlider');
+    const knob = document.getElementById('sliderKnob');
+    knob.classList.add('warn');
+    const knobText = knob.querySelector('.knob-text');
+    const arrow = document.getElementById('sliderArrow');
+
+    arrow.innerHTML = `
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5 12h14M13 6l6 6-6 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        `;
+    // arrow.innerHTML = '';
+    const knobWidth = 96;
+    const sliderWidth = 320;
+    const minLeft = 4;
+    const maxLeft = sliderWidth - knobWidth - 4;
+    let dragging = false;
+    let startX = 0;
+    let knobStartLeft = 0;
+    let startCondition = false; // false = not started, true = started
+    let knob_status = 1;
+
+    // import { io } from 'https://cdn.jsdelivr.net/npm/socket.io-client@4.7.5/dist/socket.io.esm.min.js';
+    // window.socket = io();
+
+
+    function setKnobState() {
+      set_knob_appearance();
+      if (!startCondition && knob_status == 0) {
+        land_flight();
+        // let content = knob_status == 0 ? 'Start' : 'Not Ready';
+        // knob.querySelector('.knob-text').textContent = content;
+        // knob.classList.remove('active');
+        // Right arrow SVG
+        arrow.innerHTML = `
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5 12h14M13 6l6 6-6 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        `;
+        arrow.style.left = '';
+        arrow.style.right = '12px';
+      } else if (knob_status == 0) {
+        start_flight();
+        knob.querySelector('.knob-text').textContent = 'Active';
+        knob.classList.add('active');
+        // Left arrow SVG
+        arrow.innerHTML = `
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M19 12H5M11 6l-6 6 6 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        `;
+        arrow.style.right = '';
+        arrow.style.left = '12px';
+      }
+    }
+
+    function set_knob_appearance() {
+      if (startCondition) {
+        knob.classList.add('active');
+        knob.querySelector('.knob-text').textContent = 'Flying';
+        knob.classList.remove('warn');
+        knob.classList.add('active');
+        arrow.style.left = '12px';
+        arrow.style.right = '';
+      } else {
+        knob.classList.remove('active');
+        if (knob_status == 0) {
+          knob.querySelector('.knob-text').textContent = 'Start';
+          knob.classList.remove('warn');
+        } else {
+          knob.querySelector('.knob-text').textContent = 'Warn';
+          knob.classList.add('warn');
+        }
+        arrow.style.left = '';
+        arrow.style.right = '12px';
+      }
+    }
+
+    function start_flight() {
+      // Emit the flight start event
+        console.log('Starting flight...');
+    //   window.socket.emit('flight_start', { start: true });
+        window.socket.emit('start_flight');
+        notify('Requesting flight start...', 'good');
+        // window.socket.emit('notification', { message: 'Requesting flight start...', warning: 'good' });
+    }
+
+    function land_flight() {
+      // Emit the flight land event
+        console.log('Landing flight...');
+      window.socket.emit('land_flight');
+      notify('Requesting flight land...', 'good');
+    }
+
+    function setKnobPosition(pos, animate = true) {
+      knob.style.transition = animate ? 'left 0.2s cubic-bezier(.4,2,.6,1), background 0.2s' : 'none';
+      knob.style.left = `${pos}px`;
+    }
+
+    function bounceKnob() {
+      if (!startCondition) {
+        setKnobPosition(minLeft);
+      } else {
+        setKnobPosition(maxLeft);
+      }
+    }
+
+    function onDragStart(e) {
+      dragging = true;
+      startX = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
+      knobStartLeft = parseInt(knob.style.left, 10) || minLeft;
+      knob.style.transition = 'none';
+      document.addEventListener('mousemove', onDragMove);
+      document.addEventListener('mouseup', onDragEnd);
+      document.addEventListener('touchmove', onDragMove, {passive: false});
+      document.addEventListener('touchend', onDragEnd);
+    }
+
+    function onDragMove(e) {
+      if (!dragging) return;
+      e.preventDefault();
+      const clientX = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
+      let dx = clientX - startX;
+      let newLeft = knobStartLeft + dx;
+      newLeft = Math.max(minLeft, Math.min(maxLeft, newLeft));
+      setKnobPosition(newLeft, false);
+    }
+
+    function onDragEnd(e) {
+      if (!dragging) return;
+      dragging = false;
+      const left = parseInt(knob.style.left, 10) || minLeft;
+      if (knob_status == 1) {
+          startCondition = false;
+          setKnobState();
+          setKnobPosition(minLeft);
+      }
+      else if (!startCondition) {
+        if (left > maxLeft - 10) {
+          // Dragged all the way right: activate start
+          startCondition = true;
+          setKnobState();
+          setKnobPosition(maxLeft);
+        } else {
+          // Not far enough: bounce back left
+          setKnobPosition(minLeft);
+        }
+      } else {
+        if (left < minLeft + 10) {
+          // Dragged all the way left: deactivate start
+          startCondition = false;
+          setKnobState();
+          setKnobPosition(minLeft);
+        } else{
+          // Not far enough: bounce back right
+          setKnobPosition(maxLeft);
+        }
+      }
+      document.removeEventListener('mousemove', onDragMove);
+      document.removeEventListener('mouseup', onDragEnd);
+      document.removeEventListener('touchmove', onDragMove);
+      document.removeEventListener('touchend', onDragEnd);
+    }
+
+    knob.addEventListener('mousedown', onDragStart);
+    knob.addEventListener('touchstart', onDragStart, {passive: false});
+
+    // On hover, show correct arrow
+
+    // --- Warn tooltip logic ---
+    // Create tooltip element
+    const warnTooltip = document.createElement('div');
+    warnTooltip.style.position = 'fixed';
+    warnTooltip.style.background = '#e53935';
+    warnTooltip.style.color = '#fff';
+    warnTooltip.style.padding = '8px 16px';
+    warnTooltip.style.borderRadius = '8px';
+    warnTooltip.style.fontSize = '1em';
+    warnTooltip.style.fontWeight = 'bold';
+    warnTooltip.style.pointerEvents = 'none';
+    warnTooltip.style.zIndex = '4000';
+    warnTooltip.style.boxShadow = '0 2px 8px #0005';
+    warnTooltip.style.display = 'none';
+    warnTooltip.textContent = 'No flight path has been created'; // Default warning
+    let warning_message = 'No flight path has been created';
+    document.body.appendChild(warnTooltip);
+
+    function showWarnTooltip(e, message) {
+      warnTooltip.textContent = message || 'No flight path has been created';
+      warnTooltip.style.display = 'block';
+      positionWarnTooltip(e);
+    }
+    function hideWarnTooltip() {
+      warnTooltip.style.display = 'none';
+    }
+    function positionWarnTooltip(e) {
+      let x = (e.touches ? e.touches[0].clientX : e.clientX) + 18;
+      let y = (e.touches ? e.touches[0].clientY : e.clientY) - warnTooltip.offsetHeight - 12;
+      warnTooltip.style.left = x + 'px';
+      warnTooltip.style.top = y + 'px';
+    }
+
+    knob.addEventListener('mouseenter', (e) => {
+      if (knob_status == 1) {
+        arrow.style.opacity = '0';
+        if (knob.classList.contains('warn')) {
+          showWarnTooltip(e, warning_message);
+        }
+      } else {
+        arrow.style.opacity = '1';
+      }
+      set_knob_appearance();
+    });
+    knob.addEventListener('mousemove', (e) => {
+      if (knob.classList.contains('warn') && warnTooltip.style.display === 'block') {
+        positionWarnTooltip(e);
+      }
+    });
+    knob.addEventListener('mouseleave', () => {
+      if (knob.classList.contains('active')) {
+        knob.querySelector('.knob-text').textContent = 'Active';
+      }
+      arrow.style.opacity = '0';
+      hideWarnTooltip();
+    });
+
+    window.socket.on('flight_status', data => {
+      if (data) {
+        if (data.status === 'idle') {
+          console.log('Flight idle received');
+          knob_status = 1; // Set to idle state
+          warning_message = 'Please save a new flight path';
+          reset_knob();
+          set_knob_appearance();
+        } else if (data.status === 'param_receive') {
+          console.log('Flight parameters received by server');
+          knob_status = 0; // Set to safe state
+          reset_knob();
+        } else if (data.status == 'flight_armed') {
+            knob.querySelector('.knob-text').textContent = 'Takeoff';
+        } else if (data.status == 'flight_engaged') {
+            knob.querySelector('.knob-text').textContent = 'Scan';
+        } else if (data.status == 'flight_landing') {
+            knob.querySelector('.knob-text').textContent = 'Landing';
+        } else if (data.status == 'flight_error') {
+            knob.querySelector('.knob-text').textContent = 'Error';
+        }
+      }
+    });
+
+    function reset_knob() {
+      knob.querySelector('.knob-text').textContent = 'Start';
+      knob.classList.remove('active');
+      knob.classList.remove('warn');
+      // Right arrow SVG
+      arrow.innerHTML = `
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M5 12h14M13 6l6 6-6 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      `;
+      arrow.style.left = '';
+      arrow.style.right = '12px';
+      startCondition = false;
+      setKnobPosition(minLeft);
+   }
+
+    // Initialize
+    setKnobState();
+    setKnobPosition(minLeft);
+
+    // If you want to expose the startCondition to other scripts, you can do so here.
+    // window.getFlightStartCondition = () => startCondition;
+
+    // Settings button notification
+    const settingsBtn = document.getElementById('settingsBtn');
+    settingsBtn.onclick = () => {
+        notify('Settings dialog coming soon!', 'default');
+    };
+  </script>
+</body>
+</html>

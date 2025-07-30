@@ -13,7 +13,7 @@ import os
 import numpy as np
 from rclpy.node import Node
 from rclpy.qos import qos_profile_system_default
-from std_msgs.msg import Float32, Bool, String
+from std_msgs.msg import Float32, Bool, String, Float32MultiArray
 import rclpy
 
 class PCPostProcessor(Node):
@@ -23,25 +23,6 @@ class PCPostProcessor(Node):
 
         self.get_logger().info("Point cloud post processor alive")
 
-        # Create subscribers
-        self.radius_sub = self.create_subscription(
-             Float32,
-             "/host/gui/out/radius", 
-             self.radius_callback, 
-             qos_profile_system_default
-        )
-        self.object_height_sub = self.create_subscription(
-             Float32,
-             "/host/gui/out/object_height", 
-             self.object_height_callback, 
-             qos_profile_system_default
-        )
-        self.start_height_sub = self.create_subscription(
-             Float32,
-             "/host/gui/out/start_height", 
-             self.start_height_callback, 
-             qos_profile_system_default
-        )
         self.dump_complete_sub = self.create_subscription(
              Bool,
              "/host/out/pcc/dump_complete", 
@@ -59,12 +40,29 @@ class PCPostProcessor(Node):
             "/host/out/pcpp/export_complete",
             qos_profile_system_default
         )
+        self.helix_param_sub = self.create_subscription(
+            Float32MultiArray,
+            "/helix_params",
+            self.helix_params_callback,
+            10
+        )
 
+        self.pcd_directory_subscriber = self.create_subscription(
+            String,
+            "/web/pcd_directory",
+            self.pcd_directory_callback,
+            qos_profile_system_default
+        )
+        
         # Variables for subscribers to update
         self.radius = 0.0
         self.object_height = 0.0
         self.start_height = 0.0
         self.dump_directory = ""
+
+        # Add these variables for the one-shot timer logic
+        self.processing_timer = None
+        self.is_processing = False
 
         # Create publishers
         self.export_complete_pub = self.create_publisher(
@@ -77,32 +75,43 @@ class PCPostProcessor(Node):
         # Load all PCD files from the directory
         self.pcd_list = []
         self.combined_pcd = None 
-        
-    
-    def radius_callback(self, msg):
-        self.get_logger().info("Radius set to " + str(msg.data))
-        """Callback for radius."""
-        self.radius = msg.data
 
-    def object_height_callback(self, msg):
-        self.get_logger().info("Object height set to " + str(msg.data))
-        """Callback for object height."""
-        self.object_height = msg.data
+    def pcd_directory_callback(self, msg):
+        """Callback for receiving the PCD directory from the web interface."""
+        self.get_logger().info(f"Received PCD directory: {msg.data}")
+        self.dump_directory = msg.data
+        if not os.path.exists(self.dump_directory):
+            os.makedirs(self.dump_directory)
+            self.get_logger().info(f"Created directory: {self.dump_directory}")
 
-    def start_height_callback(self, msg):
-        self.get_logger().info("Start height set to " + str(msg.data))
-        """Callback for starting height."""
-        self.start_height = msg.data
+    def helix_params_callback(self, data):
+        """Callback for helix parameters."""
+        self.get_logger().info(f"Received helix parameters: {data.data}")
+        self.radius = data.data[0]
+        self.object_height = data.data[1]
+        self.start_height = data.data[3]
+        # self.flight_params = {
+        #     "helix_height": data.data[1],
+        #     "helix_radius": data.data[0],
+        #     "helix_num_passes": data.data[2],
+        #     "helix_start_height": data.data[3],
+        #     "helix_rate": 15.0 # Default rate, can be adjusted
+        # }
 
     def dump_complete_callback(self, msg):
         """Callback for dump complete."""
-        self.get_logger().info("Dump finished. Combining Pointclouds.")
-        if msg.data:
-            self.save()
-            ec = Bool()
-            ec.data = True
-            self.export_complete_pub.publish(ec)
-
+        # Only start the processing if msg.data is True and we are not already processing
+        if msg.data and not self.is_processing:
+            self.get_logger().info("Dump finished. Combining Pointclouds.")
+            self.is_processing = True
+            self.get_logger().info("Waiting 10 seconds before processing...")
+            self.processing_timer = self.create_timer(
+                10.0, 
+                self.save_after_delay, # Call a new function after the delay
+                callback_group=None, 
+                clock=None
+            )
+            
     def dump_directory_callback(self, msg):
         """Callback for dump directory."""
         self.dump_directory = msg.data
@@ -129,9 +138,12 @@ class PCPostProcessor(Node):
 
     def filter_pcs(self):
         """Filter combined point cloud."""
+
         points = np.asarray(self.combined_pcd.points)
+        self.get_logger().info(f"Number of points before filtering: {len(points)}")
         points = self.confine_to_circle(points, self.radius)
-        max_z = self.start_height + self.object_height + 0.5
+        self.get_logger().info(f"Number of points after confining to circle: {len(points)}")
+        max_z = self.start_height + self.object_height + 0.3
         points = self.confine_to_z(points, self.start_height, max_z)
         self.combined_pcd = o3d.geometry.PointCloud()
         self.combined_pcd.points = o3d.utility.Vector3dVector(points)
@@ -140,6 +152,7 @@ class PCPostProcessor(Node):
 
     def confine_to_circle(self, points, r):
         """Confine points to a circle."""
+        self.get_logger().info(f"Confine to circle with radius: {r}")
         center_x = r
         center_y = 0.0
         distances = np.sqrt((points[:, 0] - center_x) ** 2 + (points[:, 1] - center_y) ** 2)
@@ -148,11 +161,25 @@ class PCPostProcessor(Node):
 
     def confine_to_z(self, points, min_z, max_z):
         """Confine points within certain Z boundaries."""
+        self.get_logger().info(f"Confine to Z, bottom: {min_z}, top: {max_z}")
         z_height = points[:, 2]
         mask = points[:, 2] < -min_z # and points[:, 2] > -max_z
         # mask = z_height < -min_z and z_height > -max_z
         return points[mask]
     
+    def save_after_delay(self):
+        """Callback function for the timer to trigger the save process."""
+        try:
+            self.save()
+        except Exception as e:
+            self.get_logger().error(f"Error during pcd save: {e}")
+        finally:
+            # Cancel and destroy the timer after it has executed
+            if self.processing_timer:
+                self.processing_timer.cancel()
+                self.processing_timer = None
+            self.is_processing = False # Reset the flag
+
     def save(self):
         """Process points and save to a file."""
         self.load_pcs()
@@ -162,6 +189,9 @@ class PCPostProcessor(Node):
         self.get_logger().info("Writing file to " + self.dump_directory + "/combined_filtered.pcd")
         o3d.io.write_point_cloud(self.dump_directory + "/combined_filtered.pcd", self.combined_pcd)
         self.pcd_list = []
+        ec = Bool()
+        ec.data = True
+        self.export_complete_pub.publish(ec)
 
 def main(args=None):
     rclpy.init(args=args)
@@ -171,4 +201,4 @@ def main(args=None):
     rclpy.shutdown()
 
 if __name__ == "__main__":
-    main() 
+    main()
