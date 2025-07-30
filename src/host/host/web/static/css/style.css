@@ -328,3 +328,11 @@ body {
   width: 0%;
   /* transition: width 0.25s ease-in-out; */
 }
+.progress-text {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  color: #fff;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
