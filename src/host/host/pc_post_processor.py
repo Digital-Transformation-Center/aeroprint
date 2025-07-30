@@ -107,13 +107,10 @@ class PCPostProcessor(Node):
                     callback_group=None, 
                     clock=None
                 )
-                # return  # Exit callback to avoid blocking
+                return  # Exit callback to avoid blocking
                 # self.save()
             except Exception as e:
                 self.get_logger().error(f"Error during pcd save: {e}")
-            ec = Bool()
-            ec.data = True
-            self.export_complete_pub.publish(ec)
 
     def dump_directory_callback(self, msg):
         """Callback for dump directory."""
@@ -179,6 +176,9 @@ class PCPostProcessor(Node):
         self.get_logger().info("Writing file to " + self.dump_directory + "/combined_filtered.pcd")
         o3d.io.write_point_cloud(self.dump_directory + "/combined_filtered.pcd", self.combined_pcd)
         self.pcd_list = []
+        ec = Bool()
+        ec.data = True
+        self.export_complete_pub.publish(ec)
 
 def main(args=None):
     rclpy.init(args=args)
