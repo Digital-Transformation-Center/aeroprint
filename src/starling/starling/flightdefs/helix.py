@@ -100,9 +100,6 @@ class Helix(Path):
     def get_num_steps(self):
         return self.num_steps
     
-    def get_duration(self):
-        return self.num_steps / self.rate
-
     def get_starting_position(self, invert_axis=None):
         if invert_axis is not None:
             if invert_axis == 'x':
