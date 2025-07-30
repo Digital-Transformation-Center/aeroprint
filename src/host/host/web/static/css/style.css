@@ -219,6 +219,7 @@ body {
 }
 
 .path-box {
+  transform: translateZ(0);
   position: relative;
   height: 380px;
   overflow: auto;
@@ -245,6 +246,7 @@ body {
 }
 
 .path-box iframe {
+  transform: translateZ(0);
   position: relative;
   z-index: 1;
   width: 100%;
@@ -327,4 +329,12 @@ body {
 #flight_time_progress {
   width: 0%;
   /* transition: width 0.25s ease-in-out; */
+}
+.progress-text {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  color: #fff;
+  font-weight: bold;
+  font-size: 0.9rem;
 }

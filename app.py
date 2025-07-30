@@ -1,6 +1,9 @@
 from flask import Flask, render_template, send_file
 from flask_socketio import SocketIO, emit
 import os, json, subprocess, platform
+import threading 
+import time
+
 
 app = Flask(__name__)
 socketio = SocketIO(app)
@@ -120,6 +123,30 @@ def download_slicing():
     file_path = os.path.join(os.getcwd(), "latest_slices.gcode")
     return send_file(file_path, as_attachment=True)
 
+def simulate_pointcloud_stream():
+    import random
+    num_points = 500
+    delay = 0.02  # 20ms between points
+    for _ in range(num_points):
+        # Generate a random point on the surface of a cube (like your dev cube)
+        face = random.randint(0, 5)
+        x = (random.random() - 0.5) * 2
+        y = (random.random() - 0.5) * 2
+        z = (random.random() - 0.5) * 2
+        if face == 0: x = 1
+        if face == 1: x = -1
+        if face == 2: y = 1
+        if face == 3: y = -1
+        if face == 4: z = 1
+        if face == 5: z = -1
+        # Emit as a single point (flat array)
+        socketio.emit('pointcloud_point', {'point': [x, y, z]})
+        time.sleep(delay)
+
+@app.route("/simulate_pointcloud")
+def simulate_pointcloud():
+    threading.Thread(target=simulate_pointcloud_stream, daemon=True).start()
+    return "Simulated point cloud streaming started!"
 
 if __name__ == "__main__":
     socketio.run(app, debug=True)

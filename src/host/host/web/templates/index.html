@@ -76,6 +76,10 @@
           <div id="pointcloud-viewer" style="width:100%; height: 380px; display:none; position:absolute; top:0; left:0; background:#111;"></div>
           <div id="mesh-viewer" style="width:100%; height: 380px; display:none; position:absolute; top:0; left:0; background:#111;"></div>
           <div id="slicing-viewer" style="width:100%; height: 380px; display:none; position:absolute; top:0; left:0; pointer-events:none;"></div>
+          <img id="printer-gif"
+               src="{{ url_for('static', filename='images/3d_printer.gif') }}"
+               alt="3D Printer Animation"
+               style="display:none; width:100%; height:100%; max-width:none; max-height:none; position:absolute; top:0; left:0; z-index:30; background:#111;">
           <iframe src="/widgets/flight_config" title="Helix Path Visualizer" scrolling="no" aria-placeholder="Helix Path Visualizer"></iframe>
           <!-- Download Slicing Button: Only visible in Slicing phase -->
           <button id="download-slicing-btn"
@@ -93,7 +97,7 @@
         </button>
 
         <!-- Print Size Selector -->
-        <div class="size-selector">
+        <div class="size-selector" id="size-selector">
           <button id="btn-SM" class="size-btn" onclick="selectSize('SM')">SM</button>
           <button id="btn-MED" class="size-btn" onclick="selectSize('MED')">MED</button>
           <button id="btn-LG" class="size-btn" onclick="selectSize('LG')">LG</button>
@@ -221,28 +225,41 @@
       const pathIframe = document.querySelector('.path-box iframe');
 
       if (phase === "Processing") {
-        if (pcViewer) pcViewer.style.display = "block";
-        if (meshViewer) meshViewer.style.display = "none";
+        if (pcViewer) {
+          pcViewer.style.display = "block";
+          fetchAndShowCombinedPointCloud();
+        }
+        if (meshViewer) {
+          meshViewer.style.display = "none";
+          meshViewer.innerHTML = ""; // <-- Remove any old canvas!
+        }
         if (slicingViewer) slicingViewer.style.display = "none";
         if (pathIframe) pathIframe.style.visibility = "visible";
       } else if (phase === "Meshing") {
-        if (pcViewer) pcViewer.style.display = "none";
+        if (pcViewer) {
+          pcViewer.style.display = "none";
+          pcViewer.innerHTML = ""; // <-- Remove any old canvas!
+        }
         if (meshViewer) {
           meshViewer.style.display = "block";
-          showMesh();
+          fetchAndShowFullPointCloud(); // <--- ONLY THIS!
         }
         if (slicingViewer) slicingViewer.style.display = "none";
         if (pathIframe) pathIframe.style.visibility = "hidden";
       } else if (phase === "Slicing") {
         if (pcViewer) pcViewer.style.display = "none";
-        if (meshViewer) {
-          meshViewer.style.display = "block";
-          showMesh();
-        }
-        if (slicingViewer) {
+        if (meshViewer) meshViewer.style.display = "none"; 
+        if (slicingViewer){
           slicingViewer.style.display = "block";
-          showSlicing(); // function to render slicing visualization
+          showSlicingPointCloud();
         }
+        if (pathIframe) pathIframe.style.visibility = "hidden";
+      } else if (phase === "Printing") {
+        const printerGif = document.getElementById('printer-gif');
+        if (printerGif) printerGif.style.display = "block";
+        if (pcViewer) pcViewer.style.display = "none";
+        if (meshViewer) meshViewer.style.display = "none";
+        if (slicingViewer) slicingViewer.style.display = "none";
         if (pathIframe) pathIframe.style.visibility = "hidden";
       } else {
         if (pcViewer) pcViewer.style.display = "none";
@@ -273,6 +290,13 @@
         if (downloadSlicingBtn) downloadSlicingBtn.style.display = "inline-block";
       } else {
         if (downloadSlicingBtn) downloadSlicingBtn.style.display = "none";
+      }
+
+      const sizeSelector = document.getElementById('size-selector');
+      if (phase === "Preflight") {
+        if (sizeSelector) sizeSelector.style.display = "flex";
+      } else {
+        if (sizeSelector) sizeSelector.style.display = "none";
       }
     }
 
@@ -361,14 +385,20 @@
           pcViewer.style.display = "block";
           initPointCloudViewer();
         }
-        if (meshViewer) meshViewer.style.display = "none";
+        if (meshViewer) {
+          meshViewer.style.display = "none";
+          meshViewer.innerHTML = ""; // <-- Remove any old canvas!
+        }
         if (slicingViewer) slicingViewer.style.display = "none";
         if (pathIframe) pathIframe.style.visibility = "visible";
       } else if (data.phase === "Meshing") {
-        if (pcViewer) pcViewer.style.display = "none";
+        if (pcViewer) {
+          pcViewer.style.display = "none";
+          pcViewer.innerHTML = ""; // <-- Remove any old canvas!
+        }
         if (meshViewer) {
           meshViewer.style.display = "block";
-          showMesh();
+          fetchAndShowCombinedPointCloud();
         }
         if (slicingViewer) slicingViewer.style.display = "none";
         if (pathIframe) pathIframe.style.visibility = "hidden";
@@ -382,6 +412,13 @@
           slicingViewer.style.display = "block";
           showSlicing(); // function to render slicing visualization
         }
+        if (pathIframe) pathIframe.style.visibility = "hidden";
+      } else if (data.phase === "Printing") {
+        const printerGif = document.getElementById('printer-gif');
+        if (printerGif) printerGif.style.display = "block";
+        if (pcViewer) pcViewer.style.display = "none";
+        if (meshViewer) meshViewer.style.display = "none";
+        if (slicingViewer) slicingViewer.style.display = "none";
         if (pathIframe) pathIframe.style.visibility = "hidden";
       } else {
         if (pcViewer) pcViewer.style.display = "none";
@@ -512,41 +549,98 @@ function initPointCloudViewer() {
   animate();
 }
 
-let pcViewerScene, pcViewerCamera, pcViewerRenderer, pcViewerPoints;
+let pcViewerRenderer = null;
+let pcViewerAnimationId = null;
+let meshViewerRenderer = null;
+let meshViewerAnimationId = null;
 
 function showPointCloud(pointsArray) {
   const container = document.getElementById('pointcloud-viewer');
   const width = container.clientWidth;
   const height = container.clientHeight;
 
-  // If not already initialized, set up Three.js scene
-  if (!pcViewerScene) {
-    pcViewerScene = new THREE.Scene();
-    pcViewerCamera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
-    pcViewerCamera.position.z = 5;
-    pcViewerRenderer = new THREE.WebGLRenderer({antialias:true});
-    pcViewerRenderer.setSize(width, height);
-    container.innerHTML = ""; // Clear previous
-    container.appendChild(pcViewerRenderer.domElement);
+  // Clean up previous renderer and animation
+  if (pcViewerRenderer) {
+    pcViewerRenderer.dispose?.();
+    pcViewerRenderer.forceContextLoss?.();
+    pcViewerRenderer = null;
   }
+  if (pcViewerAnimationId) {
+    cancelAnimationFrame(pcViewerAnimationId);
+    pcViewerAnimationId = null;
+  }
+  container.innerHTML = "";
 
-  // Remove previous points if any
-  if (pcViewerPoints) {
-    pcViewerScene.remove(pcViewerPoints);
-  }
+  // Three.js setup
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+  camera.position.z = 5;
+
+  pcViewerRenderer = new THREE.WebGLRenderer({antialias:true});
+  pcViewerRenderer.setSize(width, height);
+  container.appendChild(pcViewerRenderer.domElement);
 
   // Create geometry from real data
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pointsArray), 3));
   const material = new THREE.PointsMaterial({ color: 0x00aaff, size: 0.05 });
-  pcViewerPoints = new THREE.Points(geometry, material);
-  pcViewerScene.add(pcViewerPoints);
+  const points = new THREE.Points(geometry, material);
+  scene.add(points);
 
-  // Animate
   function animate() {
-    requestAnimationFrame(animate);
-    if (pcViewerPoints) pcViewerPoints.rotation.y += 0.002;
-    pcViewerRenderer.render(pcViewerScene, pcViewerCamera);
+    pcViewerAnimationId = requestAnimationFrame(animate);
+    points.rotation.y += 0.002;
+    pcViewerRenderer.render(scene, camera);
+  }
+  animate();
+}
+
+function showMeshPointCloud(pointsArray) {
+  const container = document.getElementById('mesh-viewer');
+  const width = container.clientWidth;
+  const height = container.clientHeight;
+
+  // Clean up previous renderer and animation
+  if (meshViewerRenderer) {
+    meshViewerRenderer.dispose?.();
+    meshViewerRenderer.forceContextLoss?.();
+    meshViewerRenderer = null;
+  }
+  if (meshViewerAnimationId) {
+    cancelAnimationFrame(meshViewerAnimationId);
+    meshViewerAnimationId = null;
+  }
+  container.innerHTML = "";
+
+  // Three.js setup
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+  camera.position.z = 5;
+
+  meshViewerRenderer = new THREE.WebGLRenderer({antialias:true});
+  meshViewerRenderer.setSize(width, height);
+  container.appendChild(meshViewerRenderer.domElement);
+
+  // Create geometry from real data
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pointsArray), 3));
+  geometry.computeBoundingBox();
+  if (geometry.boundingBox) {
+    const center = geometry.boundingBox.getCenter(new THREE.Vector3());
+    const size = geometry.boundingBox.getSize(new THREE.Vector3());
+    const maxDim = Math.max(size.x, size.y, size.z);
+    camera.position.set(center.x, center.y, center.z + maxDim * 2);
+    camera.lookAt(center);
+  }
+
+  const material = new THREE.PointsMaterial({ color: 0x00aaff, size: 0.05 });
+  const points = new THREE.Points(geometry, material);
+  scene.add(points);
+
+  function animate() {
+    meshViewerAnimationId = requestAnimationFrame(animate);
+    points.rotation.y += 0.002;
+    meshViewerRenderer.render(scene, camera);
   }
   animate();
 }
@@ -621,6 +715,179 @@ function showSlicing() {
 
   function animate() {
     requestAnimationFrame(animate);
+    renderer.render(scene, camera);
+  }
+  animate();
+}
+
+// --- Fetch and show only the combined_filtered.pcd (Processing phase) ---
+async function fetchAndShowCombinedPointCloud() {
+  const response = await fetch('/api/get_current_scan_num');
+  const scanNumberObj = await response.json();
+  const scanNumber = scanNumberObj.scan_num !== undefined ? scanNumberObj.scan_num : scanNumberObj;
+
+  const assetsResponse = await fetch(`/api/list_assets/26/pcd`);
+  const assets = await assetsResponse.json();
+  const asset = assets.find(
+    asset =>
+      asset.type === "file" &&
+      asset.name === "combined_filtered.pcd"
+  );
+  if (!asset) {
+    console.warn("No combined_filtered.pcd file found for scan number", scanNumber);
+    return;
+  }
+  const pcdResponse = await fetch(asset.path);
+  const arrayBuffer = await pcdResponse.arrayBuffer();
+  const textDecoder = new TextDecoder("utf-8");
+  const headerText = textDecoder.decode(arrayBuffer.slice(0, 1024));
+  const headerEnd = headerText.indexOf("DATA binary");
+  const dataStart = headerText.indexOf('\n', headerEnd) + 1;
+  const pointsMatch = headerText.match(/POINTS\s+(\d+)/);
+  const numPoints = parseInt(pointsMatch[1]);
+  const floatData = new Float32Array(arrayBuffer, dataStart, numPoints * 3);
+  showPointCloud(floatData); // <-- renders in pointcloud-viewer
+  console.log(`Parsed ${numPoints} points from combined_filtered.pcd`);
+}
+
+// --- Fetch and show all individual PCDs (Meshing phase) ---
+async function fetchAndShowFullPointCloud() {
+  const response = await fetch('/api/get_current_scan_num');
+  const scanNumberObj = await response.json();
+  const scanNumber = scanNumberObj.scan_num !== undefined ? scanNumberObj.scan_num : scanNumberObj;
+
+  const assetsResponse = await fetch(`/api/list_assets/26/pcd`);
+  const assets = await assetsResponse.json();
+  const pcdFiles = assets.filter(
+    asset =>
+      asset.type === "file" &&
+      asset.name.endsWith('.pcd') &&
+      asset.name !== "combined_filtered.pcd"
+  );
+  let allPoints = [];
+  for (const asset of pcdFiles) {
+    const pcdResponse = await fetch(asset.path);
+    const arrayBuffer = await pcdResponse.arrayBuffer();
+    const textDecoder = new TextDecoder("utf-8");
+    const headerText = textDecoder.decode(arrayBuffer.slice(0, 1024));
+    const headerEnd = headerText.indexOf("DATA binary");
+    const dataStart = headerText.indexOf('\n', headerEnd) + 1;
+    const pointsMatch = headerText.match(/POINTS\s+(\d+)/);
+    const numPoints = parseInt(pointsMatch[1]);
+    const floatData = new Float32Array(arrayBuffer, dataStart, numPoints * 3);
+    allPoints.push(...floatData);
+    console.log(`Parsed ${numPoints} points from ${asset.name}`);
+  }
+  showMeshPointCloud(allPoints); // <-- renders in mesh-viewer
+}
+
+async function showSlicingPointCloud() {
+  const container = document.getElementById('slicing-viewer');
+  const width = container.clientWidth;
+  const height = container.clientHeight;
+  container.innerHTML = "";
+
+  // Fetch the combined_filtered.pcd file
+  const response = await fetch('/api/get_current_scan_num');
+  const scanNumberObj = await response.json();
+  const scanNumber = scanNumberObj.scan_num !== undefined ? scanNumberObj.scan_num : scanNumberObj;
+
+  const assetsResponse = await fetch(`/api/list_assets/26/pcd`);
+  const assets = await assetsResponse.json();
+  const asset = assets.find(
+    asset =>
+      asset.type === "file" &&
+      asset.name === "combined_filtered.pcd"
+  );
+  if (!asset) {
+    console.warn("No combined_filtered.pcd file found for scan number", scanNumber);
+    return;
+  }
+  const pcdResponse = await fetch(asset.path);
+  const arrayBuffer = await pcdResponse.arrayBuffer();
+  const textDecoder = new TextDecoder("utf-8");
+  const headerText = textDecoder.decode(arrayBuffer.slice(0, 1024));
+  const headerEnd = headerText.indexOf("DATA binary");
+  const dataStart = headerText.indexOf('\n', headerEnd) + 1;
+  const pointsMatch = headerText.match(/POINTS\s+(\d+)/);
+  const numPoints = parseInt(pointsMatch[1]);
+  const floatData = new Float32Array(arrayBuffer, dataStart, numPoints * 3);
+
+  // Three.js setup
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+  camera.position.z = 5;
+
+  const renderer = new THREE.WebGLRenderer({antialias:true, alpha:true});
+  renderer.setSize(width, height);
+  container.appendChild(renderer.domElement);
+
+  // Create geometry from real data
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.BufferAttribute(floatData, 3));
+  geometry.computeBoundingBox();
+  let center = new THREE.Vector3(0,0,0);
+  let size = new THREE.Vector3(1,1,1);
+  if (geometry.boundingBox) {
+    center = geometry.boundingBox.getCenter(new THREE.Vector3());
+    size = geometry.boundingBox.getSize(new THREE.Vector3());
+    const maxDim = Math.max(size.x, size.y, size.z);
+    camera.position.set(center.x, center.y, center.z + maxDim * 1.2);
+    camera.lookAt(center);
+
+    // Center the geometry so rotation is around its center
+    geometry.translate(-center.x, -center.y, -center.z);
+  }
+
+  const material = new THREE.PointsMaterial({ color: 0xff8800, size: 0.05 });
+  const points = new THREE.Points(geometry, material);
+  scene.add(points);
+
+  // Add animated slicing planes
+  const planeGeometryXZ = new THREE.PlaneGeometry(size.x * 1.2, size.y * 1.2);
+  const planeGeometryYZ = new THREE.PlaneGeometry(size.z * 1.2, size.y * 1.2);
+  const planeGeometryXY = new THREE.PlaneGeometry(size.x * 1.2, size.z * 1.2);
+
+  const planeMaterial = new THREE.MeshBasicMaterial({
+    color: 0x00eaff,
+    side: THREE.DoubleSide,
+    transparent: true,
+    opacity: 0.18
+  });
+
+  // Z slicing plane (XY plane, moves along Z)
+  const slicingPlaneZ = new THREE.Mesh(planeGeometryXZ, planeMaterial.clone());
+  scene.add(slicingPlaneZ);
+
+  // X slicing plane (YZ plane, moves along X)
+  const slicingPlaneX = new THREE.Mesh(planeGeometryYZ, planeMaterial.clone());
+  slicingPlaneX.rotation.y = Math.PI / 2;
+  scene.add(slicingPlaneX);
+
+  // Y slicing plane (XZ plane, moves along Y)
+  const slicingPlaneY = new THREE.Mesh(planeGeometryXY, planeMaterial.clone());
+  slicingPlaneY.rotation.x = Math.PI / 2;
+  scene.add(slicingPlaneY);
+
+  // Diagonal slicing plane (moves along X and Z)
+  const slicingPlaneDiag = new THREE.Mesh(planeGeometryXZ, planeMaterial.clone());
+  slicingPlaneDiag.rotation.z = Math.PI / 4;
+  scene.add(slicingPlaneDiag);
+
+  let t = 0;
+  function animate() {
+    requestAnimationFrame(animate);
+
+    t += 0.01;
+    // Animate the slicing planes
+    slicingPlaneZ.position.z = center.z + Math.sin(t) * size.z * 0.6;
+    slicingPlaneX.position.x = center.x + Math.cos(t * 1.2) * size.x * 0.6;
+    slicingPlaneY.position.y = center.y + Math.sin(t * 0.8) * size.y * 0.6;
+    slicingPlaneDiag.position.x = center.x + Math.sin(t * 0.7) * size.x * 0.6;
+    slicingPlaneDiag.position.z = center.z + Math.cos(t * 0.7) * size.z * 0.6;
+
+    points.rotation.y += 0.002; // Rotate the point cloud
+
     renderer.render(scene, camera);
   }
   animate();
