@@ -1,6 +1,5 @@
 # docker-compose.yml
 
-
 services:
   # Define a service named 'talker'
   talker:
@@ -35,26 +34,20 @@ services:
     stdin_open: true
 
     volumes:
-    - /dev/shm:/dev/shm
-    - ../../src/:/home/aeroprint_user/aeroprint/src
-    - /var/lib/aeroprint:/var/lib/aeroprint
+      - /dev/shm:/dev/shm
+      - ../../src/:/home/aeroprint_user/aeroprint/src
+      - /var/lib/aeroprint:/var/lib/aeroprint
 
-    # *** CHANGED: Use host networking mode ***
-    # This allows the container to share the host's network namespace,
-    # making ROS 2 discovery easier across containers or with host processes.
-    network_mode: default
-
+    # Use bridge networking with port mapping instead of host mode
+    # Host mode doesn't work well on Windows Docker Desktop
     ports:
       - "8080:8080"
       - "5000:5000"
-   # ipc: host
+
+    # Enable IPC host for better ROS communication
+    ipc: host
 
     command: tail -f /dev/null
 
-    # environment:
-    #   - FASTDDS_BUILTIN_TRANSPORTS=UDPv4 # Force Fast-DDS to use only UDP transport
-
-# *** REMOVED: No custom networks needed when using host networking mode ***
-# networks:
-#   ros_network:
-#     driver: bridge
+    environment:
+      - FASTDDS_BUILTIN_TRANSPORTS=UDPv4 # Force Fast-DDS to use only UDP transport
