@@ -726,7 +726,7 @@ async function fetchAndShowCombinedPointCloud() {
   const scanNumberObj = await response.json();
   const scanNumber = scanNumberObj.scan_num !== undefined ? scanNumberObj.scan_num : scanNumberObj;
 
-  const assetsResponse = await fetch(`/api/list_assets/26/pcd`);
+  const assetsResponse = await fetch(`/api/list_assets/${scanNumber}/pcd`);
   const assets = await assetsResponse.json();
   const asset = assets.find(
     asset =>
@@ -756,7 +756,7 @@ async function fetchAndShowFullPointCloud() {
   const scanNumberObj = await response.json();
   const scanNumber = scanNumberObj.scan_num !== undefined ? scanNumberObj.scan_num : scanNumberObj;
 
-  const assetsResponse = await fetch(`/api/list_assets/26/pcd`);
+  const assetsResponse = await fetch(`/api/list_assets/${scanNumber}/pcd`);
   const assets = await assetsResponse.json();
   const pcdFiles = assets.filter(
     asset =>
@@ -792,7 +792,7 @@ async function showSlicingPointCloud() {
   const scanNumberObj = await response.json();
   const scanNumber = scanNumberObj.scan_num !== undefined ? scanNumberObj.scan_num : scanNumberObj;
 
-  const assetsResponse = await fetch(`/api/list_assets/26/pcd`);
+  const assetsResponse = await fetch(`/api/list_assets/${scanNumber}/pcd`);
   const assets = await assetsResponse.json();
   const asset = assets.find(
     asset =>
