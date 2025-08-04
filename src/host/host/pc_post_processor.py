@@ -54,12 +54,15 @@ class PCPostProcessor(Node):
             qos_profile_system_default
         )
         
-
         # Variables for subscribers to update
         self.radius = 0.0
         self.object_height = 0.0
         self.start_height = 0.0
         self.dump_directory = ""
+
+        # Add these variables for the one-shot timer logic
+        self.processing_timer = None
+        self.is_processing = False
 
         # Create publishers
         self.export_complete_pub = self.create_publisher(
@@ -97,16 +100,18 @@ class PCPostProcessor(Node):
 
     def dump_complete_callback(self, msg):
         """Callback for dump complete."""
-        self.get_logger().info("Dump finished. Combining Pointclouds.")
-        if msg.data:
-            try:
-                self.save()
-            except Exception as e:
-                self.get_logger().error(f"Error during pcd save: {e}")
-            ec = Bool()
-            ec.data = True
-            self.export_complete_pub.publish(ec)
-
+        # Only start the processing if msg.data is True and we are not already processing
+        if msg.data and not self.is_processing:
+            self.get_logger().info("Dump finished. Combining Pointclouds.")
+            self.is_processing = True
+            self.get_logger().info("Waiting 10 seconds before processing...")
+            self.processing_timer = self.create_timer(
+                10.0, 
+                self.save_after_delay, # Call a new function after the delay
+                callback_group=None, 
+                clock=None
+            )
+            
     def dump_directory_callback(self, msg):
         """Callback for dump directory."""
         self.dump_directory = msg.data
@@ -162,6 +167,19 @@ class PCPostProcessor(Node):
         # mask = z_height < -min_z and z_height > -max_z
         return points[mask]
     
+    def save_after_delay(self):
+        """Callback function for the timer to trigger the save process."""
+        try:
+            self.save()
+        except Exception as e:
+            self.get_logger().error(f"Error during pcd save: {e}")
+        finally:
+            # Cancel and destroy the timer after it has executed
+            if self.processing_timer:
+                self.processing_timer.cancel()
+                self.processing_timer = None
+            self.is_processing = False # Reset the flag
+
     def save(self):
         """Process points and save to a file."""
         self.load_pcs()
@@ -171,6 +189,9 @@ class PCPostProcessor(Node):
         self.get_logger().info("Writing file to " + self.dump_directory + "/combined_filtered.pcd")
         o3d.io.write_point_cloud(self.dump_directory + "/combined_filtered.pcd", self.combined_pcd)
         self.pcd_list = []
+        ec = Bool()
+        ec.data = True
+        self.export_complete_pub.publish(ec)
 
 def main(args=None):
     rclpy.init(args=args)
@@ -180,4 +201,4 @@ def main(args=None):
     rclpy.shutdown()
 
 if __name__ == "__main__":
-    main() 
+    main()

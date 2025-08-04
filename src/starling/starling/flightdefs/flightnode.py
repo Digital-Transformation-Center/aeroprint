@@ -162,10 +162,12 @@ class FlightNode(Node):
                 self.control_timer_period, self._control_loop_callback
         ) 
         else:
-            self.get_logger().info("Entering landing sequence.")
-            self.current_system_state = "LANDING"
+            if hasattr(self, "control_timer") and self.control_timer is not None:
+                self.get_logger().info("Entering landing sequence.")
+                self.current_system_state = "LANDING"
+            else:
+                self._land_vehicle()
             self.is_landing = True
-            self._land_vehicle()
             if hasattr(self, "external_land_callback") and self.external_land_callback:
                 self.external_land_callback()
                 
@@ -189,8 +191,7 @@ class FlightNode(Node):
             )
 
         # We will hold position so the drone can settle, then land
-        if self.offboard_arr_counter == self.steps + 50:
-            self.figure8_timer.cancel()
+        if self.offboard_arr_counter == self.steps + 35:
             self.current_system_state = "LANDING"
             self.is_landing = True
             self.get_logger().info("Figure path completed, landing now.")
@@ -282,7 +283,7 @@ class FlightNode(Node):
                     
 
         elif self.current_system_state == "LANDING":
-            self._engage_offboard_mode()
+            # self._engage_offboard_mode()
             self._land_vehicle()
             if self.figure8_timer is not None:
                 self.figure8_timer.cancel()

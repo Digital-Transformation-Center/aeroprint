@@ -2,11 +2,12 @@ import os
 import rclpy
 from rclpy.node import Node
 from threading import Thread
-from flask import Flask, render_template, send_from_directory, jsonify
+from flask import Flask, render_template, send_from_directory, jsonify, request
 import std_msgs.msg
 from std_msgs.msg import String, Float32MultiArray
 import json
 from rclpy.qos import qos_profile_system_default
+import shutil
 
 from flask_socketio import SocketIO
 
@@ -48,6 +49,10 @@ class FlaskWebApp:
         self.socketio.emit('heartbeat', {'ok': ok})
 
     def setup_routes(self):
+        @self.app.route('/files')
+        def files():
+            return render_template('files.html')
+        
         @self.app.route('/')
         def home():
             selected_size = "MED"
@@ -149,12 +154,40 @@ class FlaskWebApp:
             scan_num = self.node.fm.get_id()
             return jsonify({"scan_num": scan_num})
         
+        @self.app.route('/api/delete_asset/<int:n>')
+        def delete_asset(n):
+            target_dir = os.path.join(ASSETS_DIR, str(n))
+            # Security: ensure target_dir is within ASSETS_DIR
+            if not os.path.abspath(target_dir).startswith(os.path.abspath(ASSETS_DIR)):
+                return jsonify({"error": "Access denied"}), 403
+            if not os.path.isdir(target_dir):
+                return jsonify({"error": "Directory not found"}), 404
+            try:
+                shutil.rmtree(target_dir)
+                return jsonify({"success": True, "deleted": str(n)})
+            except Exception as e:
+                return jsonify({"error": str(e)}), 500
+
+        @self.app.route('/api/delete_asset/all')
+        def delete_all_assets():
+            deleted = []
+            errors = []
+            for entry in os.listdir(ASSETS_DIR):
+                entry_path = os.path.join(ASSETS_DIR, entry)
+                if os.path.isdir(entry_path) and entry.isdigit():
+                    try:
+                        shutil.rmtree(entry_path)
+                        deleted.append(entry)
+                    except Exception as e:
+                        errors.append({"dir": entry, "error": str(e)})
+            return jsonify({"success": True, "deleted": deleted, "errors": errors})
+        
 
     def setup_socketio_handlers(self):
         @self.socketio.on('disconnect')
         def handle_disconnect():
             self.node.get_logger().info('Client disconnected.')
-            self.node.request_land_flight()  # Request landing on disconnect
+            # self.node.request_land_flight()  # Request landing on disconnect
             
         @self.socketio.on('shutdown_test_node')
         def handle_shutdown_test_node():
@@ -271,7 +304,7 @@ class FlaskServerNode(Node):
         )
 
         self.start_flight_publisher = self.create_publisher(
-            std_msgs.msg.Bool, 'start_flight', 10
+            std_msgs.msg.Bool, '/start_flight', 10
         )
 
         self.status_subscriber = self.create_subscription(
@@ -313,7 +346,7 @@ class FlaskServerNode(Node):
             std_msgs.msg.Bool, '/host/out/mesher/mesh_complete', self.mesh_complete_callback, 10
         )
         self.slicing_complete_subscriber = self.create_subscription(
-            std_msgs.msg.Bool, '/host/out/slicer/slicing_complete', self.mesh_complete_callback, 10
+            std_msgs.msg.Bool, '/host/out/slicer/slicing_complete', self.slicing_complete_callback, 10
         )
 
         import threading
@@ -402,6 +435,10 @@ class FlaskServerNode(Node):
             if hasattr(self, 'flask_web_app'):
                 self.flask_web_app.emit_status('flight_error')
 
+    def slicing_complete_callback(self, msg):
+        if hasattr(self, 'flask_web_app'):
+            self.flask_web_app.emit_ui_phase('Printing')
+    
     def mesh_complete_callback(self, msg):
         if hasattr(self, 'flask_web_app'):
             self.flask_web_app.emit_ui_phase('Slicing')
