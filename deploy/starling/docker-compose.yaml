@@ -1,6 +1,5 @@
 # docker-compose.yml
 
-version: '3.8' # Specify the Docker Compose file format version
 
 services:
   # Define a service named 'talker'
@@ -38,7 +37,7 @@ services:
     volumes:
     - /dev/shm:/dev/shm
     - ../../src/:/home/aeroprint_user/aeroprint/src
-    - C:\var\lib\aeroprint:/var/lib/aeroprint
+    - /var/lib/aeroprint:/var/lib/aeroprint
 
     # *** CHANGED: Use host networking mode ***
     # This allows the container to share the host's network namespace,
