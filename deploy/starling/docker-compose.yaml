@@ -36,26 +36,24 @@ services:
     stdin_open: true
 
     volumes:
-    - /dev/shm:/dev/shm
-    - ../../src/:/home/aeroprint_user/aeroprint/src
-    - C:\var\lib\aeroprint:/var/lib/aeroprint
+      - /dev/shm:/dev/shm
+      - ../../src/:/home/aeroprint_user/aeroprint/src
+      - C:\var\lib\aeroprint:/var/lib/aeroprint
 
-    # *** CHANGED: Use host networking mode ***
-    # This allows the container to share the host's network namespace,
-    # making ROS 2 discovery easier across containers or with host processes.
-    network_mode: host
-
-    # ports:
-    #   - "8080:8080"
-    #   - "5000:5000"
+    # Use bridge networking instead of host mode on Windows
+    ports:
+      - "8080:8080"
+      - "5000:5000"
+    
     ipc: host
 
-    command: tail -f /dev/null
+    # Remove this line and add your webapp startup command:
+    # command: tail -f /dev/null
+    command: >
+      bash -c "
+        cd /home/aeroprint_user/aeroprint/src/host/host &&
+        python web_app.py
+      "
 
-    # environment:
-    #   - FASTDDS_BUILTIN_TRANSPORTS=UDPv4 # Force Fast-DDS to use only UDP transport
-
-# *** REMOVED: No custom networks needed when using host networking mode ***
-# networks:
-#   ros_network:
-#     driver: bridge
+    environment:
+      - FASTDDS_BUILTIN_TRANSPORTS=UDPv4

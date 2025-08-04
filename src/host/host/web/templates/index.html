@@ -97,7 +97,7 @@
         </button>
 
         <!-- Print Size Selector -->
-        <div class="size-selector">
+        <div class="size-selector" id="size-selector">
           <button id="btn-SM" class="size-btn" onclick="selectSize('SM')">SM</button>
           <button id="btn-MED" class="size-btn" onclick="selectSize('MED')">MED</button>
           <button id="btn-LG" class="size-btn" onclick="selectSize('LG')">LG</button>
@@ -290,6 +290,13 @@
         if (downloadSlicingBtn) downloadSlicingBtn.style.display = "inline-block";
       } else {
         if (downloadSlicingBtn) downloadSlicingBtn.style.display = "none";
+      }
+
+      const sizeSelector = document.getElementById('size-selector');
+      if (phase === "Preflight") {
+        if (sizeSelector) sizeSelector.style.display = "flex";
+      } else {
+        if (sizeSelector) sizeSelector.style.display = "none";
       }
     }
 
