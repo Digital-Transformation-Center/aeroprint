@@ -86,5 +86,34 @@ def send_radius(radius):
         "ros2", "topic", "pub", "-1", "/host/gui/out/radius", "std_msgs/msg/Float32", f'{{"data": {radius}}}'
     ])
 
+def send_pointcloud(points):
+    # points should be a list of tuples/lists with (x, y, z) coordinates
+    socketio.emit('pointcloud_point', {'points': points})
+
+def simulate_pointcloud_stream():
+    import random
+    num_points = 500
+    delay = 0.02  # 20ms between points
+    for _ in range(num_points):
+        # Generate a random point on the surface of a cube (like your dev cube)
+        face = random.randint(0, 5)
+        x = (random.random() - 0.5) * 2
+        y = (random.random() - 0.5) * 2
+        z = (random.random() - 0.5) * 2
+        if face == 0: x = 1
+        if face == 1: x = -1
+        if face == 2: y = 1
+        if face == 3: y = -1
+        if face == 4: z = 1
+        if face == 5: z = -1
+        # Emit as a single point (flat array)
+        socketio.emit('pointcloud_point', {'point': [x, y, z]})
+        time.sleep(delay)
+
+@app.route("/simulate_pointcloud")
+def simulate_pointcloud():
+    threading.Thread(target=simulate_pointcloud_stream, daemon=True).start()
+    return "Simulated point cloud streaming started!"
+
 if __name__ == "__main__":
     socketio.run(app, debug=True)
