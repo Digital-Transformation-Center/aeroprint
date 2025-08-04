@@ -7,6 +7,9 @@ import struct
 import random
 from flask import jsonify
 
+
+
+
 app = Flask(__name__)
 socketio = SocketIO(app)
 
@@ -282,11 +285,6 @@ def handle_command(data):
     with open("command.json", "w") as f:
         json.dump({"command": command, "size": size, "radius": radius}, f)
     emit("command_response", {"status": "ok"})
-
-# Add these imports at the top
-import subprocess
-import threading
-import time
 
 # Add this function to listen to drone status
 def listen_to_drone_status():
