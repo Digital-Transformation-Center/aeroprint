@@ -38,7 +38,7 @@ services:
     volumes:
       - /dev/shm:/dev/shm
       - ../../src/:/home/aeroprint_user/aeroprint/src
-      - C:\var\lib\aeroprint:/var/lib/aeroprint
+      - /var/lib/aeroprint:/var/lib/aeroprint  # Fixed: Linux path instead of Windows
 
     # Use bridge networking instead of host mode on Windows
     ports:
@@ -49,11 +49,7 @@ services:
 
     # Remove this line and add your webapp startup command:
     # command: tail -f /dev/null
-    command: >
-      bash -c "
-        cd /home/aeroprint_user/aeroprint/src/host/host &&
-        python web_app.py
-      "
+    command: tail -f /dev/null
 
     environment:
       - FASTDDS_BUILTIN_TRANSPORTS=UDPv4
