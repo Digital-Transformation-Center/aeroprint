@@ -338,3 +338,24 @@ body {
   font-weight: bold;
   font-size: 0.9rem;
 }
+
+.printing-gif {
+    text-align: center;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin: 20px 0;
+}
+
+.printing-gif img {
+    max-width: 300px;
+    height: auto;
+    border-radius: 8px;
+}
+
+.printing-gif p {
+    margin-top: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}

@@ -186,119 +186,118 @@
       // Do NOT emit any command here!
     }
 
-    function simulatePhase(phase) {
-      // Update status bar visuals
-      document.querySelectorAll('.status-bar .status').forEach(elem => {
+    // Update your simulatePhase function to include the printing GIF logic
+function simulatePhase(phase) {
+    // Update status bar visuals
+    document.querySelectorAll('.status-bar .status').forEach(elem => {
         elem.classList.remove('active');
         if (elem.textContent.trim() === phase) {
-          elem.classList.add('active', 'slide-in');
-          setTimeout(() => elem.classList.remove('slide-in'), 600);
+            elem.classList.add('active', 'slide-in');
+            setTimeout(() => elem.classList.remove('slide-in'), 600);
         }
-      });
+    });
 
-      updatePhaseDescription(phase);
+    updatePhaseDescription(phase);
 
-      // Progress bar and button logic
-      const progressContainer = document.getElementById("progress-container");
-      const progressBar = document.getElementById("progress-bar");
-      const actionBtn = document.getElementById("action-btn");
+    // Progress bar and button logic
+    const progressContainer = document.getElementById("progress-container");
+    const progressBar = document.getElementById("progress-bar");
+    const actionBtn = document.getElementById("action-btn");
 
-      if (phase === "Preflight") {
+    if (phase === "Preflight") {
         actionBtn.style.display = "inline-block";
         progressContainer.style.display = "none";
         progressBar.style.width = "0%";
-      } else {
+    } else {
         actionBtn.style.display = "none";
-        progressContainer.style.display = "flex"; // override Jinja's value
-        // let progress = 0;
-        // clearInterval(devProgressInterval);
-        // devProgressInterval = setInterval(() => {
-        //   progress = Math.min(progress + 5, 100);
-        //   progressBar.style.width = progress + "%";
-        //   if (progress === 100) clearInterval(devProgressInterval);
-        // }, 300);
-      }
+        progressContainer.style.display = "flex";
+    }
 
-      const pcViewer = document.getElementById('pointcloud-viewer');
-      const meshViewer = document.getElementById('mesh-viewer');
-      const slicingViewer = document.getElementById('slicing-viewer');
-      const pathIframe = document.querySelector('.path-box iframe');
+    const pcViewer = document.getElementById('pointcloud-viewer');
+    const meshViewer = document.getElementById('mesh-viewer');
+    const slicingViewer = document.getElementById('slicing-viewer');
+    const pathIframe = document.querySelector('.path-box iframe');
+    const printerGif = document.getElementById('printer-gif'); // Add this line
 
-      if (phase === "Processing") {
+    // Hide everything first
+    if (pcViewer) pcViewer.style.display = "none";
+    if (meshViewer) meshViewer.style.display = "none";
+    if (slicingViewer) slicingViewer.style.display = "none";
+    if (printerGif) printerGif.style.display = "none"; // Add this line
+    if (pathIframe) pathIframe.style.visibility = "visible";
+
+    // Show appropriate viewer based on phase
+    if (phase === "Processing") {
         if (pcViewer) {
-          pcViewer.style.display = "block";
-          fetchAndShowCombinedPointCloud();
+            pcViewer.style.display = "block";
+            fetchAndShowCombinedPointCloud();
         }
         if (meshViewer) {
-          meshViewer.style.display = "none";
-          meshViewer.innerHTML = ""; // <-- Remove any old canvas!
+            meshViewer.style.display = "none";
+            meshViewer.innerHTML = "";
         }
         if (slicingViewer) slicingViewer.style.display = "none";
         if (pathIframe) pathIframe.style.visibility = "visible";
-      } else if (phase === "Meshing") {
+    } else if (phase === "Meshing") {
         if (pcViewer) {
-          pcViewer.style.display = "none";
-          pcViewer.innerHTML = ""; // <-- Remove any old canvas!
+            pcViewer.style.display = "none";
+            pcViewer.innerHTML = "";
         }
         if (meshViewer) {
-          meshViewer.style.display = "block";
-          fetchAndShowFullPointCloud(); // <--- ONLY THIS!
+            meshViewer.style.display = "block";
+            fetchAndShowFullPointCloud();
         }
         if (slicingViewer) slicingViewer.style.display = "none";
         if (pathIframe) pathIframe.style.visibility = "hidden";
-      } else if (phase === "Slicing") {
+    } else if (phase === "Slicing") {
         if (pcViewer) pcViewer.style.display = "none";
         if (meshViewer) meshViewer.style.display = "none"; 
         if (slicingViewer){
-          slicingViewer.style.display = "block";
-          showSlicingPointCloud();
+            slicingViewer.style.display = "block";
+            showSlicingPointCloud();
         }
         if (pathIframe) pathIframe.style.visibility = "hidden";
-      } else if (phase === "Printing") {
-        const printerGif = document.getElementById('printer-gif');
+    } else if (phase === "Printing") {
+        // ADD THIS BLOCK - Show printing GIF and hide everything else
         if (printerGif) printerGif.style.display = "block";
         if (pcViewer) pcViewer.style.display = "none";
         if (meshViewer) meshViewer.style.display = "none";
         if (slicingViewer) slicingViewer.style.display = "none";
         if (pathIframe) pathIframe.style.visibility = "hidden";
-      } else {
-        if (pcViewer) pcViewer.style.display = "none";
-        if (meshViewer) meshViewer.style.display = "none";
-        if (slicingViewer) slicingViewer.style.display = "none";
+    } else {
+        // Default case - show flight path
         if (pathIframe) pathIframe.style.visibility = "visible";
-      }
-
-      // Show/hide the download button based on phase
-      const downloadBtn = document.getElementById('download-pointcloud-btn');
-      if (phase === "Processing") {
-        if (downloadBtn) downloadBtn.style.display = "inline-block";
-      } else {
-        if (downloadBtn) downloadBtn.style.display = "none";
-      }
-
-      // Show/hide the download mesh button based on phase
-      const downloadMeshBtn = document.getElementById('download-mesh-btn');
-      if (phase === "Meshing") {
-        if (downloadMeshBtn) downloadMeshBtn.style.display = "inline-block";
-      } else {
-        if (downloadMeshBtn) downloadMeshBtn.style.display = "none";
-      }
-
-      // Show/hide the download slicing button based on phase
-      const downloadSlicingBtn = document.getElementById('download-slicing-btn');
-      if (phase === "Slicing") {
-        if (downloadSlicingBtn) downloadSlicingBtn.style.display = "inline-block";
-      } else {
-        if (downloadSlicingBtn) downloadSlicingBtn.style.display = "none";
-      }
-
-      const sizeSelector = document.getElementById('size-selector');
-      if (phase === "Preflight") {
-        if (sizeSelector) sizeSelector.style.display = "flex";
-      } else {
-        if (sizeSelector) sizeSelector.style.display = "none";
-      }
     }
+
+    // Show/hide download buttons based on phase
+    const downloadBtn = document.getElementById('download-pointcloud-btn');
+    if (phase === "Processing") {
+        if (downloadBtn) downloadBtn.style.display = "inline-block";
+    } else {
+        if (downloadBtn) downloadBtn.style.display = "none";
+    }
+
+    const downloadMeshBtn = document.getElementById('download-mesh-btn');
+    if (phase === "Meshing") {
+        if (downloadMeshBtn) downloadMeshBtn.style.display = "inline-block";
+    } else {
+        if (downloadMeshBtn) downloadMeshBtn.style.display = "none";
+    }
+
+    const downloadSlicingBtn = document.getElementById('download-slicing-btn');
+    if (phase === "Slicing") {
+        if (downloadSlicingBtn) downloadSlicingBtn.style.display = "inline-block";
+    } else {
+        if (downloadSlicingBtn) downloadSlicingBtn.style.display = "none";
+    }
+
+    const sizeSelector = document.getElementById('size-selector');
+    if (phase === "Preflight") {
+        if (sizeSelector) sizeSelector.style.display = "flex";
+    } else {
+        if (sizeSelector) sizeSelector.style.display = "none";
+    }
+}
 
     function typePhaseDescription(text) {
       const descDiv = document.querySelector('.phase-description');
@@ -891,6 +890,77 @@ async function showSlicingPointCloud() {
     renderer.render(scene, camera);
   }
   animate();
+}
+
+// Add this function to your index.html JavaScript section
+
+function updatePhaseVisuals(phase) {
+    // Hide all phase-specific elements first
+    const printingGif = document.querySelector('.printing-gif');
+    const scanningElements = document.querySelectorAll('.scanning-visual');
+    const meshingElements = document.querySelectorAll('.meshing-visual');
+    const slicingElements = document.querySelectorAll('.slicing-visual');
+    
+    // Hide all phase visuals
+    if (printingGif) printingGif.style.display = 'none';
+    scanningElements.forEach(el => el.style.display = 'none');
+    meshingElements.forEach(el => el.style.display = 'none');
+    slicingElements.forEach(el => el.style.display = 'none');
+    
+    // Show appropriate visual based on phase
+    switch(phase) {
+        case "Printing":
+            if (printingGif) printingGif.style.display = 'block';
+            break;
+        case "Scanning":
+            scanningElements.forEach(el => el.style.display = 'block');
+            break;
+        case "Meshing":
+            meshingElements.forEach(el => el.style.display = 'block');
+            break;
+        case "Slicing":
+            slicingElements.forEach(el => el.style.display = 'block');
+            break;
+        default:
+            // Preflight, Takeoff, Landing - no special visuals
+            break;
+    }
+}
+
+// Update your existing socket listener for status updates
+socket.on('status_update', function(data) {
+    console.log('Status update received:', data);
+    
+    // Update the phase display
+    const phaseElement = document.querySelector('#current-phase');
+    if (phaseElement) {
+        phaseElement.textContent = data.phase;
+    }
+    
+    // Update phase-specific visuals
+    updatePhaseVisuals(data.phase);
+    
+    // Update progress bar or other UI elements as needed
+    updatePhaseProgress(data.phase);
+});
+
+// Optional: Function to update progress based on phase
+function updatePhaseProgress(phase) {
+    const progressBar = document.querySelector('.progress-bar');
+    if (!progressBar) return;
+    
+    const phaseProgress = {
+        "Preflight": 0,
+        "Takeoff": 20,
+        "Scanning": 40,
+        "Landing": 60,
+        "Meshing": 70,
+        "Slicing": 85,
+        "Printing": 100
+    };
+    
+    const progress = phaseProgress[phase] || 0;
+    progressBar.style.width = `${progress}%`;
 }
   </script>
 </body>
