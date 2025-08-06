@@ -492,103 +492,96 @@ def handle_command(data):
     size = data.get("size", "MED")
     radius = SIZE_TO_RADIUS.get(size, 2.0)
     
-    # If starting a new scan, increment the scan number
+    print(f"🎯 Received command: {command}, size: {size}, radius: {radius}")
+    
     if command == "START":
         new_scan = increment_scan_number()
         print(f"Starting new scan: {new_scan}")
-        update_phase("Takeoff")
         
-        # Send commands to drone
-        send_radius(radius)
+        # 🔧 FIX: Set ROS parameters for post-processor
+        try:
+            print(f"📡 Setting post-processor radius to: {radius}")
+            
+            # Set radius for post-processor node
+            result1 = subprocess.run([
+                "ros2", "param", "set", "/pc_post_processor_node", "circle_radius", str(radius)
+            ], capture_output=True, text=True, timeout=5)
+            
+            if result1.returncode == 0:
+                print(f"✅ Post-processor radius set successfully")
+            else:
+                print(f"❌ Failed to set post-processor radius: {result1.stderr}")
+            
+            # Also set for helical flight node
+            result2 = subprocess.run([
+                "ros2", "param", "set", "/helical_flight_node", "radius", str(radius)
+            ], capture_output=True, text=True, timeout=5)
+            
+            if result2.returncode == 0:
+                print(f"✅ Helical flight radius set successfully")
+            else:
+                print(f"❌ Failed to set helical flight radius: {result2.stderr}")
+                
+            # Verify the parameter was set
+            verify_result = subprocess.run([
+                "ros2", "param", "get", "/pc_post_processor_node", "circle_radius"
+            ], capture_output=True, text=True, timeout=3)
+            
+            print(f"🔍 Verified post-processor radius: {verify_result.stdout.strip()}")
+            
+        except Exception as e:
+            print(f"❌ Error setting ROS parameters: {e}")
+        
+        update_phase("Takeoff")
+        send_radius(radius)  # Send to GUI topic
         send_ready()
         
     elif command == "STOP":
         print("Stopping scan")
         update_phase("Landing")
     
-    print(f"Received command: {command}, size: {size}, radius: {radius}")
+    # Save to JSON
     with open("command.json", "w") as f:
         json.dump({"command": command, "size": size, "radius": radius}, f)
+    
     emit("command_response", {"status": "ok"})
 
-@socketio.on("emergency_stop")
-def handle_emergency_stop():
+    @socketio.on("select_size")
+def handle_select_size(data):
     """
-    Handle emergency stop command - immediately land the drone
+    Handle size selection from frontend
     """
-    print("🚨 EMERGENCY STOP RECEIVED - Landing drone immediately")
+    size = data.get("size", "MED")
+    radius = SIZE_TO_RADIUS.get(size, 2.0)
+    
+    print(f"📏 Size selected: {size} (radius: {radius})")
     
     try:
-        # Method 1: Send emergency land command to ROS
-        result1 = subprocess.run([
-            "ros2", "topic", "pub", "/emergency_stop", "std_msgs/Bool", "data: true", "--once"
-        ], capture_output=True, text=True, timeout=3)
+        # Set the radius parameter immediately when size is selected
+        subprocess.run([
+            "ros2", "param", "set", "/pc_post_processor_node", "circle_radius", str(radius)
+        ], timeout=3)
         
-        # Method 2: Send mavros land command
-        result2 = subprocess.run([
-            "ros2", "service", "call", "/mavros/cmd/land", "mavros_msgs/srv/CommandTOL", "{}"
-        ], capture_output=True, text=True, timeout=3)
+        subprocess.run([
+            "ros2", "param", "set", "/helical_flight_node", "radius", str(radius)
+        ], timeout=3)
         
-        # Method 3: Force flight mode to LAND
-        result3 = subprocess.run([
-            "ros2", "service", "call", "/mavros/set_mode", "mavros_msgs/srv/SetMode", 
-            "base_mode: 0\ncustom_mode: 'LAND'"
-        ], capture_output=True, text=True, timeout=3)
+        print(f"✅ Radius {radius} set for size {size}")
         
-        # Method 4: Send to your helical flight node
-        result4 = subprocess.run([
-            "ros2", "topic", "pub", "/scan/end", "std_msgs/Bool", "data: true", "--once"
-        ], capture_output=True, text=True, timeout=3)
-        
-        print("✅ Emergency stop commands sent to drone")
-        print(f"Emergency stop result: {result1.returncode}")
-        print(f"Mavros land result: {result2.returncode}")
-        print(f"Set mode result: {result3.returncode}")
-        print(f"Scan end result: {result4.returncode}")
-        
-        # Update phase to Landing
-        update_phase("Landing")
-        
-        # Stop any ongoing scan
-        with open("command.json", "w") as f:
-            json.dump({"command": "STOP", "emergency": True}, f)
+        # Save size selection
+        if os.path.exists("command.json"):
+            with open("command.json", "r") as f:
+                data = json.load(f)
+        else:
+            data = {}
             
-        emit("command_response", {"status": "emergency_stop_sent", "message": "Emergency stop activated"})
+        data.update({"size": size, "radius": radius})
+        
+        with open("command.json", "w") as f:
+            json.dump(data, f)
+            
+        emit("size_selected", {"size": size, "radius": radius, "status": "ok"})
         
     except Exception as e:
-        print(f"❌ Error sending emergency stop: {e}")
-        emit("command_response", {"status": "error", "message": str(e)})
-
-@socketio.on('land_flight')
-def handle_land_flight():
-    """
-    Handle land flight command - normal landing (used by both regular stop and emergency stop)
-    """
-    print("🛬 LAND FLIGHT command received")
-    
-    try:
-        # Send normal land commands to drone
-        result1 = subprocess.run([
-            "ros2", "topic", "pub", "/scan/end", "std_msgs/Bool", "data: true", "--once"
-        ], capture_output=True, text=True, timeout=3)
-        
-        result2 = subprocess.run([
-            "ros2", "service", "call", "/mavros/cmd/land", "mavros_msgs/srv/CommandTOL", "{}"
-        ], capture_output=True, text=True, timeout=3)
-        
-        print("✅ Land flight commands sent")
-        print(f"Scan end result: {result1.returncode}")
-        print(f"Mavros land result: {result2.returncode}")
-        
-        # Update phase to Landing
-        update_phase("Landing")
-        
-        # Update command file
-        with open("command.json", "w") as f:
-            json.dump({"command": "STOP", "landing": True}, f)
-            
-        emit("command_response", {"status": "landing_initiated"})
-        
-    except Exception as e:
-        print(f"❌ Error sending land command: {e}")
-        emit("command_response", {"status": "error", "message": str(e)})
+        print(f"❌ Error setting size: {e}")
+        emit("size_selected", {"status": "error", "message": str(e)})
