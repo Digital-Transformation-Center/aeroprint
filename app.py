@@ -498,42 +498,40 @@ def handle_command(data):
         new_scan = increment_scan_number()
         print(f"Starting new scan: {new_scan}")
         
-        # 🔧 FIX: Set ROS parameters for post-processor
+        # Check what the current parameter is BEFORE setting
+        try:
+            current_radius = subprocess.run([
+
+                "ros2", "param", "get", "/pc_post_processor_node", "circle_radius"
+            ], capture_output=True, text=True, timeout=3)
+            print(f"🔍 BEFORE - Current post-processor radius: {current_radius.stdout.strip()}")
+        except Exception as e:
+            print(f"Could not get current radius: {e}")
+        
+        # Set the new radius
         try:
             print(f"📡 Setting post-processor radius to: {radius}")
             
-            # Set radius for post-processor node
             result1 = subprocess.run([
                 "ros2", "param", "set", "/pc_post_processor_node", "circle_radius", str(radius)
             ], capture_output=True, text=True, timeout=5)
             
-            if result1.returncode == 0:
-                print(f"✅ Post-processor radius set successfully")
-            else:
-                print(f"❌ Failed to set post-processor radius: {result1.stderr}")
+            print(f"Set radius result: {result1.returncode}")
+            print(f"Set radius stdout: {result1.stdout}")
+            print(f"Set radius stderr: {result1.stderr}")
             
-            # Also set for helical flight node
-            result2 = subprocess.run([
-                "ros2", "param", "set", "/helical_flight_node", "radius", str(radius)
-            ], capture_output=True, text=True, timeout=5)
-            
-            if result2.returncode == 0:
-                print(f"✅ Helical flight radius set successfully")
-            else:
-                print(f"❌ Failed to set helical flight radius: {result2.stderr}")
-                
-            # Verify the parameter was set
+            # Verify immediately after setting
             verify_result = subprocess.run([
                 "ros2", "param", "get", "/pc_post_processor_node", "circle_radius"
             ], capture_output=True, text=True, timeout=3)
             
-            print(f"🔍 Verified post-processor radius: {verify_result.stdout.strip()}")
+            print(f"🔍 AFTER - Verified post-processor radius: {verify_result.stdout.strip()}")
             
         except Exception as e:
             print(f"❌ Error setting ROS parameters: {e}")
         
         update_phase("Takeoff")
-        send_radius(radius)  # Send to GUI topic
+        send_radius(radius)
         send_ready()
         
     elif command == "STOP":
@@ -546,7 +544,7 @@ def handle_command(data):
     
     emit("command_response", {"status": "ok"})
 
-    @socketio.on("select_size")
+@socketio.on("select_size")
 def handle_select_size(data):
     """
     Handle size selection from frontend
@@ -571,17 +569,42 @@ def handle_select_size(data):
         # Save size selection
         if os.path.exists("command.json"):
             with open("command.json", "r") as f:
-                data = json.load(f)
+                command_data = json.load(f)
         else:
-            data = {}
+            command_data = {}
             
-        data.update({"size": size, "radius": radius})
+        command_data.update({"size": size, "radius": radius})
         
         with open("command.json", "w") as f:
-            json.dump(data, f)
+            json.dump(command_data, f)
             
         emit("size_selected", {"size": size, "radius": radius, "status": "ok"})
         
     except Exception as e:
         print(f"❌ Error setting size: {e}")
         emit("size_selected", {"status": "error", "message": str(e)})
+
+def debug_ros_nodes():
+    """
+    Check what ROS nodes are actually running
+    """
+    try:
+        result = subprocess.run([
+            "ros2", "node", "list"
+        ], capture_output=True, text=True, timeout=5)
+        
+        print("🤖 ROS Nodes running:")
+        print(result.stdout)
+        
+        if "/pc_post_processor_node" in result.stdout:
+            print("✅ Post-processor node found")
+        else:
+            print("❌ Post-processor node NOT found!")
+            
+    except Exception as e:
+        print(f"Error checking ROS nodes: {e}")
+
+# Call this when starting a scan
+if command == "START":
+    debug_ros_nodes()  # Add this line
+    # ... rest of your code
