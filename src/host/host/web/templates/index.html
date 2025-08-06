@@ -20,14 +20,12 @@
       <img src="{{ url_for('static', filename='images/aeroprint_title.png') }}" alt="AeroPrint Logo">
     </div>
       <!-- Always present in DOM -->
-      <div class="top-left-stop" id="emergency-stop-container" style="display: none;">
-        <button id="emergency-stop" onclick="sendStopCommand()" aria-label="Emergency Stop">
-          <!-- SVG Red Octagon -->
-          <svg width="48" height="48" viewBox="0 0 48 48">
-            <polygon points="12,4 36,4 44,12 44,36 36,44 12,44 4,36 4,12" fill="#f44336" stroke="#900" stroke-width="2"/>
-            <text x="24" y="30" text-anchor="middle" font-size="18" fill="#fff" font-family="Arial" font-weight="bold">STOP</text>
+      <div class="top-left-stop">
+        <div id="emergency-stop" onclick="sendStopCommand()">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="white">
+            <rect x="6" y="6" width="12" height="12" rx="2"/>
           </svg>
-        </button>
+        </div>
       </div>
 
     <!-- Dev Phase Preview Menu (hidden by default, toggled with Ctrl+Q) -->
@@ -146,31 +144,31 @@
   });
 
     function toggleAction() {
-      const btn = document.getElementById('action-btn');
-      const isStart = btn.classList.contains('start-btn');
+  const btn = document.getElementById('action-btn');
+  const isStart = btn.classList.contains('start-btn');
 
-      if (isStart) {
-        // Going from START to STOP
-        btn.textContent = "STOP";
-        btn.classList.remove("start-btn");
-        btn.classList.add("stop-btn");
-        socket.emit('send_command', {
-          command: "START",
-          size: selectedSize
-        });
-        socket.emit('start_flight')
-      } else {
-        // Going from STOP to START
-        socket.emit('land_flight');
-        btn.textContent = "START";
-        btn.classList.remove("stop-btn");
-        btn.classList.add("start-btn");
-        socket.emit('send_command', {
-          command: "STOP",
-          size: selectedSize
-        });
-      }
-    }
+  if (isStart) {
+    // Going from START to STOP
+    btn.textContent = "STOP";
+    btn.classList.remove("start-btn");
+    btn.classList.add("stop-btn");
+    socket.emit('send_command', {
+      command: "START",
+      size: selectedSize
+    });
+    socket.emit('start_flight')
+  } else {
+    // Going from STOP to START - USE LAND_FLIGHT
+    socket.emit('land_flight');  // This stays the same
+    btn.textContent = "START";
+    btn.classList.remove("stop-btn");
+    btn.classList.add("start-btn");
+    socket.emit('send_command', {
+      command: "STOP",
+      size: selectedSize
+    });
+  }
+}
 
     function selectSize(size) {
       selectedSize = size;
@@ -297,28 +295,26 @@ function simulatePhase(phase) {
     } else {
         if (sizeSelector) sizeSelector.style.display = "none";
     }
+
+    // Show/hide emergency stop button based on phase - KEEP IT VISIBLE
+    const emergencyStopContainer = document.querySelector('.top-left-stop');
+    if (phase === "Scanning" || phase === "Takeoff" || phase === "Processing" || phase === "Meshing" || phase === "Slicing") {
+        if (emergencyStopContainer) emergencyStopContainer.style.display = "block";
+    } else {
+        if (emergencyStopContainer) emergencyStopContainer.style.display = "none";
+    }
 }
 
     function typePhaseDescription(text) {
-      const descDiv = document.querySelector('.phase-description');
-      if (!descDiv) return;
-      let p = descDiv.querySelector('p');
-      if (!p) {
-        p = document.createElement('p');
-        descDiv.prepend(p);
-      }
-      p.textContent = ""; // Clear previous text
-
-      let i = 0;
-      function type() {
-        if (i < text.length) {
-          p.textContent += text.charAt(i);
-          i++;
-          setTimeout(type, 18); // Adjust speed here (ms per character)
-        }
-      }
-      type();
-    }
+  const descDiv = document.querySelector('.phase-description');
+  if (!descDiv) return;
+  let p = descDiv.querySelector('p');
+  if (!p) {
+    p = document.createElement('p');
+    descDiv.prepend(p);
+  }
+  p.textContent = text; // Direct assignment - no animation
+}
 
     function updatePhaseDescription(phase) {
       const text = phaseDescriptions[phase] || "";
@@ -342,7 +338,18 @@ function simulatePhase(phase) {
     }
 
     socket.on('command_response', data => {
-      console.log("Server response:", data);
+      console.log("✅ Server response:", data);
+      if (data.status === "emergency_stop_sent") {
+        console.log("🚨 Emergency stop confirmed by server");
+      }
+    });
+
+    socket.on('connect', () => {
+    console.log("🔗 Connected to Flask server");
+    });
+
+    socket.on('disconnect', () => {
+    console.log("❌ Disconnected from Flask server");
     });
 
     socket.on('status_update', function(data) {
@@ -479,10 +486,28 @@ function simulatePhase(phase) {
     });
 
     function sendStopCommand() {
-      socket.emit('emergency_stop');
-      // Optionally show a message to the user
-      alert("Emergency stop sent. Drone landing...");
+    // Send land flight command (same as regular stop)
+    socket.emit('land_flight');
+    
+    // Also send a regular stop command as backup
+    socket.emit('send_command', {
+        command: "STOP",
+        size: selectedSize
+    });
+    
+    // Update UI to show emergency state
+    const actionBtn = document.getElementById('action-btn');
+    if (actionBtn) {
+        actionBtn.textContent = "START";
+        actionBtn.classList.remove("stop-btn");
+        actionBtn.classList.add("start-btn");
     }
+    
+    // Show notification
+    alert("EMERGENCY STOP ACTIVATED - Drone returning to land immediately!");
+    
+    console.log("Drone Returning to Land");
+}
 
     // Toggle dev menu with Ctrl+Q
     document.addEventListener('keydown', function(e) {
@@ -891,6 +916,18 @@ async function showSlicingPointCloud() {
   }
   animate();
 }
+
+// Add this to your dev mode functions
+function toggleEmergencyStop() {
+    const emergencyStopContainer = document.querySelector('.top-left-stop');
+    if (emergencyStopContainer) {
+        const isVisible = emergencyStopContainer.style.display !== "none";
+        emergencyStopContainer.style.display = isVisible ? "none" : "block";
+        console.log("Emergency stop button:", isVisible ? "hidden" : "shown");
+    }
+}
+
+// You can call this in browser console: toggleEmergencyStop()
 
 // Add this function to your index.html JavaScript section
 
