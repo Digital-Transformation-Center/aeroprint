@@ -38,7 +38,7 @@ services:
     volumes:
       - /dev/shm:/dev/shm
       - ../../src/:/home/aeroprint_user/aeroprint/src
-      - /var/lib/aeroprint:/var/lib/aeroprint  # Fixed: Linux path instead of Windows
+      - ../../data:/var/lib/aeroprint  # Map Windows data directory to container aeroprint directory
 
     # Use bridge networking instead of host mode on Windows
     ports:
