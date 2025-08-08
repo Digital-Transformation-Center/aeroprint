@@ -19,8 +19,8 @@
     <div class="title-banner">
       <img src="{{ url_for('static', filename='images/aeroprint_title.png') }}" alt="AeroPrint Logo">
     </div>
-      <!-- Always present in DOM -->
-      <div class="top-left-stop" id="emergency-stop-container" style="display: none;">
+  <!-- Always present in DOM -->
+  <div class="top-left-stop" id="emergency-stop-container" style="display: none;">
         <button id="emergency-stop" onclick="sendStopCommand()" aria-label="Emergency Stop">
           <!-- SVG Red Octagon -->
           <svg width="48" height="48" viewBox="0 0 48 48">
@@ -297,6 +297,8 @@ function simulatePhase(phase) {
     } else {
         if (sizeSelector) sizeSelector.style.display = "none";
     }
+  // Ensure stop-sign visibility follows phase during dev preview
+  updatePhaseUI(phase);
 }
     function updatePhaseDescription(phase) {
       const text = phaseDescriptions[phase] || "";
@@ -314,16 +316,20 @@ function simulatePhase(phase) {
     function updatePhaseUI(phase) {
       const actionBtn = document.getElementById('action-btn');
       const progressContainer = document.querySelector('.progress-container');
-      const stopBtn = document.querySelector('.top-left-stop');
+      const stopContainer = document.getElementById('emergency-stop-container');
+
+      const showStopFor = ["Scanning", "Processing", "Meshing", "Slicing"]; // show only in these phases
 
       if (phase === "Preflight") {
         if (actionBtn) actionBtn.style.display = "inline-block";
         if (progressContainer) progressContainer.style.display = "none";
-        if (stopBtn) stopBtn.style.display = "none";
       } else {
         if (actionBtn) actionBtn.style.display = "none";
         if (progressContainer) progressContainer.style.display = "block";
-        if (stopBtn) stopBtn.style.display = "block";
+      }
+
+      if (stopContainer) {
+        stopContainer.style.display = showStopFor.includes(phase) ? "block" : "none";
       }
     }
 
@@ -465,9 +471,8 @@ function simulatePhase(phase) {
     });
 
     function sendStopCommand() {
-      socket.emit('emergency_stop');
-      // Optionally show a message to the user
-      alert("Emergency stop sent. Drone landing...");
+      // Trigger safe land pathway
+      socket.emit('land_flight');
     }
 
     // Toggle dev menu with Ctrl+Q
@@ -491,6 +496,7 @@ function simulatePhase(phase) {
     // Update phase description on load (no typewriter)
     document.addEventListener('DOMContentLoaded', () => {
       updatePhaseDescription("{{ stage }}");
+      updatePhaseUI("{{ stage }}"); // ensure correct initial visibility for stop button
     });
 
     let pcViewerInitialized = false;

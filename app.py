@@ -510,3 +510,33 @@ def handle_command(data):
     with open("command.json", "w") as f:
         json.dump({"command": command, "size": size, "radius": radius}, f)
     emit("command_response", {"status": "ok"})
+
+# --- Safe landing support ---
+def land_drone():
+    """Request a safe landing via MAVROS by switching mode to AUTO.LAND.
+    If mavros isn't available on this host, this will simply no-op.
+    """
+    try:
+        subprocess.run([
+            "ros2", "service", "call",
+            "/mavros/set_mode", "mavros_msgs/srv/SetMode",
+            "{custom_mode: 'AUTO.LAND'}"
+        ], check=False)
+    except Exception as e:
+        print(f"land_drone: failed to call MAVROS set_mode AUTO.LAND: {e}")
+
+
+@socketio.on("land_flight")
+def socket_land_flight():
+    print("SocketIO: land_flight requested")
+    update_phase("Landing")
+    land_drone()
+    emit("command_response", {"status": "ok", "action": "land"})
+
+
+@socketio.on("emergency_stop")
+def socket_emergency_stop():
+    print("SocketIO: emergency_stop requested -> initiating landing")
+    update_phase("Landing")
+    land_drone()
+    emit("command_response", {"status": "ok", "action": "emergency_land"})
