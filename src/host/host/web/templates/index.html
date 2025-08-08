@@ -298,8 +298,8 @@ function simulatePhase(phase) {
         if (sizeSelector) sizeSelector.style.display = "none";
     }
 }
-
-    function typePhaseDescription(text) {
+    function updatePhaseDescription(phase) {
+      const text = phaseDescriptions[phase] || "";
       const descDiv = document.querySelector('.phase-description');
       if (!descDiv) return;
       let p = descDiv.querySelector('p');
@@ -307,22 +307,8 @@ function simulatePhase(phase) {
         p = document.createElement('p');
         descDiv.prepend(p);
       }
-      p.textContent = ""; // Clear previous text
-
-      let i = 0;
-      function type() {
-        if (i < text.length) {
-          p.textContent += text.charAt(i);
-          i++;
-          setTimeout(type, 18); // Adjust speed here (ms per character)
-        }
-      }
-      type();
-    }
-
-    function updatePhaseDescription(phase) {
-      const text = phaseDescriptions[phase] || "";
-      typePhaseDescription(text);
+      // Set instantly (no typewriter)
+      p.textContent = text;
     }
 
     function updatePhaseUI(phase) {
@@ -502,13 +488,9 @@ function simulatePhase(phase) {
       "Printing": "🖨️ PRINT OPERATION IS UNDERWAY. LAYERS ARE BEING DEPOSITED IN SEQUENCE USING THE GENERATED TOOLPATH."
     };
 
-    // Update phase description on load
+    // Update phase description on load (no typewriter)
     document.addEventListener('DOMContentLoaded', () => {
-      document.querySelectorAll('.phase-description p').forEach(p => {
-        const phase = p.closest('.phase-description').getAttribute('data-phase');
-        p.textContent = phaseDescriptions[phase] || '';z
-      });
-      updatePhaseDescription("{{ stage }}"); // On page load
+      updatePhaseDescription("{{ stage }}");
     });
 
     let pcViewerInitialized = false;
