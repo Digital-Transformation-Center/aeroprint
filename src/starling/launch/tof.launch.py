@@ -16,6 +16,7 @@ def generate_launch_description():
                         'wait_timeout_sec': 0.3,
                         'max_wait_tries': 3,
                         'fallback_to_latest': True,
+                        'passthrough_on_missing_tf': True,
                     }
                 ],
             ),

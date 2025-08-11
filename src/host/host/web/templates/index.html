@@ -767,7 +767,35 @@ async function fetchAndShowCombinedPointCloud() {
       asset.name === "combined_filtered.pcd"
   );
   if (!asset) {
-    console.warn("No combined_filtered.pcd file found for scan number", scanNumber);
+    // Fallback: render all available PCDs into the Processing viewer
+    const pcdFiles = assets.filter(a => a.type === 'file' && a.name.endsWith('.pcd'));
+    if (!pcdFiles.length) {
+      console.warn("No PCD files found for scan number", scanNumber);
+      return;
+    }
+    let allPoints = [];
+    for (const f of pcdFiles) {
+      try {
+        const pcdResp = await fetch(f.path);
+        const arrayBuffer = await pcdResp.arrayBuffer();
+        const info = getPcdHeaderInfo(arrayBuffer);
+        if (!info || info.dataOffset == null || !info.numPoints) {
+          console.warn(`PCD header parsing failed for ${f.name}`);
+          continue;
+        }
+        const sliced = arrayBuffer.slice(info.dataOffset);
+        const floatData = new Float32Array(sliced, 0, info.numPoints * 3);
+        allPoints.push(...floatData);
+      } catch (e) {
+        console.warn(`Failed to load ${f.name}:`, e);
+      }
+    }
+    if (allPoints.length) {
+      showPointCloud(allPoints);
+      console.info(`Fallback: rendered ${pcdFiles.length} PCD files (${allPoints.length / 3} points)`);
+    } else {
+      console.warn("Fallback failed: no points parsed from available PCD files");
+    }
     return;
   }
   const pcdResponse = await fetch(asset.path);

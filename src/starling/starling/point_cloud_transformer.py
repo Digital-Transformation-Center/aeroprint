@@ -11,7 +11,7 @@ from tf2_sensor_msgs import do_transform_cloud
 
 
 class PointCloudTransformer(Node):
-    """Point cloud transformer with TF wait and latest fallback."""
+    """Point cloud transformer with TF wait, latest fallback, and optional passthrough."""
 
     def __init__(self) -> None:
         super().__init__('point_cloud_transformer')
@@ -22,16 +22,17 @@ class PointCloudTransformer(Node):
 
         # Parameters
         self.declare_parameter('target_frame', 'odom')
-        self.declare_parameter('wait_timeout_sec', 0.25)   # seconds to wait for exact-time TF
-        self.declare_parameter('max_wait_tries', 2)        # attempts for exact-time TF
+        self.declare_parameter('wait_timeout_sec', 0.3)    # seconds to wait for exact-time TF
+        self.declare_parameter('max_wait_tries', 3)        # attempts for exact-time TF
         self.declare_parameter('fallback_to_latest', True) # if exact-time fails, use latest
+        self.declare_parameter('passthrough_on_missing_tf', True) # publish in source frame if TF missing
 
         # Subscriptions
         self.subscription = self.create_subscription(
             PointCloud2,
             '/tof_pc',
             self.point_cloud_callback,
-            rclpy.qos.qos_profile_sensor_data
+            rclpy.qos.qos_profile_sensor_data,
         )
         self.get_logger().info('Subscribing to /tof_pc')
 
@@ -39,7 +40,7 @@ class PointCloudTransformer(Node):
         self.publisher = self.create_publisher(
             PointCloud2,
             '/starling/out/relative_posed_pc',
-            rclpy.qos.qos_profile_sensor_data
+            rclpy.qos.qos_profile_sensor_data,
         )
         self.get_logger().info('Publishing to /starling/out/relative_posed_pc')
 
@@ -68,6 +69,7 @@ class PointCloudTransformer(Node):
         wait_timeout = Duration(seconds=float(self.get_parameter('wait_timeout_sec').value))
         max_tries = int(self.get_parameter('max_wait_tries').value)
         use_latest_fallback = bool(self.get_parameter('fallback_to_latest').value)
+        passthrough_on_missing = bool(self.get_parameter('passthrough_on_missing_tf').value)
 
         try:
             # Try exact-time TF
@@ -89,6 +91,13 @@ class PointCloudTransformer(Node):
                         f"Using latest TF for {source_frame}->{target_frame} (stamp: {ts.sec}.{ts.nanosec:09d})")
 
             if transform is None:
+                # Optional passthrough: publish in source frame to avoid dropping data
+                if passthrough_on_missing:
+                    self.get_logger().warn(
+                        f"Publishing point cloud in source frame '{source_frame}' due to missing TF to '{target_frame}' (stamp: {stamp.nanoseconds})")
+                    # Publish the original message as-is to avoid dropping data
+                    self.publisher.publish(msg)
+                    return
                 raise tf2_ros.ExtrapolationException(
                     f"No TF for {source_frame}->{target_frame} at {stamp.nanoseconds} and no latest fallback.")
 
