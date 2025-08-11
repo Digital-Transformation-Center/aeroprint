@@ -470,6 +470,52 @@ function simulatePhase(phase) {
       flight_time_label.textContent = `Estimated Flight Time: ${Math.ceil(window.flight_time_est)}s`;
     });
 
+    // --- Helper: robust PCD header parsing ---
+    function findBytes(haystack, needle) {
+      outer: for (let i = 0; i <= haystack.length - needle.length; i++) {
+        for (let j = 0; j < needle.length; j++) {
+          if (haystack[i + j] !== needle[j]) continue outer;
+        }
+        return i;
+      }
+      return -1;
+    }
+
+    function getPcdHeaderInfo(arrayBuffer) {
+      const maxHeader = Math.min(arrayBuffer.byteLength, 16384);
+      const headerBytes = new Uint8Array(arrayBuffer, 0, maxHeader);
+      const enc = new TextEncoder();
+      const needle = enc.encode('DATA binary');
+      const dataIdx = findBytes(headerBytes, needle);
+      if (dataIdx === -1) {
+        console.warn('PCD: DATA binary not found in header');
+        return null;
+      }
+      // Find newline after DATA binary
+      let newlineIdx = -1;
+      for (let i = dataIdx; i < headerBytes.length; i++) {
+        if (headerBytes[i] === 0x0A) { // '\n'
+          newlineIdx = i;
+          break;
+        }
+      }
+      if (newlineIdx === -1) {
+        console.warn('PCD: newline after DATA binary not found');
+        return null;
+      }
+      const dataOffset = newlineIdx + 1; // byte offset where binary data starts
+
+      // Decode header text up to dataOffset to get POINTS
+      const headerText = new TextDecoder('utf-8').decode(headerBytes.slice(0, Math.min(dataOffset, headerBytes.length)));
+      const pointsMatch = headerText.match(/POINTS\s+(\d+)/i);
+      const numPoints = pointsMatch ? parseInt(pointsMatch[1]) : undefined;
+      if (!numPoints || Number.isNaN(numPoints)) {
+        console.warn('PCD: could not parse POINTS from header');
+        return { dataOffset };
+      }
+      return { dataOffset, numPoints };
+    }
+
     function sendStopCommand() {
       // Trigger safe land pathway
       socket.emit('land_flight');
@@ -726,13 +772,14 @@ async function fetchAndShowCombinedPointCloud() {
   }
   const pcdResponse = await fetch(asset.path);
   const arrayBuffer = await pcdResponse.arrayBuffer();
-  const textDecoder = new TextDecoder("utf-8");
-  const headerText = textDecoder.decode(arrayBuffer.slice(0, 1024));
-  const headerEnd = headerText.indexOf("DATA binary");
-  const dataStart = headerText.indexOf('\n', headerEnd) + 1;
-  const pointsMatch = headerText.match(/POINTS\s+(\d+)/);
-  const numPoints = parseInt(pointsMatch[1]);
-  const floatData = new Float32Array(arrayBuffer, dataStart, numPoints * 3);
+  const info = getPcdHeaderInfo(arrayBuffer);
+  if (!info || info.dataOffset == null) {
+    console.warn('PCD header parsing failed for combined_filtered.pcd');
+    return;
+  }
+  const numPoints = info.numPoints;
+  const sliced = arrayBuffer.slice(info.dataOffset); // aligned buffer start
+  const floatData = numPoints ? new Float32Array(sliced, 0, numPoints * 3) : new Float32Array(sliced);
   showPointCloud(floatData); // <-- renders in pointcloud-viewer
   console.log(`Parsed ${numPoints} points from combined_filtered.pcd`);
 }
@@ -755,15 +802,15 @@ async function fetchAndShowFullPointCloud() {
   for (const asset of pcdFiles) {
     const pcdResponse = await fetch(asset.path);
     const arrayBuffer = await pcdResponse.arrayBuffer();
-    const textDecoder = new TextDecoder("utf-8");
-    const headerText = textDecoder.decode(arrayBuffer.slice(0, 1024));
-    const headerEnd = headerText.indexOf("DATA binary");
-    const dataStart = headerText.indexOf('\n', headerEnd) + 1;
-    const pointsMatch = headerText.match(/POINTS\s+(\d+)/);
-    const numPoints = parseInt(pointsMatch[1]);
-    const floatData = new Float32Array(arrayBuffer, dataStart, numPoints * 3);
+    const info = getPcdHeaderInfo(arrayBuffer);
+    if (!info || info.dataOffset == null || !info.numPoints) {
+      console.warn(`PCD header parsing failed for ${asset.name}`);
+      continue;
+    }
+    const sliced = arrayBuffer.slice(info.dataOffset);
+    const floatData = new Float32Array(sliced, 0, info.numPoints * 3);
     allPoints.push(...floatData);
-    console.log(`Parsed ${numPoints} points from ${asset.name}`);
+    console.log(`Parsed ${info.numPoints} points from ${asset.name}`);
   }
   showMeshPointCloud(allPoints); // <-- renders in mesh-viewer
 }
@@ -792,13 +839,12 @@ async function showSlicingPointCloud() {
   }
   const pcdResponse = await fetch(asset.path);
   const arrayBuffer = await pcdResponse.arrayBuffer();
-  const textDecoder = new TextDecoder("utf-8");
-  const headerText = textDecoder.decode(arrayBuffer.slice(0, 1024));
-  const headerEnd = headerText.indexOf("DATA binary");
-  const dataStart = headerText.indexOf('\n', headerEnd) + 1;
-  const pointsMatch = headerText.match(/POINTS\s+(\d+)/);
-  const numPoints = parseInt(pointsMatch[1]);
-  const floatData = new Float32Array(arrayBuffer, dataStart, numPoints * 3);
+  const info = getPcdHeaderInfo(arrayBuffer);
+  if (!info || info.dataOffset == null || !info.numPoints) {
+    console.warn('PCD header parsing failed for slicing view');
+    return;
+  }
+  // Data offset and count parsed via getPcdHeaderInfo; use sliced buffer below
 
   // Three.js setup
   const scene = new THREE.Scene();
@@ -811,6 +857,8 @@ async function showSlicingPointCloud() {
 
   // Create geometry from real data
   const geometry = new THREE.BufferGeometry();
+  const sliced = arrayBuffer.slice(info.dataOffset);
+  const floatData = new Float32Array(sliced, 0, info.numPoints * 3);
   geometry.setAttribute('position', new THREE.BufferAttribute(floatData, 3));
   geometry.computeBoundingBox();
   let center = new THREE.Vector3(0,0,0);
