@@ -87,6 +87,12 @@
                   style="margin: 12px 0; display: none; position: absolute; top: 12px; left: 12px; z-index: 20;">
             Download Slices
           </button>
+          <!-- Download Mesh Button: Only visible in Meshing phase -->
+          <button id="download-mesh-btn"
+                  onclick="window.location='/download_mesh'"
+                  style="margin: 12px 0; display: none; position: absolute; top: 12px; left: 160px; z-index: 20;">
+            Download Mesh
+          </button>
         </div>
 
         <!-- Place the download button here -->
@@ -121,6 +127,7 @@
     const socket = io();
     let selectedSize = "{{ selected_size }}";  // store size for use during START
     let devProgressInterval = null;
+  let pcRefreshInterval = null;
     const connection_indicator = document.getElementById('starling-status');
 
     // updatePhaseDescription('Preflight');
@@ -371,10 +378,22 @@ function simulatePhase(phase) {
       const meshViewer = document.getElementById('mesh-viewer');
       const slicingViewer = document.getElementById('slicing-viewer');
       const pathIframe = document.querySelector('.path-box iframe');
-      if (data.phase === "Processing") {
+      // Clear any previous periodic refresh
+      if (pcRefreshInterval) { clearInterval(pcRefreshInterval); pcRefreshInterval = null; }
+
+    if (data.phase === "Scanning") {
         if (pcViewer) {
           pcViewer.style.display = "block";
-          initPointCloudViewer();
+      fetchAndShowFullPointCloud(); // render whatever exists so far
+          pcRefreshInterval = setInterval(() => fetchAndShowFullPointCloud(), 3000);
+        }
+        if (meshViewer) { meshViewer.style.display = "none"; meshViewer.innerHTML = ""; }
+        if (slicingViewer) slicingViewer.style.display = "none";
+        if (pathIframe) pathIframe.style.visibility = "visible";
+      } else if (data.phase === "Processing") {
+        if (pcViewer) {
+          pcViewer.style.display = "block";
+      fetchAndShowCombinedPointCloud(0.2); // ~20% of points
         }
         if (meshViewer) {
           meshViewer.style.display = "none";
@@ -382,14 +401,14 @@ function simulatePhase(phase) {
         }
         if (slicingViewer) slicingViewer.style.display = "none";
         if (pathIframe) pathIframe.style.visibility = "visible";
-      } else if (data.phase === "Meshing") {
+    } else if (data.phase === "Meshing") {
         if (pcViewer) {
           pcViewer.style.display = "none";
           pcViewer.innerHTML = ""; // <-- Remove any old canvas!
         }
         if (meshViewer) {
           meshViewer.style.display = "block";
-          fetchAndShowCombinedPointCloud();
+      fetchAndShowFullPointCloud(0.8); // ~80% of points
         }
         if (slicingViewer) slicingViewer.style.display = "none";
         if (pathIframe) pathIframe.style.visibility = "hidden";
@@ -754,7 +773,23 @@ function showSlicing() {
 }
 
 // --- Fetch and show only the combined_filtered.pcd (Processing phase) ---
-async function fetchAndShowCombinedPointCloud() {
+function samplePointsByRatio(floatData, ratio = 1.0) {
+  if (!floatData || !floatData.length || ratio >= 0.999) return floatData;
+  const n = Math.floor(floatData.length / 3);
+  const target = Math.max(1, Math.floor(n * Math.max(0.0, Math.min(ratio, 1.0))));
+  const stride = Math.max(1, Math.floor(n / target));
+  const out = new Float32Array(target * 3);
+  let oi = 0;
+  for (let i = 0; i < n && oi < out.length; i += stride) {
+    const j = i * 3;
+    out[oi++] = floatData[j];
+    out[oi++] = floatData[j + 1];
+    out[oi++] = floatData[j + 2];
+  }
+  return out.subarray(0, oi);
+}
+
+async function fetchAndShowCombinedPointCloud(ratio = 1.0) {
   const response = await fetch('/api/get_current_scan_num');
   const scanNumberObj = await response.json();
   const scanNumber = scanNumberObj.scan_num !== undefined ? scanNumberObj.scan_num : scanNumberObj;
@@ -791,7 +826,8 @@ async function fetchAndShowCombinedPointCloud() {
       }
     }
     if (allPoints.length) {
-      showPointCloud(allPoints);
+      const sampled = samplePointsByRatio(new Float32Array(allPoints), ratio);
+      showPointCloud(sampled);
       console.info(`Fallback: rendered ${pcdFiles.length} PCD files (${allPoints.length / 3} points)`);
     } else {
       console.warn("Fallback failed: no points parsed from available PCD files");
@@ -808,12 +844,13 @@ async function fetchAndShowCombinedPointCloud() {
   const numPoints = info.numPoints;
   const sliced = arrayBuffer.slice(info.dataOffset); // aligned buffer start
   const floatData = numPoints ? new Float32Array(sliced, 0, numPoints * 3) : new Float32Array(sliced);
-  showPointCloud(floatData); // <-- renders in pointcloud-viewer
+  const sampled = samplePointsByRatio(floatData, ratio);
+  showPointCloud(sampled); // <-- renders in pointcloud-viewer
   console.log(`Parsed ${numPoints} points from combined_filtered.pcd`);
 }
 
-// --- Fetch and show all individual PCDs (Meshing phase) ---
-async function fetchAndShowFullPointCloud() {
+// --- Fetch and show all individual PCDs (Meshing/Scanning) ---
+async function fetchAndShowFullPointCloud(ratio = 1.0) {
   const response = await fetch('/api/get_current_scan_num');
   const scanNumberObj = await response.json();
   const scanNumber = scanNumberObj.scan_num !== undefined ? scanNumberObj.scan_num : scanNumberObj;
@@ -840,7 +877,8 @@ async function fetchAndShowFullPointCloud() {
     allPoints.push(...floatData);
     console.log(`Parsed ${info.numPoints} points from ${asset.name}`);
   }
-  showMeshPointCloud(allPoints); // <-- renders in mesh-viewer
+  const sampled = samplePointsByRatio(new Float32Array(allPoints), ratio);
+  showMeshPointCloud(sampled); // <-- renders in mesh-viewer
 }
 
 async function showSlicingPointCloud() {
@@ -849,30 +887,35 @@ async function showSlicingPointCloud() {
   const height = container.clientHeight;
   container.innerHTML = "";
 
-  // Fetch the combined_filtered.pcd file
+  // Aggregate all PCD files for slicing view
   const response = await fetch('/api/get_current_scan_num');
   const scanNumberObj = await response.json();
   const scanNumber = scanNumberObj.scan_num !== undefined ? scanNumberObj.scan_num : scanNumberObj;
 
   const assetsResponse = await fetch(`/api/list_assets/${scanNumber}/pcd`);
   const assets = await assetsResponse.json();
-  const asset = assets.find(
-    asset =>
-      asset.type === "file" &&
-      asset.name === "combined_filtered.pcd"
-  );
-  if (!asset) {
-    console.warn("No combined_filtered.pcd file found for scan number", scanNumber);
+  const pcdFiles = assets.filter(a => a.type === 'file' && a.name.endsWith('.pcd'));
+  if (!pcdFiles.length) {
+    console.warn("No PCD files found for slicing for scan", scanNumber);
     return;
   }
-  const pcdResponse = await fetch(asset.path);
-  const arrayBuffer = await pcdResponse.arrayBuffer();
-  const info = getPcdHeaderInfo(arrayBuffer);
-  if (!info || info.dataOffset == null || !info.numPoints) {
-    console.warn('PCD header parsing failed for slicing view');
-    return;
+  let allPoints = [];
+  for (const f of pcdFiles) {
+    try {
+      const pcdResp = await fetch(f.path);
+      const arrayBuffer = await pcdResp.arrayBuffer();
+      const info = getPcdHeaderInfo(arrayBuffer);
+      if (!info || info.dataOffset == null || !info.numPoints) {
+        console.warn(`PCD header parsing failed for ${f.name}`);
+        continue;
+      }
+      const sliced = arrayBuffer.slice(info.dataOffset);
+      const floatData = new Float32Array(sliced, 0, info.numPoints * 3);
+      allPoints.push(...floatData);
+    } catch (e) {
+      console.warn(`Failed to load ${f.name}:`, e);
+    }
   }
-  // Data offset and count parsed via getPcdHeaderInfo; use sliced buffer below
 
   // Three.js setup
   const scene = new THREE.Scene();
@@ -885,8 +928,7 @@ async function showSlicingPointCloud() {
 
   // Create geometry from real data
   const geometry = new THREE.BufferGeometry();
-  const sliced = arrayBuffer.slice(info.dataOffset);
-  const floatData = new Float32Array(sliced, 0, info.numPoints * 3);
+  const floatData = new Float32Array(allPoints);
   geometry.setAttribute('position', new THREE.BufferAttribute(floatData, 3));
   geometry.computeBoundingBox();
   let center = new THREE.Vector3(0,0,0);

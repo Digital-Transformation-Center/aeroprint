@@ -5,7 +5,9 @@ import threading
 import time
 import struct
 import random
-from flask import jsonify
+from flask import jsonify, send_file
+import io
+import zipfile
 
 
 
@@ -213,6 +215,113 @@ DATA binary
     binary_data = bytes(points)
     
     return header_bytes + binary_data
+
+def _find_scan_base(scan_num: int):
+    candidates = [
+        f"/var/lib/aeroprint/scans/{scan_num}",
+        f"./scan_{scan_num}",
+        f"./scans/{scan_num}",
+    ]
+    for c in candidates:
+        if os.path.exists(c):
+            return c
+    return None
+
+def _zip_bytes(files: dict, zip_name: str):
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, 'w', compression=zipfile.ZIP_DEFLATED) as zf:
+        for relname, data in files.items():
+            zf.writestr(relname, data)
+    buf.seek(0)
+    return send_file(buf, mimetype='application/zip', as_attachment=True, download_name=zip_name)
+
+@app.route("/api/set_current_scan_num/<int:scan_num>", methods=["GET", "POST"])
+def set_current_scan_num(scan_num):
+    try:
+        with open("current_scan.json", "w") as f:
+            json.dump({"current_scan": scan_num}, f)
+        # Ensure basic dirs exist
+        for d in (
+            f"/var/lib/aeroprint/scans/{scan_num}/pcd",
+            f"./scan_{scan_num}/pcd",
+            f"./scans/{scan_num}/pcd",
+        ):
+            try:
+                os.makedirs(d, exist_ok=True)
+            except Exception:
+                pass
+        return jsonify({"ok": True, "scan_num": scan_num})
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)}), 500
+
+@app.route("/download_pointcloud")
+def download_pointcloud():
+    scan_num = get_latest_scan_number()
+    base = _find_scan_base(scan_num)
+    files = {}
+    if base:
+        pcd_dir = os.path.join(base, 'pcd')
+        if os.path.isdir(pcd_dir):
+            for fn in os.listdir(pcd_dir):
+                if fn.lower().endswith('.pcd'):
+                    fp = os.path.join(pcd_dir, fn)
+                    try:
+                        with open(fp, 'rb') as f:
+                            files[f"pcd/{fn}"] = f.read()
+                    except Exception:
+                        pass
+    if not files:
+        files['pcd/combined_filtered.pcd'] = generate_mock_pcd_data(1000)
+    return _zip_bytes(files, f"pointcloud_scan_{scan_num}.zip")
+
+@app.route("/download_mesh")
+def download_mesh():
+    scan_num = get_latest_scan_number()
+    base = _find_scan_base(scan_num)
+    files = {}
+    exts = ('.ply', '.obj', '.stl', '.glb', '.gltf')
+    if base:
+        mesh_dir = os.path.join(base, 'mesh')
+        dirs = [d for d in [mesh_dir, base] if os.path.isdir(d)]
+        for d in dirs:
+            for fn in os.listdir(d):
+                if fn.lower().endswith(exts):
+                    fp = os.path.join(d, fn)
+                    try:
+                        with open(fp, 'rb') as f:
+                            rel = f"mesh/{fn}" if d == mesh_dir else fn
+                            files[rel] = f.read()
+                    except Exception:
+                        pass
+    if not files:
+        files['README.txt'] = b'No mesh artifacts were found for this scan.'
+    return _zip_bytes(files, f"mesh_scan_{scan_num}.zip")
+
+@app.route("/download_slicing")
+def download_slicing():
+    scan_num = get_latest_scan_number()
+    base = _find_scan_base(scan_num)
+    files = {}
+    if base:
+        slice_dirs = [
+            os.path.join(base, 'slices'),
+            os.path.join(base, 'gcode'),
+            base,
+        ]
+        for d in slice_dirs:
+            if os.path.isdir(d):
+                for fn in os.listdir(d):
+                    if fn.lower().endswith('.gcode'):
+                        fp = os.path.join(d, fn)
+                        try:
+                            with open(fp, 'rb') as f:
+                                rel = f"slices/{fn}" if d != base else fn
+                                files[rel] = f.read()
+                        except Exception:
+                            pass
+    if not files:
+        files['README.txt'] = b'No slicing (.gcode) files were found for this scan.'
+    return _zip_bytes(files, f"slices_scan_{scan_num}.zip")
 
 # Add this route to increment scan number when starting a new scan
 @app.route("/api/start_new_scan")

@@ -5,6 +5,8 @@ import threading
 import time
 import struct
 import random
+import io
+import zipfile
 
 
 app = Flask(__name__)
@@ -16,6 +18,44 @@ SIZE_TO_RADIUS = {
     "MED": 2.0,
     "LG": 3.5
 }
+
+# Local testing phase durations (seconds)
+PHASE_DURATIONS = {
+    "processing": float(os.environ.get("PHASE_PROCESSING_SEC", 25)),
+    "meshing": float(os.environ.get("PHASE_MESHING_SEC", 25)),
+    "slicing": float(os.environ.get("PHASE_SLICING_SEC", 25)),
+}
+
+# Track a single post-scan phase thread to avoid duplicates
+_post_scan_thread = None
+
+def start_post_scan_sequence():
+    """Run a simple phase pipeline after Landing when offline (no Starling).
+    Sequence: Processing -> Meshing -> Slicing -> Printing with configured delays.
+    """
+    global _post_scan_thread
+    if _post_scan_thread and _post_scan_thread.is_alive():
+        return
+
+    def _runner():
+        try:
+            # small settle time after Landing
+            time.sleep(2)
+            update_phase("Processing")
+            time.sleep(PHASE_DURATIONS["processing"])  # hold in Processing
+
+            update_phase("Meshing")
+            time.sleep(PHASE_DURATIONS["meshing"])      # hold in Meshing
+
+            update_phase("Slicing")
+            time.sleep(PHASE_DURATIONS["slicing"])      # hold in Slicing
+
+            update_phase("Printing")
+        except Exception as e:
+            print(f"post-scan sequence error: {e}")
+
+    _post_scan_thread = threading.Thread(target=_runner, daemon=True)
+    _post_scan_thread.start()
 
 def is_starling_reachable():
     try:
@@ -206,20 +246,94 @@ def save_pointcloud(points, filename="latest_pointcloud.ply"):
         for pt in points:
             f.write(f"{pt[0]} {pt[1]} {pt[2]}\n")
 
+def _find_scan_base(scan_num: int):
+    candidates = [
+        f"/var/lib/aeroprint/scans/{scan_num}",
+        f"./scan_{scan_num}",
+        f"./scans/{scan_num}",
+    ]
+    for c in candidates:
+        if os.path.exists(c):
+            return c
+    return None
+
+def _zip_bytes(files: dict, zip_name: str):
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, 'w', compression=zipfile.ZIP_DEFLATED) as zf:
+        for relname, data in files.items():
+            zf.writestr(relname, data)
+    buf.seek(0)
+    return send_file(buf, mimetype='application/zip', as_attachment=True, download_name=zip_name)
+
 @app.route("/download_pointcloud")
 def download_pointcloud():
-    file_path = os.path.join(os.getcwd(), "latest_pointcloud.ply")
-    return send_file(file_path, as_attachment=True)
+    scan_num = get_latest_scan_number()
+    base = _find_scan_base(scan_num)
+    files = {}
+    if base:
+        pcd_dir = os.path.join(base, 'pcd')
+        if os.path.isdir(pcd_dir):
+            for fn in os.listdir(pcd_dir):
+                if fn.lower().endswith('.pcd'):
+                    fp = os.path.join(pcd_dir, fn)
+                    try:
+                        with open(fp, 'rb') as f:
+                            files[f"pcd/{fn}"] = f.read()
+                    except Exception:
+                        pass
+    if not files:
+        # Fallback: generate a mock combined file so the download still works
+        files['pcd/combined_filtered.pcd'] = generate_mock_pcd_data(1000)
+    return _zip_bytes(files, f"pointcloud_scan_{scan_num}.zip")
 
 @app.route("/download_mesh")
 def download_mesh():
-    file_path = os.path.join(os.getcwd(), "latest_mesh.ply")
-    return send_file(file_path, as_attachment=True)
+    scan_num = get_latest_scan_number()
+    base = _find_scan_base(scan_num)
+    files = {}
+    exts = ('.ply', '.obj', '.stl', '.glb', '.gltf')
+    if base:
+        mesh_dir = os.path.join(base, 'mesh')
+        dirs = [d for d in [mesh_dir, base] if os.path.isdir(d)]
+        for d in dirs:
+            for fn in os.listdir(d):
+                if fn.lower().endswith(exts):
+                    fp = os.path.join(d, fn)
+                    try:
+                        with open(fp, 'rb') as f:
+                            rel = f"mesh/{fn}" if d == mesh_dir else fn
+                            files[rel] = f.read()
+                    except Exception:
+                        pass
+    if not files:
+        files['README.txt'] = b'No mesh artifacts were found for this scan.'
+    return _zip_bytes(files, f"mesh_scan_{scan_num}.zip")
 
 @app.route("/download_slicing")
 def download_slicing():
-    file_path = os.path.join(os.getcwd(), "latest_slices.gcode")
-    return send_file(file_path, as_attachment=True)
+    scan_num = get_latest_scan_number()
+    base = _find_scan_base(scan_num)
+    files = {}
+    if base:
+        slice_dirs = [
+            os.path.join(base, 'slices'),
+            os.path.join(base, 'gcode'),
+            base,
+        ]
+        for d in slice_dirs:
+            if os.path.isdir(d):
+                for fn in os.listdir(d):
+                    if fn.lower().endswith('.gcode'):
+                        fp = os.path.join(d, fn)
+                        try:
+                            with open(fp, 'rb') as f:
+                                rel = f"slices/{fn}" if d != base else fn
+                                files[rel] = f.read()
+                        except Exception:
+                            pass
+    if not files:
+        files['README.txt'] = b'No slicing (.gcode) files were found for this scan.'
+    return _zip_bytes(files, f"slices_scan_{scan_num}.zip")
 
 def simulate_pointcloud_stream():
     import random
@@ -532,6 +646,9 @@ def socket_land_flight():
     update_phase("Landing")
     land_drone()
     emit("command_response", {"status": "ok", "action": "land"})
+    # If Starling is offline, run local post-scan phases so UI doesn't skip directly to Slicing
+    if not is_starling_reachable():
+        start_post_scan_sequence()
 
 
 @socketio.on("emergency_stop")
@@ -540,3 +657,12 @@ def socket_emergency_stop():
     update_phase("Landing")
     land_drone()
     emit("command_response", {"status": "ok", "action": "emergency_land"})
+    if not is_starling_reachable():
+        start_post_scan_sequence()
+
+
+if __name__ == "__main__":
+    # Enable local testing server
+    port = int(os.environ.get("PORT", 5000))
+    # Use eventlet/gevent if available; SocketIO will fall back to Werkzeug in dev
+    socketio.run(app, host="0.0.0.0", port=port, debug=True)
