@@ -393,7 +393,7 @@ function simulatePhase(phase) {
       } else if (data.phase === "Processing") {
         if (pcViewer) {
           pcViewer.style.display = "block";
-      fetchAndShowCombinedPointCloud(0.2); // ~20% of points
+      fetchAndShowCombinedPointCloud(0.02); // ~2% of points
         }
         if (meshViewer) {
           meshViewer.style.display = "none";
