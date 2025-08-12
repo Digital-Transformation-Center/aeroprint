@@ -22,6 +22,43 @@ SIZE_TO_RADIUS = {
     "LG": 3.5
 }
 
+# Phase durations for local/demo flow (seconds)
+PHASE_DURATIONS = {
+    "processing": float(os.environ.get("PHASE_PROCESSING_SEC", 45)),
+    "meshing": float(os.environ.get("PHASE_MESHING_SEC", 20)),
+    "slicing": float(os.environ.get("PHASE_SLICING_SEC", 20)),
+}
+
+_post_scan_thread = None
+
+def start_post_scan_sequence():
+    """After scan completes, step through Processing -> Meshing -> Slicing -> Printing.
+    Holds Processing for ~45s by default to allow pointcloud to load and display.
+    """
+    global _post_scan_thread
+    if _post_scan_thread and _post_scan_thread.is_alive():
+        return
+
+    def _runner():
+        try:
+            # brief settle after landing
+            time.sleep(2)
+            update_phase("Processing")
+            time.sleep(PHASE_DURATIONS["processing"])
+
+            update_phase("Meshing")
+            time.sleep(PHASE_DURATIONS["meshing"])
+
+            update_phase("Slicing")
+            time.sleep(PHASE_DURATIONS["slicing"])
+
+            update_phase("Printing")
+        except Exception as e:
+            print(f"post-scan sequence error: {e}")
+
+    _post_scan_thread = threading.Thread(target=_runner, daemon=True)
+    _post_scan_thread.start()
+
 def is_starling_reachable():
     try:
         param = "-n" if platform.system().lower() == "windows" else "-c"
@@ -389,7 +426,14 @@ def handle_command(data):
     if command == "START":
         new_scan = increment_scan_number()
         print(f"Starting new scan: {new_scan}")
+        # Optionally reflect phases here if desired
+        # update_phase("Takeoff"); time.sleep(3); update_phase("Scanning")
     
+    elif command == "STOP":
+        # Treat STOP as scan complete, initiate post-scan sequence
+        update_phase("Landing")
+        start_post_scan_sequence()
+
     print(f"Received command: {command}, size: {size}, radius: {radius}")
     with open("command.json", "w") as f:
         json.dump({"command": command, "size": size, "radius": radius}, f)
