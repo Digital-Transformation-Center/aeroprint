@@ -24,9 +24,9 @@ SIZE_TO_RADIUS = {
 
 # Phase durations for local/demo flow (seconds)
 PHASE_DURATIONS = {
-    "processing": float(os.environ.get("PHASE_PROCESSING_SEC", 45)),
-    "meshing": float(os.environ.get("PHASE_MESHING_SEC", 20)),
-    "slicing": float(os.environ.get("PHASE_SLICING_SEC", 20)),
+    "processing": float(os.environ.get("PHASE_PROCESSING_SEC", 40)),
+    "meshing": float(os.environ.get("PHASE_MESHING_SEC", 40)),
+    "slicing": float(os.environ.get("PHASE_SLICING_SEC", 40)),
 }
 
 _post_scan_thread = None

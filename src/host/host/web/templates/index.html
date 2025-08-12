@@ -31,7 +31,7 @@
       </div>
 
     <!-- Dev Phase Preview Menu (hidden by default, toggled with Ctrl+Q) -->
-    <div id="dev-phase-menu" style="display:none; position:fixed; bottom:60px; right:24px; z-index:200; background:#222; padding:8px 16px; border-radius:8px; box-shadow:0 2px 8px #00eaff;">
+  <div id="dev-phase-menu" style="display:block; position:fixed; bottom:60px; right:24px; z-index:200; background:#222; padding:8px 16px; border-radius:8px; box-shadow:0 2px 8px #00eaff;">
       <label for="dev-phase" style="color:#b0eaff; font-weight:bold;">Dev Phase Preview:</label>
       <select id="dev-phase" onchange="simulatePhase(this.value)">
         {% for phase in ["Preflight", "Scanning", "Processing", "Meshing", "Slicing", "Printing"] %}
@@ -540,14 +540,7 @@ function simulatePhase(phase) {
       socket.emit('land_flight');
     }
 
-    // Toggle dev menu with Ctrl+Q
-    document.addEventListener('keydown', function(e) {
-      if (e.ctrlKey && (e.key === 'q' || e.key === 'Q')) {
-        const menu = document.getElementById('dev-phase-menu');
-        menu.style.display = (menu.style.display === 'none' || menu.style.display === '') ? 'block' : 'none';
-        e.preventDefault();
-      }
-    });
+  // Dev menu is always visible now (Ctrl+Q toggle removed)
 
     const phaseDescriptions = {
       "Preflight": "📍SELECT A SIZE AND PRESS START TO BEGIN THE SCAN PROCESS. A FLIGHT PATH WILL THEN BE CALCULATED AND LOADED INTO THE DRONE.",
