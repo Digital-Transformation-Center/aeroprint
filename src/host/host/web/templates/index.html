@@ -121,9 +121,13 @@
   </div>
 
   <!-- Dynamic Command Logic -->
-  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.153.0/build/three.min.js"></script>
-  <script>
+  <!-- <script src="https://cdn.socket.io/4.7.5/socket.io.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.153.0/build/three.min.js"></script> -->
+  <script type="module" src="/static/vendor/socket.io-client/socket.io.esm.min.js" crossorigin="anonymous"></script>
+  <script type="module" src="/static/vendor/three/three.module.js"></script>
+  <script type="module">
+    import { io } from '/static/vendor/socket.io-client/socket.io.esm.min.js'
+
     const socket = io();
     let selectedSize = "{{ selected_size }}";  // store size for use during START
     let devProgressInterval = null;
