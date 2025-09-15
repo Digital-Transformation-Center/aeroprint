@@ -89,6 +89,7 @@ RUN echo "source /opt/ros/$ROS_DISTRO/setup.bash" >> /home/$USERNAME/.bashrc && 
 
 # Copy entrypoint.sh and set permissions
 COPY --chown=$USERNAME:$USERNAME exec/entrypoint.sh /home/$USERNAME/entrypoint.sh
+# COPY --chown=$USERNAME:$USERNAME exec/static/ /static/
 RUN chmod +x /home/$USERNAME/entrypoint.sh
 
 USER root

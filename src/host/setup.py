@@ -42,6 +42,15 @@ setup(
             os.path.join("share", package_name, "web", "static", "images"),
             glob(os.path.join("host", "web", "static","images","*.*")),
         ),
+        # Vendor JS libraries
+        (
+            os.path.join("share", package_name, "web", "static", "vendor", "three"),
+            glob(os.path.join("host", "web", "static", "vendor", "three", "*.*")),
+        ),
+        (
+            os.path.join("share", package_name, "web", "static", "vendor", "socket.io-client"),
+            glob(os.path.join("host", "web", "static", "vendor", "socket.io-client", "*.*")),
+        ),
     ],
     install_requires=["setuptools"],
     zip_safe=True,
@@ -72,6 +81,9 @@ setup(
             'web/static/*.js',
             'web/static/flight_config/*.css',
             'web/static/flight_config/*.js',
+            # Vendor assets for local serving
+            'web/static/vendor/three/*.js',
+            'web/static/vendor/socket.io-client/*.js'
 
         ]
     },

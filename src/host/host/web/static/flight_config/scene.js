@@ -1,5 +1,8 @@
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.176.0/build/three.module.js';
-import { io } from 'https://cdn.jsdelivr.net/npm/socket.io-client@4.7.5/dist/socket.io.esm.min.js';
+// import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.176.0/build/three.module.js';
+// Use relative path served by Flask static so host/port/proxy don't matter
+import * as THREE from '/static/vendor/three/three.module.js';
+// import { io } from 'https://cdn.jsdelivr.net/npm/socket.io-client@4.7.5/dist/socket.io.esm.min.js';
+import { io } from '/static/vendor/socket.io-client/socket.io.esm.min.js'
 
 const show_controls = false;
 
