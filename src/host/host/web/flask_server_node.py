@@ -233,24 +233,25 @@ class FlaskWebApp:
             self.node.get_logger().info(f"Size selected: {data.get('size', 'MED')}")
             size = data.get('size', 'MED')
             flight_config = {}
+
             if size == 'SM':
                 flight_config = {
-                    'radius': 0.2,
+                    'radius': 0.25,
                     'height': 0.3,
                     'turns': 2,
                     'startHeight': 0.47
                 }
             elif size == 'MED':
                 flight_config = {
-                    'radius': 0.3,
-                    'height': 0.5,
+                    'radius': 0.35,
+                    'height': 0.35,
                     'turns': 3,
                     'startHeight': 0.47
                 }
             elif size == 'LG':
                 flight_config = {
-                    'radius': 0.4,
-                    'height': 0.6,
+                    'radius': 0.45,
+                    'height': 0.4,
                     'turns': 4,
                     'startHeight': 0.47
                 }
