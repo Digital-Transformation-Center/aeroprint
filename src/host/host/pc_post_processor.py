@@ -123,14 +123,19 @@ class PCPostProcessor(Node):
     def load_pcs(self):
         """Load point clouds from files"""
         self.pcd_list = []  # Clear previous list
-        for filename in os.listdir(self.dump_directory):
+        if not os.path.exists(self.dump_directory):
+            self.get_logger().error("Dump directory does not exist: " + self.dump_directory)
+            raise RuntimeError("Dump directory does not exist.")
+        files = os.listdir(self.dump_directory)
+        self.get_logger().info(f"Files in dump directory: {files}")
+        for filename in files:
             if filename.endswith(".pcd"):
                 pcd_path = os.path.join(self.dump_directory, filename)
                 pcd = o3d.io.read_point_cloud(pcd_path)
                 self.pcd_list.append(pcd)
         if not self.pcd_list:
-            self.get_logger().error("No PCD files found in directory: " + self.dump_directory)
-            raise RuntimeError("No PCD files to process.")
+            self.get_logger().error("No PCD files found in dump directory: " + self.dump_directory)
+            raise RuntimeError("No PCD files found.")
         self.combined_pcd = self.pcd_list[0]
 
     def combine_pcs(self):
