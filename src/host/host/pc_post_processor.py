@@ -122,11 +122,15 @@ class PCPostProcessor(Node):
 
     def load_pcs(self):
         """Load point clouds from files"""
+        self.pcd_list = []  # Clear previous list
         for filename in os.listdir(self.dump_directory):
             if filename.endswith(".pcd"):
                 pcd_path = os.path.join(self.dump_directory, filename)
                 pcd = o3d.io.read_point_cloud(pcd_path)
                 self.pcd_list.append(pcd)
+        if not self.pcd_list:
+            self.get_logger().error("No PCD files found in directory: " + self.dump_directory)
+            raise RuntimeError("No PCD files to process.")
         self.combined_pcd = self.pcd_list[0]
 
     def combine_pcs(self):
@@ -192,6 +196,8 @@ class PCPostProcessor(Node):
         ec = Bool()
         ec.data = True
         self.export_complete_pub.publish(ec)
+        # Show 3D render view
+        o3d.visualization.draw_geometries([self.combined_pcd])
 
 def main(args=None):
     rclpy.init(args=args)
