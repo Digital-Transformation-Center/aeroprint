@@ -236,21 +236,21 @@ class FlaskWebApp:
 
             if size == 'SM':
                 flight_config = {
-                    'radius': 0.25,
+                    'radius': 0.43,
                     'height': 0.3,
                     'turns': 2,
                     'startHeight': 0.47
                 }
             elif size == 'MED':
                 flight_config = {
-                    'radius': 0.35,
+                    'radius': 0.62,
                     'height': 0.35,
                     'turns': 3,
                     'startHeight': 0.47
                 }
             elif size == 'LG':
                 flight_config = {
-                    'radius': 0.45,
+                    'radius': 0.83,
                     'height': 0.4,
                     'turns': 4,
                     'startHeight': 0.47
