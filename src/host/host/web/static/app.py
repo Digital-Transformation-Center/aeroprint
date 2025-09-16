@@ -626,3 +626,4 @@ if __name__ == "__main__":
     monitor_scan_progress()   # Option 3: Monitor based on scan files/commands
     
     socketio.run(app, debug=True, host='0.0.0.0', port=5000)
+    
