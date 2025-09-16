@@ -38,19 +38,18 @@ services:
     volumes:
       - /dev/shm:/dev/shm
       - ../../src/:/home/aeroprint_user/aeroprint/src
-      - ../../data:/var/lib/aeroprint  # Map Windows data directory to container aeroprint directory
+      - /var/lib/aeroprint:/var/lib/aeroprint  # Fixed: Linux path instead of Windows
 
     # Use bridge networking instead of host mode on Windows
-    # ports:
-    #   - "8080:8080"
-    #   - "5000:5000"
+    ports:
+      - "8080:8080"
+      - "5000:5000"
     
     ipc: host
-    network_mode: "host"
 
     # Remove this line and add your webapp startup command:
     # command: tail -f /dev/null
     command: tail -f /dev/null
 
-    # environment:
-    #   - FASTDDS_BUILTIN_TRANSPORTS=UDPv4
+    environment:
+      - FASTDDS_BUILTIN_TRANSPORTS=UDPv4
