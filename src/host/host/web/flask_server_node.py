@@ -236,8 +236,8 @@ class FlaskWebApp:
 
             if size == 'SM':
                 flight_config = {
-                    'radius': 0.43,
-                    'height': 0.3,
+                    'radius': 0.25,
+                    'height': 0.3,                  
                     'turns': 2,
                     'startHeight': 0.47
                 }
